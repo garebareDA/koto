@@ -28,10 +28,27 @@ fn get(content: &str, mut index: usize) -> usize {
     let last_str = content.chars().nth(index).expect("Failed").to_string();
     let mut identifier_str: String = String::new();
 
-    let reg = Regex::new(r"[a-zA-Z]+").expect("Failed to create REGEX");;
+    let reg = Regex::new(r"[a-zA-Z]+").expect("Failed");
     match reg.captures(&last_str){
-        _ => {}
-    }
+        Some(_) => {
+            loop {
+                let text = &content.chars().nth(index).expect("Failed").to_string();
+                let reg = Regex::new(r"(\d[a-zA-Z])+").expect("Failed");
+                let res = match reg.captures(text) {
+                    Some(_) => true,
+                    None => false,
+                };
+
+                if !res { break; }
+                identifier_str += text;
+                index += 1;
+            }
+
+
+        }
+
+        None => {}
+    };
 
     return 0;
 }
