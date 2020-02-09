@@ -4,25 +4,30 @@ use std::io::BufReader;
 use regex::Regex;
 
 fn main() {
-    let index = 0;
+    let mut index = 0;
     let path = "./programs/fuga.koto";
     let file = File::open(path).expect("file not found");
     let mut file_buffer = BufReader::new(&file);
     let mut content = String::new();
     file_buffer.read_to_string(&mut content);
 
-    get(&content, index);
+    let len = content.len();
+    loop{
+        if index >= len {
+            break;
+        }
+
+        let (result, continue_index) = get(&content, index);
+        index = continue_index + 1;
+
+        println!("{}", result);
+    }
 }
 
-fn get(content: &str, mut index: usize) -> usize {
-    let one_char = content.chars().nth(index);
-    while one_char == Some(' ') || one_char == Some('\n') {
-        index += 1;
-    }
-
+fn get(content: &str, mut index: usize) -> (i64, usize) {
     let len = content.len();
-    if index as usize >= len as usize {
-        return 0;
+    if index >= len {
+        return (0, index);
     }
 
     let last_str = content.chars().nth(index).expect("Failed").to_string();
@@ -33,22 +38,26 @@ fn get(content: &str, mut index: usize) -> usize {
         Some(_) => {
             loop {
                 let text = &content.chars().nth(index).expect("Failed").to_string();
-                let reg = Regex::new(r"(\d[a-zA-Z])+").expect("Failed");
+                let reg = Regex::new(r"(\d|[a-zA-Z])+").expect("Failed");
                 let res = match reg.captures(text) {
                     Some(_) => true,
                     None => false,
                 };
 
-                if !res { break; }
+                if !res {
+                    break;
+                }
+
                 identifier_str += text;
                 index += 1;
             }
 
-
+            if identifier_str == "print"{return (- 1, index)}
+            if identifier_str == "fn"{return (- 2, index)}
+            if identifier_str == "if"{return (- 3, index)}
+            if identifier_str == "else"{return (- 4, index)}
         }
-
         None => {}
     };
-
-    return 0;
+    return (0, index);
 }
