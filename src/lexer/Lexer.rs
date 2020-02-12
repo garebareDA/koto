@@ -115,6 +115,7 @@ pub fn get(content: &str, mut index: usize) -> (i64, usize) {
         None => {}
     };
 
+    //コメント
     let reg = Regex::new(r"#").expect("Faild");
     match reg.captures(&last_str) {
         Some(_) => {
