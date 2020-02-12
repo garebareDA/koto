@@ -10,7 +10,8 @@ pub struct Token {
     pub _string: i64,
     pub _number: i64,
     pub _comment: i64,
-    pub _identifier: i64
+    pub _identifier: i64,
+    pub _let: i64,
 }
 
 impl Token {
@@ -25,7 +26,8 @@ impl Token {
             _string: -7,
             _number: -8,
             _comment: -9,
-            _identifier: -10
+            _identifier: -10,
+            _let: -11,
         }
     }
 }

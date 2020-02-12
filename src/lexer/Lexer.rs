@@ -61,6 +61,10 @@ pub fn get(content: &str, mut index: usize) -> (i64, usize) {
                 return (TOKEN._for, index);
             }
 
+            if identifier_str == "let" {
+                return (TOKEN._let, index);
+            }
+
             return (TOKEN._identifier, index);
         }
         None => {}

@@ -25,6 +25,4 @@ fn main() {
         tokens.push(result);
         println!("{}", result);
     }
-
-    
 }
