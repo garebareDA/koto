@@ -13,6 +13,7 @@ fn main() {
     file_buffer.read_to_string(&mut content);
 
     let len = content.len();
+    let mut tokens:Vec<i64> = Vec::new();
     loop {
         if index >= len {
             break;
@@ -21,6 +22,9 @@ fn main() {
         let (result, continue_index) = Lexer::get(&content, index);
 
         index = continue_index;
+        tokens.push(result);
         println!("{}", result);
     }
+
+    
 }

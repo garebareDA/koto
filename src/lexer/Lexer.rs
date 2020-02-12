@@ -1,4 +1,7 @@
 use regex::Regex;
+use super::Token;
+
+static TOKEN:Token::Token = Token::Token::new();
 
 pub fn get(content: &str, mut index: usize) -> (i64, usize) {
     let mut one_char = content.chars().nth(index);
@@ -39,26 +42,26 @@ pub fn get(content: &str, mut index: usize) -> (i64, usize) {
             }
 
             if identifier_str == "print" {
-                return (-1, index);
+                return (TOKEN._print, index);
             }
 
             if identifier_str == "fn" {
-                return (-2, index);
+                return (TOKEN._fun, index);
             }
 
             if identifier_str == "if" {
-                return (-3, index);
+                return (TOKEN._if, index);
             }
 
             if identifier_str == "else" {
-                return (-4, index);
+                return (TOKEN._else, index);
             }
 
             if identifier_str == "for" {
-                return (-5, index);
+                return (TOKEN._for, index);
             }
 
-            return (-10, index);
+            return (TOKEN._identifier, index);
         }
         None => {}
     };
@@ -76,7 +79,7 @@ pub fn get(content: &str, mut index: usize) -> (i64, usize) {
                     break;
                 };
             }
-            return (-6, index + 1);
+            return (TOKEN._string, index + 1);
         }
 
         None => {}
@@ -102,7 +105,7 @@ pub fn get(content: &str, mut index: usize) -> (i64, usize) {
                 index += 1;
             }
 
-            return (-7, index);
+            return (TOKEN._number, index);
         }
 
         None => {}
@@ -121,7 +124,7 @@ pub fn get(content: &str, mut index: usize) -> (i64, usize) {
                 index += 1;
             }
 
-            return(-8, index);
+            return(TOKEN._comment, index);
         }
 
         None => {}
