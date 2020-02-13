@@ -31,3 +31,19 @@ impl Token {
         }
     }
 }
+
+#[derive(Debug)]
+pub struct TokenValue {
+    pub token: i64,
+    pub val: String,
+}
+
+impl TokenValue {
+    pub fn new(token:i64, val:&str) -> TokenValue {
+        let value = val.to_string();
+        TokenValue{
+            token:token,
+            val:value,
+        }
+    }
+}

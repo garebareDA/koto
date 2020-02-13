@@ -3,7 +3,7 @@ use super::Token;
 
 static TOKEN:Token::Token = Token::Token::new();
 
-pub fn get(content: &str, mut index: usize) -> (i64, usize) {
+pub fn get(content: &str, mut index: usize) -> (Token::TokenValue, usize) {
     let mut one_char = content.chars().nth(index);
 
     while one_char == Some('\n') ||  one_char == Some(' '){
@@ -13,15 +13,13 @@ pub fn get(content: &str, mut index: usize) -> (i64, usize) {
 
     let len = content.len();
     if index >= len {
-        return (0, index);
+        return (Token::TokenValue::new(0, ""), index);
     }
 
     //予約語
     let last_str = content.chars().nth(index).expect("Failed").to_string();
     let mut identifier_str: String = String::new();
     let reg = Regex::new(r"[a-zA-Z]+").expect("Failed");
-
-    println!("char:{} index:{}", last_str, index);
 
     match reg.captures(&last_str) {
         Some(_) => {
@@ -42,30 +40,37 @@ pub fn get(content: &str, mut index: usize) -> (i64, usize) {
             }
 
             if identifier_str == "print" {
-                return (TOKEN._print, index);
+                let token_value = Token::TokenValue::new(TOKEN._print, &identifier_str);
+                return (token_value, index);
             }
 
             if identifier_str == "fn" {
-                return (TOKEN._fun, index);
+                let token_value = Token::TokenValue::new(TOKEN._fun, &identifier_str);
+                return (token_value, index);
             }
 
             if identifier_str == "if" {
-                return (TOKEN._if, index);
+                let token_value = Token::TokenValue::new(TOKEN._if, &identifier_str);
+                return (token_value, index);
             }
 
             if identifier_str == "else" {
-                return (TOKEN._else, index);
+                let token_value = Token::TokenValue::new(TOKEN._else, &identifier_str);
+                return (token_value, index);
             }
 
             if identifier_str == "for" {
-                return (TOKEN._for, index);
+                let token_value = Token::TokenValue::new(TOKEN._for, &identifier_str);
+                return (token_value, index);
             }
 
             if identifier_str == "let" {
-                return (TOKEN._let, index);
+                let token_value = Token::TokenValue::new(TOKEN._let, &identifier_str);
+                return (token_value, index);
             }
 
-            return (TOKEN._identifier, index);
+            let token_value = Token::TokenValue::new(TOKEN._identifier, &identifier_str);
+            return (token_value, index);
         }
         None => {}
     };
@@ -74,16 +79,21 @@ pub fn get(content: &str, mut index: usize) -> (i64, usize) {
     let reg = Regex::new(r#"""#).expect("Faild");
     match reg.captures(&last_str) {
         Some(_) => {
-            identifier_str = '"'.to_string();
+            identifier_str = String::new();
             loop {
                 index += 1;
                 let text = &content.chars().nth(index).expect("Failed").to_string();
-                identifier_str += &text;
-                if text == &'"'.to_string() {
+                if text != "\"" {
+                    identifier_str += &text;
+                }
+
+                if text == "\"" {
                     break;
                 };
             }
-            return (TOKEN._string, index + 1);
+
+            let token_value = Token::TokenValue::new(TOKEN._string, &identifier_str);
+            return (token_value, index + 1);
         }
 
         None => {}
@@ -109,7 +119,8 @@ pub fn get(content: &str, mut index: usize) -> (i64, usize) {
                 index += 1;
             }
 
-            return (TOKEN._number, index);
+            let token_value = Token::TokenValue::new(TOKEN._number, &identifier_str);
+            return (token_value, index);
         }
 
         None => {}
@@ -129,12 +140,14 @@ pub fn get(content: &str, mut index: usize) -> (i64, usize) {
                 index += 1;
             }
 
-            return(TOKEN._comment, index);
+            let token_value = Token::TokenValue::new(TOKEN._comment, &identifier_str);
+            return(token_value, index);
         }
 
         None => {}
     }
 
     let ascii_code = content.chars().nth(index).expect("Failed").to_string().as_bytes()[0];
-    return (ascii_code as i64, index + 1);
+    let token_value = Token::TokenValue::new(ascii_code as i64, &last_str);
+    return (token_value, index + 1);
 }
