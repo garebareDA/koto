@@ -2,6 +2,6 @@ print("hello world")
 let a = 2 + 3
 print(a)
 
-fn test() {
+fn test(x) {
 
 }
