@@ -1,5 +1,6 @@
 use koto::lexer::Lexer;
 use koto::lexer::Token;
+use koto::ast::Parsing;
 
 use std::fs::File;
 use std::io::prelude::*;
@@ -27,5 +28,5 @@ fn main() {
         tokens.push(result);
     }
 
-    
+    Parsing::parsing(tokens);
 }
