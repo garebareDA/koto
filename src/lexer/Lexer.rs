@@ -106,7 +106,7 @@ pub fn get(content: &str, mut index: usize) -> (Token::TokenValue, usize) {
             loop {
                 let text = &content.chars().nth(index).expect("Failed").to_string();
                 let reg = Regex::new(r"[0-9.]+").expect("Faild");
-                let res = match reg.captures(&text.to_string()) {
+                let res = match reg.captures(text) {
                     Some(_) => true,
                     None => false,
                 };
@@ -115,7 +115,7 @@ pub fn get(content: &str, mut index: usize) -> (Token::TokenValue, usize) {
                     break;
                 }
 
-                identifier_str += &text.to_string();
+                identifier_str += text;
                 index += 1;
             }
 

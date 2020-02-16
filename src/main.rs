@@ -1,6 +1,7 @@
 use koto::lexer::Lexer;
 use koto::lexer::Token;
 use koto::ast::Parsing;
+use koto::interpreter;
 
 use std::fs::File;
 use std::io::prelude::*;
@@ -30,4 +31,6 @@ fn main() {
 
     let result = Parsing::parsing(&mut tokens);
     println!("{:?}", result);
+
+    interpreter::Interpreter::run(result);
 }
