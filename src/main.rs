@@ -28,5 +28,6 @@ fn main() {
         tokens.push(result);
     }
 
-    Parsing::parsing(tokens);
+    let result = Parsing::parsing(&mut tokens);
+    println!("{:?}", result);
 }
