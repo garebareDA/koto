@@ -1,5 +1,4 @@
 use super::super::ast::Ast;
-use std::clone::Clone;
 
 pub fn run(root: Ast::ExprAST) {
     let mut index = 0;
