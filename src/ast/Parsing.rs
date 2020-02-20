@@ -93,8 +93,26 @@ fn function_call(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
 }
 
 fn calculation(tokens: &mut Vec<Token::TokenValue>) {
+    let mut number_vector:Vec<Ast::Types> = Vec::new();
+    let mut vinary_vector:Vec<Ast::Types> = Vec::new();
+
+
     loop {
-        
+        let token = tokens[0].token;
+        let val = &tokens[0].val;
+        let result = judge(token, val);
+
+        match result {
+            Ast::Types::Binary(_) => {
+                vinary_vector.push(result);
+            },
+            _ => {
+                number_vector.push(result);
+            },
+        }
         tokens.remove(0);
     }
+
+    number_vector.reverse();
+    vinary_vector.reverse();
 }
