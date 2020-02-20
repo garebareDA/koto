@@ -26,6 +26,7 @@ pub fn parsing(tokens: &mut Vec<Token::TokenValue>) -> Ast::ExprAST {
                function.node.push(result_call);
                result = Ast::Types::Call(function);
             },
+
             _ => {}
         }
 
@@ -56,6 +57,12 @@ fn judge(token: i64, string: &str,)-> Ast::Types {
         return number;
     }
 
+    if token == 43 || token == 45 || token == 47 || token == 37{
+        let bin = Ast::BinaryAST::new(string.parse().unwrap());
+        let binary = Ast::Types::Binary(bin);
+        return binary;
+    }
+
     let string = Ast::VariableAST::new(string);
     let variable = Ast::Types::Variable(string);
     return variable;
@@ -83,4 +90,11 @@ fn function_call(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
     }
 
     return result;
+}
+
+fn calculation(tokens: &mut Vec<Token::TokenValue>) {
+    loop {
+        
+        tokens.remove(0);
+    }
 }

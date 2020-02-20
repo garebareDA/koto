@@ -54,6 +54,15 @@ pub struct BinaryAST {
     pub node: Vec<Types>,
 }
 
+impl BinaryAST {
+    pub fn new(binary: char) -> BinaryAST {
+        BinaryAST {
+            op: binary,
+            node: Vec::new(),
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct CallAST {
     pub callee: String,
