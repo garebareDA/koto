@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Types {
     Number(NumberAST),
     Variable(VariableAST),
@@ -17,7 +17,7 @@ impl ExprAST {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NumberAST {
     pub val: i64,
     pub node: Vec<Types>,
@@ -32,7 +32,7 @@ impl NumberAST {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct VariableAST {
     pub name: String,
     pub node: Vec<Types>,
@@ -48,7 +48,7 @@ impl VariableAST {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BinaryAST {
     pub op: char,
     pub node: Vec<Types>,
@@ -63,7 +63,7 @@ impl BinaryAST {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CallAST {
     pub callee: String,
     pub node: Vec<Types>,

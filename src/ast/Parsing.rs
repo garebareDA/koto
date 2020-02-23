@@ -96,9 +96,9 @@ fn function_call(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
     return result;
 }
 
-fn calculation(tokens: &mut Vec<Token::TokenValue>) {
+fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types{
     let mut number_vector:Vec<Ast::Types> = Vec::new();
-    let mut vinary_vector:Vec<Ast::Types> = Vec::new();
+    let mut binary_vector:Vec<Ast::Types> = Vec::new();
 
     loop {
         let token = tokens[0].token;
@@ -107,7 +107,7 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) {
 
         match result {
             Ast::Types::Binary(_) => {
-                vinary_vector.push(result);
+                binary_vector.push(result);
             },
 
             Ast::Types::Number(_)=> {
@@ -122,15 +122,46 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) {
         tokens.remove(0);
     }
 
-    number_vector.reverse();
-    vinary_vector.reverse();
-
-    //後ろからvinaryのnodeに入れていく
-    //[2,2,3]
-    //[+,*]
-
-    println!("{:?}", vinary_vector);
-    println!("{:?}", number_vector);
-
     
+
+    number_vector.reverse();
+    binary_vector.reverse();
+
+    let mut index = 0;
+    let mut ast_temp = Ast::Types::Binary(Ast::BinaryAST::new('+'));
+
+    for binary in binary_vector {
+       let mut number = number_vector[index].clone();
+
+        if index > 0 {
+            match number{
+                Ast::Types::Number(mut numbers) => {
+                    numbers.node.push(ast_temp.clone());
+                    number = Ast::Types::Number(numbers);
+                }
+                _ => {}
+            }
+        }
+
+        match binary {
+            Ast::Types::Binary(mut binary) => {
+                binary.node.push(number.clone());
+                ast_temp = Ast::Types::Binary(binary);
+            }
+            _ => {}
+        }
+
+        index += 1;
+    }
+
+    match ast_temp {
+        Ast::Types::Binary(mut binary) => {
+            binary.node.push(number_vector[index].clone());
+            binary.node.reverse();
+            let ast_binary = Ast::Types::Binary(binary);
+            return ast_binary;
+        }
+
+        _ => { return Ast::Types::Binary(Ast::BinaryAST::new('+'));}
+    }
 }
