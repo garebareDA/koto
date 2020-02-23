@@ -27,6 +27,10 @@ pub fn parsing(tokens: &mut Vec<Token::TokenValue>) -> Ast::ExprAST {
                result = Ast::Types::Call(function);
             },
 
+            Ast::Types::Number(_) => {
+                calculation(tokens);
+            },
+
             _ => {}
         }
 
@@ -57,7 +61,7 @@ fn judge(token: i64, string: &str,)-> Ast::Types {
         return number;
     }
 
-    if token == 43 || token == 45 || token == 47 || token == 37{
+    if token == 43 || token == 45 || token == 47 || token == 37 || token == 42{
         let bin = Ast::BinaryAST::new(string.parse().unwrap());
         let binary = Ast::Types::Binary(bin);
         return binary;
@@ -96,7 +100,6 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) {
     let mut number_vector:Vec<Ast::Types> = Vec::new();
     let mut vinary_vector:Vec<Ast::Types> = Vec::new();
 
-
     loop {
         let token = tokens[0].token;
         let val = &tokens[0].val;
@@ -106,13 +109,28 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) {
             Ast::Types::Binary(_) => {
                 vinary_vector.push(result);
             },
-            _ => {
+
+            Ast::Types::Number(_)=> {
                 number_vector.push(result);
             },
+
+            _ => {
+                break
+            }
         }
+
         tokens.remove(0);
     }
 
     number_vector.reverse();
     vinary_vector.reverse();
+
+    //後ろからvinaryのnodeに入れていく
+    //[2,2,3]
+    //[+,*]
+
+    println!("{:?}", vinary_vector);
+    println!("{:?}", number_vector);
+
+    
 }
