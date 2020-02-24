@@ -190,3 +190,7 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
         _ => { return Ast::Types::Binary(Ast::BinaryAST::new('+'));}
     }
 }
+
+fn variable(tokens: &mut Vec<Token::TokenValue>) {
+    
+}

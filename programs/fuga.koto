@@ -1,4 +1,5 @@
 print("hello world");
 print(10);
+2;
 2 + 2 - 2 * 3 / 13 % 2;
 let a = 20;
