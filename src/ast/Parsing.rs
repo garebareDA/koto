@@ -30,10 +30,6 @@ pub fn parsing(tokens: &mut Vec<Token::TokenValue>) -> Ast::ExprAST {
                 result = calculation(tokens);
             },
 
-            Ast::Types::Variabel(mut vars) => {
-                
-            }
-
             Ast::Types::End(_) => {
                 tokens.remove(0);
                 continue;
@@ -147,6 +143,11 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
         }
 
         tokens.remove(0);
+    }
+
+    if number_vector.len() == 1 {
+        let number = number_vector[0].clone();
+        return number;
     }
 
     number_vector.reverse();
