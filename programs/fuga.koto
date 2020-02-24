@@ -2,3 +2,4 @@ print("hello world");
 print(10);
 let a = 2;
 let b = 1 + 2;
+a;
