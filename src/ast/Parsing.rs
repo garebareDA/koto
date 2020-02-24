@@ -131,9 +131,13 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
                 binary_vector.push(result);
             },
 
-            Ast::Types::Number(_)=> {
+            Ast::Types::Number(_) => {
                 number_vector.push(result);
             },
+
+            Ast::Types::Strings(_) => {
+                number_vector.push(result);
+            }
 
             Ast::Types::End(_) => {
                 break;
@@ -193,5 +197,29 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
 }
 
 fn variable(tokens: &mut Vec<Token::TokenValue>) {
-    
+    let token = tokens[0].token;
+
+    if token == 40 || token == 41 {
+        tokens.remove(0);
+    }
+
+    let mut result = judge(tokens);
+
+    match result {
+        Ast::Types::Call(mut function) => {
+           let result_call = function_call(tokens);
+           function.node.push(result_call);
+           result = Ast::Types::Call(function);
+        },
+
+        Ast::Types::Number(_) => {
+            result = calculation(tokens);
+        },
+
+        Ast::Types::End(_) => {
+            tokens.remove(0);
+        },
+
+        _ => {}
+    }
 }
