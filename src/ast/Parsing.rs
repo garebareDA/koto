@@ -11,14 +11,13 @@ pub fn parsing(tokens: &mut Vec<Token::TokenValue>) -> Ast::ExprAST {
         }
 
         let token = tokens[0].token;
-        let val = &tokens[0].val;
 
         if token == 40 || token == 41 {
             tokens.remove(0);
             continue;
         }
 
-        let mut result = judge(token, val);
+        let mut result = judge(tokens);
 
         match result {
             Ast::Types::Call(mut function) => {
@@ -30,6 +29,10 @@ pub fn parsing(tokens: &mut Vec<Token::TokenValue>) -> Ast::ExprAST {
             Ast::Types::Number(_) => {
                 result = calculation(tokens);
             },
+
+            Ast::Types::Variabel(mut vars) => {
+                
+            }
 
             Ast::Types::End(_) => {
                 tokens.remove(0);
@@ -47,7 +50,10 @@ pub fn parsing(tokens: &mut Vec<Token::TokenValue>) -> Ast::ExprAST {
     return root;
 }
 
-fn judge(token: i64, string: &str,)-> Ast::Types {
+fn judge(tokens: &mut Vec<Token::TokenValue>)-> Ast::Types {
+    let token = tokens[0].token;
+    let string = tokens[0].val.clone();
+
     if token == -6 {
         let print = Ast::CallAST::new("print");
         let call = Ast::Types::Call(print);
@@ -55,7 +61,7 @@ fn judge(token: i64, string: &str,)-> Ast::Types {
     }
 
     if token == -7 {
-        let string = Ast::StringAST::new(string);
+        let string = Ast::StringAST::new(&string);
         let variable = Ast::Types::Strings(string);
         return variable;
     }
@@ -79,7 +85,17 @@ fn judge(token: i64, string: &str,)-> Ast::Types {
         return end;
     }
 
-    let string = Ast::StringAST::new(string);
+    if token == -11 {
+        tokens.remove(0);
+        let string = tokens[0].val.clone();
+
+        let variable = Ast::VariableAST::new(&string);
+        let variable = Ast::Types::Variabel(variable);
+        tokens.remove(0);
+        return variable;
+    }
+
+    let string = Ast::StringAST::new(&string);
     let variable = Ast::Types::Strings(string);
     return variable;
 }
@@ -90,7 +106,6 @@ fn function_call(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
 
     loop {
         let token = tokens[0].token;
-        let val = &tokens[0].val;
 
         if token == 40{
             tokens.remove(0);
@@ -101,7 +116,7 @@ fn function_call(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
             break;
         }
 
-        result = judge(token, val);
+        result = judge(tokens);
         tokens.remove(0);
     }
 
@@ -113,9 +128,7 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
     let mut binary_vector:Vec<Ast::Types> = Vec::new();
 
     loop {
-        let token = tokens[0].token;
-        let val = &tokens[0].val;
-        let result = judge(token, val);
+        let result = judge(tokens);
 
         match result {
             Ast::Types::Binary(_) => {
