@@ -25,7 +25,7 @@ fn function_run(call_ast: &Ast::CallAST) {
     if callee == "print" {
         let value = &call_ast.node[0];
         match value {
-            Ast::Types::Variable(value) => {
+            Ast::Types::Strings(value) => {
                 println!("{}",value.name);
             },
 

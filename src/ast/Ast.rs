@@ -1,7 +1,7 @@
 #[derive(Debug, Clone)]
 pub enum Types {
     Number(NumberAST),
-    Variable(VariableAST),
+    Strings(StringAST),
     Binary(BinaryAST),
     Call(CallAST),
     End(EndAST),
@@ -34,15 +34,15 @@ impl NumberAST {
 }
 
 #[derive(Debug, Clone)]
-pub struct VariableAST {
+pub struct StringAST {
     pub name: String,
     pub node: Vec<Types>,
 }
 
-impl VariableAST {
-    pub fn new(string: &str) -> VariableAST {
+impl StringAST {
+    pub fn new(string: &str) -> StringAST {
         let string = string.to_string();
-        VariableAST{
+        StringAST{
             name: string,
             node:Vec::new(),
         }

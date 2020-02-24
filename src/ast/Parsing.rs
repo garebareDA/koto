@@ -34,7 +34,7 @@ pub fn parsing(tokens: &mut Vec<Token::TokenValue>) -> Ast::ExprAST {
             Ast::Types::End(_) => {
                 tokens.remove(0);
                 continue;
-            }
+            },
 
             _ => {}
         }
@@ -55,8 +55,8 @@ fn judge(token: i64, string: &str,)-> Ast::Types {
     }
 
     if token == -7 {
-        let string = Ast::VariableAST::new(string);
-        let variable = Ast::Types::Variable(string);
+        let string = Ast::StringAST::new(string);
+        let variable = Ast::Types::Strings(string);
         return variable;
     }
 
@@ -79,14 +79,14 @@ fn judge(token: i64, string: &str,)-> Ast::Types {
         return end;
     }
 
-    let string = Ast::VariableAST::new(string);
-    let variable = Ast::Types::Variable(string);
+    let string = Ast::StringAST::new(string);
+    let variable = Ast::Types::Strings(string);
     return variable;
 }
 
 fn function_call(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
-    let string = Ast::VariableAST::new("");
-    let mut result = Ast::Types::Variable(string);
+    let string = Ast::StringAST::new("");
+    let mut result = Ast::Types::Strings(string);
 
     loop {
         let token = tokens[0].token;
