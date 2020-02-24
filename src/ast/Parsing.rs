@@ -30,6 +30,12 @@ pub fn parsing(tokens: &mut Vec<Token::TokenValue>) -> Ast::ExprAST {
                 result = calculation(tokens);
             },
 
+            Ast::Types::Variabel(mut var) => {
+                let result_var = variable(tokens);
+                var.node.push(result_var);
+                result = Ast::Types::Variabel(var);
+            }
+
             Ast::Types::End(_) => {
                 tokens.remove(0);
                 continue;
@@ -84,7 +90,6 @@ fn judge(tokens: &mut Vec<Token::TokenValue>)-> Ast::Types {
     if token == -11 {
         tokens.remove(0);
         let string = tokens[0].val.clone();
-
         let variable = Ast::VariableAST::new(&string);
         let variable = Ast::Types::Variabel(variable);
         tokens.remove(0);
@@ -196,7 +201,7 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
     }
 }
 
-fn variable(tokens: &mut Vec<Token::TokenValue>) {
+fn variable(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
     let token = tokens[0].token;
 
     if token == 40 || token == 41 {
@@ -206,20 +211,12 @@ fn variable(tokens: &mut Vec<Token::TokenValue>) {
     let mut result = judge(tokens);
 
     match result {
-        Ast::Types::Call(mut function) => {
-           let result_call = function_call(tokens);
-           function.node.push(result_call);
-           result = Ast::Types::Call(function);
-        },
-
         Ast::Types::Number(_) => {
-            result = calculation(tokens);
-        },
-
-        Ast::Types::End(_) => {
-            tokens.remove(0);
+           result = calculation(tokens);
         },
 
         _ => {}
     }
+
+    return result;
 }

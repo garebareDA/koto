@@ -1,3 +1,4 @@
 print("hello world");
 print(10);
-2;
+let a = 2;
+let b = 1 + 2;
