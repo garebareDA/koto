@@ -4,6 +4,7 @@ pub enum Types {
     Variable(VariableAST),
     Binary(BinaryAST),
     Call(CallAST),
+    End(EndAST),
 }
 
 #[derive(Debug)]
@@ -75,6 +76,19 @@ impl CallAST {
         CallAST {
             callee: string,
             node: Vec::new(),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct EndAST {
+    pub end: String,
+}
+
+impl EndAST {
+    pub fn new() -> Self {
+        EndAST {
+            end: "end".to_string(),
         }
     }
 }

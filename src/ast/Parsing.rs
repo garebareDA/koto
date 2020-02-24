@@ -28,13 +28,19 @@ pub fn parsing(tokens: &mut Vec<Token::TokenValue>) -> Ast::ExprAST {
             },
 
             Ast::Types::Number(_) => {
-                calculation(tokens);
+                result = calculation(tokens);
             },
+
+            Ast::Types::End(_) => {
+                tokens.remove(0);
+                continue;
+            }
 
             _ => {}
         }
 
         root.node.push(result);
+
         tokens.remove(0);
     }
 
@@ -67,6 +73,12 @@ fn judge(token: i64, string: &str,)-> Ast::Types {
         return binary;
     }
 
+    if token == 59 {
+        let end = Ast::EndAST::new();
+        let end = Ast::Types::End(end);
+        return end;
+    }
+
     let string = Ast::VariableAST::new(string);
     let variable = Ast::Types::Variable(string);
     return variable;
@@ -96,7 +108,7 @@ fn function_call(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
     return result;
 }
 
-fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types{
+fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
     let mut number_vector:Vec<Ast::Types> = Vec::new();
     let mut binary_vector:Vec<Ast::Types> = Vec::new();
 
@@ -114,15 +126,15 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types{
                 number_vector.push(result);
             },
 
-            _ => {
-                break
-            }
+            Ast::Types::End(_) => {
+                break;
+            },
+
+            _ =>{}
         }
 
         tokens.remove(0);
     }
-
-    
 
     number_vector.reverse();
     binary_vector.reverse();
