@@ -63,6 +63,11 @@ fn calculation(ast: Ast::Types) {
     match ast {
         Ast::Types::Binary(binary) => {
             let op = binary.op;
+            println!("{:?}", binary);
+            if op == '%'{
+
+            }
+
             if op == '*' {
 
             }
@@ -71,17 +76,19 @@ fn calculation(ast: Ast::Types) {
 
             }
 
-            if op == '%'{
+            if op == '-' {
 
             }
 
             if op == '+' {
-
+                match binary.node[1].clone() {
+                    Ast::Types::Number(num) => {
+                        
+                    }
+                    _ => {}
+                }
             }
 
-            if op == '-' {
-
-            }
         },
 
         _ => {}
