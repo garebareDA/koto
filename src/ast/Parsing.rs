@@ -93,6 +93,7 @@ fn judge(tokens: &mut Vec<Token::TokenValue>)-> Ast::Types {
         let variable = Ast::VariableAST::new(&string);
         let variable = Ast::Types::Variabel(variable);
         tokens.remove(0);
+        tokens.remove(0);
         return variable;
     }
 
