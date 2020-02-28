@@ -15,13 +15,30 @@ pub fn run(root: Ast::ExprAST) {
             },
 
             Ast::Types::Variabel(var) => {
-                println!("{:?}", var);
                 variable(var.node[0].clone());
             },
             _ => {}
         }
 
         index += 1;
+    }
+}
+
+fn variable(variable: Ast::Types) {
+    match variable {
+        Ast::Types::Binary(_) => {
+            calculation(variable);
+        },
+
+        Ast::Types::Number(num) => {
+            println!("{:?}", num);
+        },
+
+        Ast::Types::Strings(strings) => {
+            println!("{:?}", strings);
+        },
+
+        _ => {}
     }
 }
 
@@ -42,25 +59,31 @@ fn function_run(call_ast: &Ast::CallAST) {
     }
 }
 
-fn variable(variable: Ast::Types) {
-    match variable {
-        Ast::Types::Binary(_) => {
-            calculation(variable);
-        },
-
-        Ast::Types::Number(num) => {
-            println!("{:?}", num);
-        },
-        _ => {}
-    }
-}
-
 fn calculation(ast: Ast::Types) {
     match ast {
         Ast::Types::Binary(binary) => {
             let op = binary.op;
-            println!("{}", op);
+            if op == '*' {
+
+            }
+
+            if op == '/'{
+
+            }
+
+            if op == '%'{
+
+            }
+
+            if op == '+' {
+
+            }
+
+            if op == '-' {
+
+            }
         },
+
         _ => {}
     }
 }
