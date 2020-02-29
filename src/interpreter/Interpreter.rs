@@ -1,4 +1,5 @@
 use super::super::ast::Ast;
+use super::Arithmetic;
 
 pub fn run(root: Ast::ExprAST) {
     let mut index = 0;
@@ -62,29 +63,8 @@ fn function_run(call_ast: &Ast::CallAST) {
 fn calculation(ast: Ast::Types) {
     match ast {
         Ast::Types::Binary(binary) => {
-            let op = binary.op;
-            if op == '%' {
-
-            }
-
-            if op == '*' {
-
-            }
-
-            if op == '/' {
-
-            }
-
-            if op == '-' {
-
-            }
-
-            if op == '+' {
-
-            }
-
+            Arithmetic::common(binary);
         },
-
         _ => {}
     }
 }
