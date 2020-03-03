@@ -16,7 +16,10 @@ pub fn run(root: Ast::ExprAST) {
             },
 
             Ast::Types::Variabel(var) => {
-                variable(var.node[0].clone());
+                let var_contents = variable(var.node[0].clone());
+                println!("{:?}", var_contents);
+                println!("{}", var.name);
+                
             },
             _ => {}
         }
@@ -25,21 +28,13 @@ pub fn run(root: Ast::ExprAST) {
     }
 }
 
-fn variable(variable: Ast::Types) {
+fn variable(variable: Ast::Types) -> Ast::Types {
     match variable {
         Ast::Types::Binary(_) => {
-            calculation(variable);
+            return calculation(variable);
         },
 
-        Ast::Types::Number(num) => {
-            println!("{:?}", num);
-        },
-
-        Ast::Types::Strings(strings) => {
-            println!("{:?}", strings);
-        },
-
-        _ => {}
+        _ => {return variable;}
     }
 }
 
@@ -60,11 +55,14 @@ fn function_run(call_ast: &Ast::CallAST) {
     }
 }
 
-fn calculation(ast: Ast::Types) {
+fn calculation(ast: Ast::Types) -> Ast::Types {
     match ast {
         Ast::Types::Binary(binary) => {
-            Arithmetic::common(binary);
+            return Arithmetic::common(binary);
         },
-        _ => {}
+        _ => {
+            //TODO エラーのenumを返す
+            return Ast::Types::Binary(Ast::BinaryAST::new('+'))
+        }
     }
 }

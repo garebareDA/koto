@@ -1,6 +1,6 @@
 use super::super::ast::Ast;
 
-pub fn common(bin: Ast::BinaryAST) {
+pub fn common(bin: Ast::BinaryAST) -> Ast::Types {
     let op = bin.op;
     let node = bin.node[0].clone();
     let mut next_node = bin.node[1].clone();
@@ -58,7 +58,7 @@ pub fn common(bin: Ast::BinaryAST) {
     }
 
     next_node = calculattions(next_node, 2);
-    println!("{:?}", next_node);
+    return next_node;
 }
 
 fn match_type(node:Ast::Types, next_node:Ast::Types) -> (Vec<i64>, Vec<Ast::Types>) {
