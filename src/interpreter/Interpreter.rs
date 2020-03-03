@@ -4,6 +4,8 @@ use super::Arithmetic;
 pub fn run(root: Ast::ExprAST) {
     let mut index = 0;
     let len = root.node.len();
+    let mut vec_variable:Vec<Ast::Types> = Vec::new();
+
     loop {
         if index >= len {
             break;
@@ -12,14 +14,14 @@ pub fn run(root: Ast::ExprAST) {
         let node = &root.node[index];
         match node {
             Ast::Types::Call(function) => {
-                function_run(function);
+                function_run(function, &vec_variable);
             },
 
             Ast::Types::Variabel(var) => {
                 let var_contents = variable(var.node[0].clone());
-                println!("{:?}", var_contents);
-                println!("{}", var.name);
-                
+                let mut var_ast = Ast::VariableAST::new(&var.name);
+                var_ast.node.push(var_contents);
+                vec_variable.push(Ast::Types::Variabel(var_ast));
             },
             _ => {}
         }
@@ -38,7 +40,7 @@ fn variable(variable: Ast::Types) -> Ast::Types {
     }
 }
 
-fn function_run(call_ast: &Ast::CallAST) {
+fn function_run(call_ast: &Ast::CallAST, variable: &Vec<Ast::Types>) {
     let callee = call_ast.callee.clone();
     if callee == "print" {
         let value = &call_ast.node[0];
@@ -49,6 +51,11 @@ fn function_run(call_ast: &Ast::CallAST) {
 
             Ast::Types::Number(number) => {
                 println!("{}", number.val);
+            }
+
+            Ast::Types::Variabel(var) => {
+                let result = serch_variable(variable, &var.name);
+                println!("{}", result);
             }
             _ => {}
         }
@@ -65,4 +72,34 @@ fn calculation(ast: Ast::Types) -> Ast::Types {
             return Ast::Types::Binary(Ast::BinaryAST::new('+'))
         }
     }
+}
+
+fn serch_variable(ast_vec: &Vec<Ast::Types>, serch_word: &str) -> String {
+    for ast in ast_vec {
+        match ast {
+            Ast::Types::Variabel(var) => {
+                if var.name == serch_word.to_string() {
+                    match var.node[0].clone() {
+                        Ast::Types::Strings(strings) => {
+                            return strings.name.clone();
+                        }
+
+                        Ast::Types::Number(num) => {
+                            return num.val.to_string();
+                        }
+
+                        Ast::Types::Variabel(var) => {
+                            let var_name = var.name;
+                            return serch_variable(&ast_vec, &var_name);
+                        }
+                        _ => {}
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+
+    //TODO エラーのenumを返す
+    return "error".to_string();
 }

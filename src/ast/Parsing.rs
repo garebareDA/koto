@@ -64,8 +64,8 @@ fn judge(tokens: &mut Vec<Token::TokenValue>)-> Ast::Types {
 
     if token == -7 {
         let string = Ast::StringAST::new(&string);
-        let variable = Ast::Types::Strings(string);
-        return variable;
+        let strings = Ast::Types::Strings(string);
+        return strings;
     }
 
     if token == -8 {
@@ -73,6 +73,22 @@ fn judge(tokens: &mut Vec<Token::TokenValue>)-> Ast::Types {
         let num = Ast::NumberAST::new(num);
         let number = Ast::Types::Number(num);
         return number;
+    }
+
+    if token == -10 {
+        let variable = Ast::VariableAST::new(&string);
+        let variable = Ast::Types::Variabel(variable);
+        return variable;
+    }
+
+    if token == -11 {
+        tokens.remove(0);
+        let string = tokens[0].val.clone();
+        let variable = Ast::VariableAST::new(&string);
+        let variable = Ast::Types::Variabel(variable);
+        tokens.remove(0);
+        tokens.remove(0);
+        return variable;
     }
 
     if token == 43 || token == 45 || token == 47 || token == 37 || token == 42{
@@ -87,19 +103,8 @@ fn judge(tokens: &mut Vec<Token::TokenValue>)-> Ast::Types {
         return end;
     }
 
-    if token == -11 {
-        tokens.remove(0);
-        let string = tokens[0].val.clone();
-        let variable = Ast::VariableAST::new(&string);
-        let variable = Ast::Types::Variabel(variable);
-        tokens.remove(0);
-        tokens.remove(0);
-        return variable;
-    }
-
     let variable = Ast::VariableAST::new(&string);
     let variable = Ast::Types::Variabel(variable);
-    tokens.remove(0);
     return variable;
 }
 

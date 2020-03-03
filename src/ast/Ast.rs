@@ -1,4 +1,6 @@
 #[derive(Debug, Clone)]
+//TODO 取り出すメソッドを追加する
+//TODO エラーのenumを追加する
 pub enum Types {
     Number(NumberAST),
     Strings(StringAST),
