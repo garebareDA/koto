@@ -8,6 +8,7 @@ pub enum Types {
     Call(CallAST),
     Variabel(VariableAST),
     End(EndAST),
+    Error(ErrorAST)
 }
 
 #[derive(Debug)]
@@ -107,6 +108,19 @@ impl EndAST {
     pub fn new() -> Self {
         EndAST {
             end: "end".to_string(),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ErrorAST {
+    pub error: String,
+}
+
+impl ErrorAST {
+    pub fn new(error: &str) -> Self{
+        ErrorAST{
+            error:error.to_string(),
         }
     }
 }
