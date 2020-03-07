@@ -91,6 +91,7 @@ fn serch_variable(ast_vec: &Vec<Ast::Types>, serch_word: &str) -> String {
                             let var_name = var.name;
                             return serch_variable(&ast_vec, &var_name);
                         }
+
                         _ => {}
                     }
                 }
