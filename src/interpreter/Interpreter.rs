@@ -68,8 +68,7 @@ fn calculation(ast: Ast::Types) -> Ast::Types {
             return Arithmetic::common(binary);
         },
         _ => {
-            //TODO エラーのenumを返す
-            return Ast::Types::Binary(Ast::BinaryAST::new('+'))
+            return Ast::Types::Error(Ast::ErrorAST::new("Binary Error"));
         }
     }
 }
@@ -100,6 +99,5 @@ fn serch_variable(ast_vec: &Vec<Ast::Types>, serch_word: &str) -> String {
         }
     }
 
-    //TODO エラーのenumを返す
     return "error".to_string();
 }
