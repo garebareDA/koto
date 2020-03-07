@@ -56,6 +56,10 @@ fn judge(tokens: &mut Vec<Token::TokenValue>)-> Ast::Types {
     let token = tokens[0].token;
     let string = tokens[0].val.clone();
 
+    if token == -1 {
+        //if文の実装を何とかする
+    }
+
     if token == -6 {
         let print = Ast::CallAST::new("print");
         let call = Ast::Types::Call(print);

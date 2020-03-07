@@ -5,3 +5,9 @@ let c = "hello world";
 print(a);
 print(b);
 print(c);
+
+if 9<0 {
+    
+}
+
+print(a);
