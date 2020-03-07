@@ -61,30 +61,6 @@ pub fn common(bin: Ast::BinaryAST) -> Ast::Types {
     return next_node;
 }
 
-fn match_type(node: Ast::Types, next_node: Ast::Types) -> (Vec<i64>, Vec<Ast::Types>) {
-    let mut numbers: Vec<i64> = Vec::new();
-    let mut types: Vec<Ast::Types> = Vec::new();
-
-    match node {
-        Ast::Types::Number(num) => {
-            numbers.push(num.val);
-        }
-        _ => {}
-    }
-
-    match next_node {
-        Ast::Types::Number(num) => {
-            numbers.push(num.val);
-            if !num.node.is_empty() {
-                types.push(num.node[0].clone());
-            }
-        }
-        _ => {}
-    }
-
-    return (numbers, types);
-}
-
 fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
     let mut number_a = 0;
     let mut node_first = Ast::Types::Error(Ast::ErrorAST::new("variable error"));
@@ -115,57 +91,27 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
             let number_b = num.val;
             if bin == '%' && select_binary == 1 {
                 let result = modulo(number_a, number_b);
-                if num.node.is_empty() {
-                    let ast = Ast::NumberAST::new(result);
-                    return Ast::Types::Number(ast);
-                }
-                let number_type = calculattions_common(result, num);
-                let number_result = calculattions(number_type, select_binary);
-                return number_result;
+                return calculattions_continue(num, result, select_binary);
             }
 
             if bin == '*' && select_binary == 1 {
                 let result = multiplication(number_a, number_b);
-                if num.node.is_empty() {
-                    let ast = Ast::NumberAST::new(result);
-                    return Ast::Types::Number(ast);
-                }
-                let number_type = calculattions_common(result, num);
-                let number_result = calculattions(number_type, select_binary);
-                return number_result;
+                return calculattions_continue(num, result, select_binary);
             }
 
             if bin == '/' && select_binary == 1 {
                 let result = division(number_a, number_b);
-                if num.node.is_empty() {
-                    let ast = Ast::NumberAST::new(result);
-                    return Ast::Types::Number(ast);
-                }
-                let number_type = calculattions_common(result, num);
-                let number_result = calculattions(number_type, select_binary);
-                return number_result;
+                return calculattions_continue(num, result, select_binary);
             }
 
             if bin == '-' && select_binary == 2 {
                 let result = minus(number_a, number_b);
-                if num.node.is_empty() {
-                    let ast = Ast::NumberAST::new(result);
-                    return Ast::Types::Number(ast);
-                }
-                let number_type = calculattions_common(result, num);
-                let number_result = calculattions(number_type, select_binary);
-                return number_result;
+                return calculattions_continue(num, result, select_binary);
             }
 
             if bin == '+' && select_binary == 2 {
                 let result = plus(number_a, number_b);
-                if num.node.is_empty() {
-                    let ast = Ast::NumberAST::new(result);
-                    return Ast::Types::Number(ast);
-                }
-                let number_type = calculattions_common(result, num);
-                let number_result = calculattions(number_type, select_binary);
-                return number_result;
+                return calculattions_continue(num, result, select_binary);
             }
 
             if !num.node.is_empty() {
@@ -193,6 +139,40 @@ fn calculattions_common(num: i64, ast: Ast::NumberAST) -> Ast::Types {
     let node_number = ast.node[0].clone();
     number_ast.node.push(node_number);
     return Ast::Types::Number(number_ast);
+}
+
+fn calculattions_continue(num:Ast::NumberAST, result:i64, select_binary:i64) -> Ast::Types {
+    if num.node.is_empty() {
+        let ast = Ast::NumberAST::new(result);
+        return Ast::Types::Number(ast);
+    }
+    let number_type = calculattions_common(result, num);
+    let number_result = calculattions(number_type, select_binary);
+    return number_result;
+}
+
+fn match_type(node: Ast::Types, next_node: Ast::Types) -> (Vec<i64>, Vec<Ast::Types>) {
+    let mut numbers: Vec<i64> = Vec::new();
+    let mut types: Vec<Ast::Types> = Vec::new();
+
+    match node {
+        Ast::Types::Number(num) => {
+            numbers.push(num.val);
+        }
+        _ => {}
+    }
+
+    match next_node {
+        Ast::Types::Number(num) => {
+            numbers.push(num.val);
+            if !num.node.is_empty() {
+                types.push(num.node[0].clone());
+            }
+        }
+        _ => {}
+    }
+
+    return (numbers, types);
 }
 
 fn modulo(a: i64, b: i64) -> i64 {
