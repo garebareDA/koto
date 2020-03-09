@@ -17,34 +17,15 @@ pub fn parsing(tokens: &mut Vec<Token::TokenValue>) -> Ast::ExprAST {
             continue;
         }
 
-        let mut result = judge(tokens);
-
-        match result {
-            Ast::Types::Call(mut function) => {
-               let result_call = function_call(tokens);
-               function.node.push(result_call);
-               result = Ast::Types::Call(function);
-            },
-
-            Ast::Types::Number(_) => {
-                result = calculation(tokens);
-            },
-
-            Ast::Types::Variabel(mut var) => {
-                let result_var = variable(tokens);
-                var.node.push(result_var);
-                result = Ast::Types::Variabel(var);
+        match scope(tokens) {
+            Some(types) => {
+                root.node.push(types);
             }
 
-            Ast::Types::End(_) => {
-                tokens.remove(0);
+            None => {
                 continue;
-            },
-
-            _ => {}
+            }
         }
-
-        root.node.push(result);
 
         tokens.remove(0);
     }
@@ -232,6 +213,33 @@ fn variable(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
     return result;
 }
 
-fn scope() {
-    
+fn scope(tokens: &mut Vec<Token::TokenValue>) -> Option<Ast::Types> {
+    let mut result = judge(tokens);
+    match result {
+        Ast::Types::Call(mut function) => {
+           let result_call = function_call(tokens);
+           function.node.push(result_call);
+           result = Ast::Types::Call(function);
+           return Some(result);
+        },
+
+        Ast::Types::Number(_) => {
+            result = calculation(tokens);
+            return Some(result);
+        },
+
+        Ast::Types::Variabel(mut var) => {
+            let result_var = variable(tokens);
+            var.node.push(result_var);
+            result = Ast::Types::Variabel(var);
+            return Some(result);
+        }
+
+        Ast::Types::End(_) => {
+            tokens.remove(0);
+        },
+
+        _ => {tokens.remove(0);}
+    }
+    return None;
 }
