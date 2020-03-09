@@ -231,3 +231,7 @@ fn variable(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
 
     return result;
 }
+
+fn scope() {
+    
+}

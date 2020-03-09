@@ -1,12 +1,11 @@
 #[derive(Debug, Clone)]
-//TODO 取り出すメソッドを追加する
-//TODO エラーのenumを追加する
 pub enum Types {
     Number(NumberAST),
     Strings(StringAST),
     Binary(BinaryAST),
     Call(CallAST),
     Variabel(VariableAST),
+    If(IfAST),
     End(EndAST),
     Error(ErrorAST)
 }
@@ -95,6 +94,20 @@ impl VariableAST {
         VariableAST {
             name: string,
             node: Vec::new(),
+        }
+    }
+}
+#[derive(Debug, Clone)]
+pub struct IfAST {
+    pub judge:Vec<Types>,
+    pub node: Vec<Types>,
+}
+
+impl IfAST{
+    pub fn new(judge: Vec<Types>) -> IfAST {
+        IfAST{
+            judge: judge,
+            node:Vec::new(),
         }
     }
 }
