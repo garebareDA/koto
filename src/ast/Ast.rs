@@ -6,6 +6,7 @@ pub enum Types {
     Call(CallAST),
     Variabel(VariableAST),
     If(IfAST),
+    Scope(ScopeAST),
     End(EndAST),
     Error(ErrorAST)
 }
@@ -108,6 +109,19 @@ impl IfAST{
         IfAST{
             judge: judge,
             node:Vec::new(),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ScopeAST {
+    pub scope: char,
+}
+
+impl ScopeAST {
+    pub fn new(scope: char) -> ScopeAST {
+        ScopeAST{
+            scope:scope
         }
     }
 }

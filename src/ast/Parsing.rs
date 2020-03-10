@@ -6,7 +6,7 @@ pub fn parsing(tokens: &mut Vec<Token::TokenValue>) -> Ast::ExprAST {
     let mut root = Ast::ExprAST::new();
 
     loop {
-        if tokens.is_empty(){
+        if tokens.is_empty() {
             break;
         }
 
@@ -33,12 +33,18 @@ pub fn parsing(tokens: &mut Vec<Token::TokenValue>) -> Ast::ExprAST {
     return root;
 }
 
-fn judge(tokens: &mut Vec<Token::TokenValue>)-> Ast::Types {
+fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
     let token = tokens[0].token;
     let string = tokens[0].val.clone();
 
     if token == -1 {
-        //if文の実装を何とかする
+        tokens.remove(0);
+        let result = calculation(tokens);
+        let mut result_vec: Vec<Ast::Types> = Vec::new();
+        result_vec.push(result);
+        let mut if_ast = Ast::IfAST::new(result_vec);
+
+        return Ast::Types::If(if_ast);
     }
 
     if token == -6 {
@@ -76,8 +82,25 @@ fn judge(tokens: &mut Vec<Token::TokenValue>)-> Ast::Types {
         return variable;
     }
 
-    if token == 43 || token == 45 || token == 47 || token == 37 || token == 42{
+    if token == 43 || token == 45 || token == 47 || token == 37 || token == 42 {
         let bin = Ast::BinaryAST::new(string.parse().unwrap());
+        let binary = Ast::Types::Binary(bin);
+        return binary;
+    }
+
+    if token == 60 || token == 62 || token == 124 || token == 61 || token == 33 || token == 38 {
+        let mut bin = Ast::BinaryAST::new(string.parse().unwrap());
+
+        let token = tokens[1].token;
+
+        if token == 61 || token == 38 || token == 124 {
+            tokens.remove(0);
+            let string = tokens[0].val.clone();
+            let in_binary = Ast::BinaryAST::new(string.parse().unwrap());
+            let in_binary = Ast::Types::Binary(in_binary);
+            bin.node.push(in_binary);
+        }
+
         let binary = Ast::Types::Binary(bin);
         return binary;
     }
@@ -86,6 +109,12 @@ fn judge(tokens: &mut Vec<Token::TokenValue>)-> Ast::Types {
         let end = Ast::EndAST::new();
         let end = Ast::Types::End(end);
         return end;
+    }
+
+    if token == 123 || token == 125 {
+        let scope_ast = Ast::ScopeAST::new(string.chars().nth(0).unwrap());
+        let scope = Ast::Types::Scope(scope_ast);
+        return scope;
     }
 
     let variable = Ast::VariableAST::new(&string);
@@ -100,12 +129,12 @@ fn function_call(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
     loop {
         let token = tokens[0].token;
 
-        if token == 40{
+        if token == 40 {
             tokens.remove(0);
             continue;
         }
 
-        if token == 41{
+        if token == 41 {
             break;
         }
 
@@ -117,8 +146,8 @@ fn function_call(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
 }
 
 fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
-    let mut number_vector:Vec<Ast::Types> = Vec::new();
-    let mut binary_vector:Vec<Ast::Types> = Vec::new();
+    let mut number_vector: Vec<Ast::Types> = Vec::new();
+    let mut binary_vector: Vec<Ast::Types> = Vec::new();
 
     loop {
         let result = judge(tokens);
@@ -126,21 +155,25 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
         match result {
             Ast::Types::Binary(_) => {
                 binary_vector.push(result);
-            },
+            }
 
             Ast::Types::Number(_) => {
                 number_vector.push(result);
-            },
+            }
 
             Ast::Types::Strings(_) => {
                 number_vector.push(result);
             }
 
+            Ast::Types::Scope(_) => {
+                break;
+            }
+
             Ast::Types::End(_) => {
                 break;
-            },
+            }
 
-            _ =>{}
+            _ => {}
         }
 
         tokens.remove(0);
@@ -158,10 +191,10 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
     let mut ast_temp = Ast::Types::Binary(Ast::BinaryAST::new('+'));
 
     for binary in binary_vector {
-       let mut number = number_vector[index].clone();
+        let mut number = number_vector[index].clone();
 
         if index > 0 {
-            match number{
+            match number {
                 Ast::Types::Number(mut numbers) => {
                     numbers.node.push(ast_temp.clone());
                     number = Ast::Types::Number(numbers);
@@ -189,7 +222,7 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
             return ast_binary;
         }
 
-        _ => { return Ast::Types::Binary(Ast::BinaryAST::new('+'));}
+        _ => return Ast::Types::Error(Ast::ErrorAST::new("Binary parsing error")),
     }
 }
 
@@ -204,8 +237,8 @@ fn variable(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
 
     match result {
         Ast::Types::Number(_) => {
-           result = calculation(tokens);
-        },
+            result = calculation(tokens);
+        }
 
         _ => {}
     }
@@ -213,20 +246,53 @@ fn variable(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
     return result;
 }
 
+fn if_syntax(tokens: &mut Vec<Token::TokenValue>, mut if_ast: Ast::IfAST) -> Ast::Types {
+    loop {
+        if tokens.is_empty() {
+            break;
+        }
+
+        let token = tokens[0].token;
+        if token == 40 || token == 41 {
+            tokens.remove(0);
+            continue;
+        }
+
+        if token == 125{
+            tokens.remove(0);
+            break;
+        }
+
+        match scope(tokens) {
+            Some(types) => {
+                if_ast.node.push(types);
+            }
+
+            None => {
+                continue;
+            }
+        }
+
+        tokens.remove(0);
+    }
+
+    return Ast::Types::If(if_ast);
+}
+
 fn scope(tokens: &mut Vec<Token::TokenValue>) -> Option<Ast::Types> {
     let mut result = judge(tokens);
     match result {
         Ast::Types::Call(mut function) => {
-           let result_call = function_call(tokens);
-           function.node.push(result_call);
-           result = Ast::Types::Call(function);
-           return Some(result);
-        },
+            let result_call = function_call(tokens);
+            function.node.push(result_call);
+            result = Ast::Types::Call(function);
+            return Some(result);
+        }
 
         Ast::Types::Number(_) => {
             result = calculation(tokens);
             return Some(result);
-        },
+        }
 
         Ast::Types::Variabel(mut var) => {
             let result_var = variable(tokens);
@@ -235,11 +301,20 @@ fn scope(tokens: &mut Vec<Token::TokenValue>) -> Option<Ast::Types> {
             return Some(result);
         }
 
+        Ast::Types::If(ifs) => {
+            let result = if_syntax(tokens, ifs);
+            return Some(result);
+        }
+
         Ast::Types::End(_) => {
             tokens.remove(0);
-        },
+        }
 
-        _ => {tokens.remove(0);}
+        _ => {
+            if !tokens.is_empty() {
+                tokens.remove(0);
+            }
+        }
     }
     return None;
 }

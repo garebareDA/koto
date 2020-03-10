@@ -6,8 +6,6 @@ print(a);
 print(b);
 print(c);
 
-if 9<0 {
-    
+if 9 < 0 {
+    println(a);
 }
-
-print(a);
