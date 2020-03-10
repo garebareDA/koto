@@ -12,25 +12,7 @@ pub fn run(root: Ast::ExprAST) {
         }
 
         let node = &root.node[index];
-        //TODO if for　のために関数にする
-        match node {
-            Ast::Types::Call(function) => {
-                function_run(function, &vec_variable);
-            },
-
-            Ast::Types::Variabel(var) => {
-                let var_contents = variable(var.node[0].clone());
-                let mut var_ast = Ast::VariableAST::new(&var.name);
-                var_ast.node.push(var_contents);
-                vec_variable.push(Ast::Types::Variabel(var_ast));
-            },
-
-            Ast::Types::If(ifs) => {
-                //TODO ifの実行を実装
-            }
-            _ => {}
-        }
-
+        run_judg(node, &mut vec_variable);
         index += 1;
     }
 }
@@ -106,4 +88,24 @@ fn serch_variable(ast_vec: &Vec<Ast::Types>, serch_word: &str) -> String {
     }
 
     return "error".to_string();
+}
+
+fn run_judg (node: &Ast::Types, vec_variable:&mut Vec<Ast::Types>) {
+    match node {
+        Ast::Types::Call(function) => {
+            function_run(function, &vec_variable);
+        },
+
+        Ast::Types::Variabel(var) => {
+            let var_contents = variable(var.node[0].clone());
+            let mut var_ast = Ast::VariableAST::new(&var.name);
+            var_ast.node.push(var_contents);
+            vec_variable.push(Ast::Types::Variabel(var_ast));
+        },
+
+        Ast::Types::If(ifs) => {
+            //TODO ifの実行を実装
+        }
+        _ => {}
+    }
 }
