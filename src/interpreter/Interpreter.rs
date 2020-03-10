@@ -12,6 +12,7 @@ pub fn run(root: Ast::ExprAST) {
         }
 
         let node = &root.node[index];
+        //TODO if for　のために関数にする
         match node {
             Ast::Types::Call(function) => {
                 function_run(function, &vec_variable);
@@ -23,6 +24,10 @@ pub fn run(root: Ast::ExprAST) {
                 var_ast.node.push(var_contents);
                 vec_variable.push(Ast::Types::Variabel(var_ast));
             },
+
+            Ast::Types::If(ifs) => {
+                //TODO ifの実行を実装
+            }
             _ => {}
         }
 

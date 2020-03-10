@@ -1,4 +1,5 @@
 use super::super::ast::Ast;
+//TODO比較演算子の追加
 
 pub fn common(bin: Ast::BinaryAST) -> Ast::Types {
     let op = bin.op;
