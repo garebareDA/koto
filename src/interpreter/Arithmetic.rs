@@ -115,6 +115,11 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
                 return calculattions_continue(num, result, select_binary);
             }
 
+            if bin == '<' && select_binary == 3 {
+                let result = greater_than(number_a, number_b);
+                
+            }
+
             if !num.node.is_empty() {
                 let result = calculattions(node_seccond.clone(), select_binary);
 
@@ -135,20 +140,16 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
     return numbers;
 }
 
-fn calculattions_common(num: i64, ast: Ast::NumberAST) -> Ast::Types {
-    let mut number_ast = Ast::NumberAST::new(num);
-    let node_number = ast.node[0].clone();
-    number_ast.node.push(node_number);
-    return Ast::Types::Number(number_ast);
-}
-
 fn calculattions_continue(num:Ast::NumberAST, result:i64, select_binary:i64) -> Ast::Types {
     if num.node.is_empty() {
         let ast = Ast::NumberAST::new(result);
         return Ast::Types::Number(ast);
     }
-    let number_type = calculattions_common(result, num);
-    let number_result = calculattions(number_type, select_binary);
+    let mut number_ast = Ast::NumberAST::new(result);
+    let node_number = num.node[0].clone();
+    number_ast.node.push(node_number);
+
+    let number_result = calculattions(Ast::Types::Number(number_ast), select_binary);
     return number_result;
 }
 
@@ -194,4 +195,20 @@ fn minus(a: i64, b: i64) -> i64 {
 
 fn plus(a: i64, b: i64) -> i64 {
     a + b
+}
+
+fn greater_than(a: i64, b: i64) -> bool {
+    a < b
+}
+
+fn greater_than_equal(a: i64, b: i64) -> bool {
+    a <= b
+}
+
+fn less_than(a: i64, b: i64) -> bool {
+    a > b
+}
+
+fn less_than_equal(a: i64, b: i64) -> bool {
+    a >= b
 }
