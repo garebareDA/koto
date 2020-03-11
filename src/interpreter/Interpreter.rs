@@ -105,7 +105,8 @@ fn run_judg (node: &Ast::Types, vec_variable:&mut Vec<Ast::Types>) {
 
         Ast::Types::If(ifs) => {
             //TODO ifの実行を実装
-            
+            println!("ここからifだから!!!!!!!");
+            calculation(ifs.judge[0].clone());
         }
         _ => {}
     }

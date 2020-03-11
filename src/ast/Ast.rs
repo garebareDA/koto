@@ -1,5 +1,6 @@
 #[derive(Debug, Clone)]
 pub enum Types {
+    Boolean(BooleanAST),
     Number(NumberAST),
     Strings(StringAST),
     Binary(BinaryAST),
@@ -19,6 +20,21 @@ pub struct ExprAST {
 impl ExprAST {
     pub fn new() -> ExprAST {
         ExprAST { node: Vec::new() }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct BooleanAST {
+    pub boolean: bool,
+    pub node: Vec<Types>,
+}
+
+impl BooleanAST {
+    pub fn new(boolean: bool) -> BooleanAST {
+        BooleanAST{
+            boolean:boolean,
+            node: Vec::new(),
+        }
     }
 }
 
