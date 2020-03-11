@@ -49,6 +49,28 @@ fn function_run(call_ast: &Ast::CallAST, variable: &Vec<Ast::Types>) {
     }
 }
 
+fn if_run(result: &Ast::Types, ifs: &Vec<Ast::Types> ,vec_variable: &mut Vec<Ast::Types>) {
+    match result {
+        Ast::Types::Boolean(boolean) => {
+
+            if boolean.boolean {
+                let mut index = 0;
+                let len = ifs.len();
+
+                loop {
+                    if index >= len {
+                        break;
+                    }
+                    let node = &ifs[index];
+                    run_judg(node, vec_variable);
+                    index += 1;
+                }
+            }
+        }
+        _ => {}
+    }
+}
+
 fn calculation(ast: Ast::Types) -> Ast::Types {
     match ast {
         Ast::Types::Binary(binary) => {
@@ -104,9 +126,10 @@ fn run_judg (node: &Ast::Types, vec_variable:&mut Vec<Ast::Types>) {
         },
 
         Ast::Types::If(ifs) => {
-            //TODO ifの実行を実装
-            println!("ここからifだから!!!!!!!");
-            calculation(ifs.judge[0].clone());
+            let result = calculation(ifs.judge[0].clone());
+            if !ifs.node.is_empty() {
+                if_run(&result, &ifs.node, vec_variable);
+            }
         }
         _ => {}
     }

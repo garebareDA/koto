@@ -1,11 +1,11 @@
 let a = 2;
-let b = 2 + 2 * 2 + 2 * 5 / 5 -4;
+let b = 2 + 2 + 2 - 2 -5   * 2;
 let c = "hello world";
 
 print(a);
 print(b);
 print(c);
 
-if 9 < 600 {
-    println(a);
+if 9 < 600 && 1 < 2{
+    print(a);
 }

@@ -1,5 +1,5 @@
 use super::super::ast::Ast;
-//TODO比較演算子の追加
+//等価演算子実装などはBooleanのパースを実装してから
 
 pub fn common(bin: Ast::BinaryAST) -> Ast::Types {
     let op = bin.op;
@@ -13,6 +13,8 @@ pub fn common(bin: Ast::BinaryAST) -> Ast::Types {
         if !types.is_empty() {
             ast.node.push(types[0].clone());
             next_node = Ast::Types::Number(ast);
+        }else{
+            next_node = Ast::Types::Number(ast);
         }
     }
 
@@ -23,6 +25,8 @@ pub fn common(bin: Ast::BinaryAST) -> Ast::Types {
         if !types.is_empty() {
             ast.node.push(types[0].clone());
             next_node = Ast::Types::Number(ast);
+        }else{
+            next_node = Ast::Types::Number(ast);
         }
     }
 
@@ -32,6 +36,8 @@ pub fn common(bin: Ast::BinaryAST) -> Ast::Types {
         let mut ast = Ast::NumberAST::new(result);
         if !types.is_empty() {
             ast.node.push(types[0].clone());
+            next_node = Ast::Types::Number(ast);
+        }else{
             next_node = Ast::Types::Number(ast);
         }
     }
@@ -45,6 +51,8 @@ pub fn common(bin: Ast::BinaryAST) -> Ast::Types {
         if !types.is_empty() {
             ast.node.push(types[0].clone());
             next_node = Ast::Types::Number(ast);
+        }else{
+            next_node = Ast::Types::Number(ast);
         }
     }
 
@@ -55,16 +63,94 @@ pub fn common(bin: Ast::BinaryAST) -> Ast::Types {
         if !types.is_empty() {
             ast.node.push(types[0].clone());
             next_node = Ast::Types::Number(ast);
+        }else{
+            next_node = Ast::Types::Number(ast);
         }
     }
 
     next_node = calculattions(next_node, 2);
 
+    if op == '<' {
+        let (numbers, types) = match_type(node.clone(), next_node.clone());
+        let mut result = false;
+
+        if bin.node.len() == 3 {
+            result = greater_than_equal(numbers[0], numbers[1]);
+        }else{
+            result = greater_than(numbers[0], numbers[1]);
+        }
+
+        let mut ast = Ast::BooleanAST::new(result);
+        if !types.is_empty() {
+            ast.node.push(types[0].clone());
+            next_node = Ast::Types::Boolean(ast);
+        }else{
+            next_node = Ast::Types::Boolean(ast);
+        }
+    }
+
+    if op == '>' {
+        let (numbers, types) = match_type(node.clone(), next_node.clone());
+        let mut result = false;
+
+        if bin.node.len() == 3 {
+            result = less_than_equal(numbers[0], numbers[1]);
+        }else{
+            result = less_than(numbers[0], numbers[1]);
+        }
+
+        let mut ast = Ast::BooleanAST::new(result);
+        if !types.is_empty() {
+            ast.node.push(types[0].clone());
+            next_node = Ast::Types::Boolean(ast);
+        }else{
+            next_node = Ast::Types::Boolean(ast);
+        }
+    }
+
     next_node = calculattions(next_node, 3);
+
+    if op == '=' {
+        let (numbers, types) = match_type(node.clone(), next_node.clone());
+        let mut result = false;
+
+        if bin.node.len() == 3 {
+            result = equivalence(numbers[0], numbers[1]);
+        }else{
+            panic!("error");
+        }
+
+        let mut ast = Ast::BooleanAST::new(result);
+        if !types.is_empty() {
+            ast.node.push(types[0].clone());
+            next_node = Ast::Types::Boolean(ast);
+        }else{
+            next_node = Ast::Types::Boolean(ast);
+        }
+    }
+
+    if op == '!' {
+        let (numbers, types) = match_type(node.clone(), next_node.clone());
+        let mut result = false;
+
+        if bin.node.len() == 3 {
+            result = inequality(numbers[0], numbers[1]);
+        }else{
+            panic!("error");
+        }
+
+        let mut ast = Ast::BooleanAST::new(result);
+        if !types.is_empty() {
+            ast.node.push(types[0].clone());
+            next_node = Ast::Types::Boolean(ast);
+        }else{
+            next_node = Ast::Types::Boolean(ast);
+        }
+    }
+
     next_node = calculattions(next_node, 4);
     next_node = calculattions(next_node, 5);
     next_node = calculattions(next_node, 6);
-    println!("{:?}", next_node);
     return next_node;
 }
 
@@ -110,7 +196,7 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
 
             if len == 1 {
                 node_seccond = binary.node[0].clone();
-            } else if len == 2 {
+            } else if len >= 2 {
                 comparison_node = binary.node[0].clone();
                 node_seccond = binary.node[1].clone();
             } else {
@@ -204,12 +290,35 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
                 let result = calculattions(node_seccond.clone(), select_binary);
 
                 let mut binarys = Ast::BinaryAST::new(bin);
+
+                match comparison_node {
+                    Ast::Types::Binary(_) => {
+                        binarys.node.push(comparison_node);
+                    }
+                    _ => {}
+                }
+
                 binarys.node.push(result);
+                let mut ast_retruns = Ast::Types::Error(Ast::ErrorAST::new("variable error"));
 
-                let mut numbers = Ast::NumberAST::new(number_a);
-                numbers.node.push(Ast::Types::Binary(binarys));
+                match numbers.clone() {
+                    Ast::Types::Number(_) => {
+                        let mut numbers = Ast::NumberAST::new(number_a);
+                        numbers.node.push(Ast::Types::Binary(binarys));
+                        let ast_return = Ast::Types::Number(numbers);
+                        ast_retruns = ast_return
+                    }
 
-                return Ast::Types::Number(numbers);
+                    Ast::Types::Boolean(_) => {
+                        let mut booleans = Ast::BooleanAST::new(bool_a);
+                        booleans .node.push(Ast::Types::Binary(binarys));
+                        let ast_return = Ast::Types::Boolean(booleans);
+                        ast_retruns = ast_return
+                    }
+
+                    _ => {}
+                }
+                return ast_retruns;
             }
 
             return numbers;
@@ -246,6 +355,7 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
             if bin == '&'  && select_binary == priority_fifth {
                 match comparison_node {
                     Ast::Types::Binary(_) => {
+
                         let result = logical_and(bool_a, bool_b);
                         return calculation_comparison_continue_bool(bools, result, select_binary);
                     }
@@ -273,12 +383,36 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
                 let result = calculattions(node_seccond.clone(), select_binary);
 
                 let mut binarys = Ast::BinaryAST::new(bin);
+
+                match comparison_node {
+                    Ast::Types::Binary(_) => {
+                        binarys.node.push(comparison_node);
+                    }
+                    _ => {}
+                }
+
                 binarys.node.push(result);
 
-                let mut numbers = Ast::NumberAST::new(number_a);
-                numbers.node.push(Ast::Types::Binary(binarys));
+                let mut ast_retruns = Ast::Types::Error(Ast::ErrorAST::new("variable error"));
 
-                return Ast::Types::Number(numbers);
+                match numbers.clone() {
+                    Ast::Types::Number(_) => {
+                        let mut numbers = Ast::NumberAST::new(number_a);
+                        numbers.node.push(Ast::Types::Binary(binarys));
+                        let ast_return = Ast::Types::Number(numbers);
+                        ast_retruns = ast_return
+                    }
+
+                    Ast::Types::Boolean(_) => {
+                        let mut booleans = Ast::BooleanAST::new(bool_a);
+                        booleans .node.push(Ast::Types::Binary(binarys));
+                        let ast_return = Ast::Types::Boolean(booleans);
+                        ast_retruns = ast_return
+                    }
+
+                    _ => {}
+                }
+                return ast_retruns;
             }
 
             return numbers;
