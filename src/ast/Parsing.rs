@@ -82,6 +82,18 @@ fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
         return variable;
     }
 
+    if token == -12 {
+        if string == "true" {
+            let bools = Ast::BooleanAST::new(true);
+            let bools = Ast::Types::Boolean(bools);
+            return bools;
+        }else if string == "false" {
+            let bools = Ast::BooleanAST::new(false);
+            let bools = Ast::Types::Boolean(bools);
+            return bools;
+        }
+    }
+
     if token == 43 || token == 45 || token == 47 || token == 37 || token == 42 {
         let bin = Ast::BinaryAST::new(string.parse().unwrap());
         let binary = Ast::Types::Binary(bin);

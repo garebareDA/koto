@@ -12,6 +12,8 @@ pub struct Token {
     pub _comment: i64,
     pub _identifier: i64,
     pub _let: i64,
+
+    pub _bool:i64,
 }
 
 impl Token {
@@ -28,6 +30,7 @@ impl Token {
             _comment: -9,
             _identifier: -10,
             _let: -11,
+            _bool:-12,
         }
     }
 }

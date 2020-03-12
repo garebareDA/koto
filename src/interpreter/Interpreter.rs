@@ -101,6 +101,13 @@ fn serch_variable(ast_vec: &Vec<Ast::Types>, serch_word: &str) -> String {
                             return serch_variable(&ast_vec, &var_name);
                         }
 
+                        Ast::Types::Boolean(bools) => {
+                            if bools.boolean {
+                                return "true".to_string();
+                            }else {
+                                return "false".to_string();
+                            }
+                        }
                         _ => {}
                     }
                 }
