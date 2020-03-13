@@ -130,6 +130,25 @@ impl IfAST{
 }
 
 #[derive(Debug, Clone)]
+pub struct ForAST {
+    pub init_var: Types,
+    pub conditions: Types,
+    pub increase : Types,
+    pub node: Vec<Types>
+}
+
+impl ForAST {
+    pub fn new(init:Types, cond:Types, inc:Types) -> ForAST {
+        ForAST{
+            init_var: init,
+            conditions: cond,
+            increase : inc,
+            node: Vec::new()
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct ScopeAST {
     pub scope: char,
 }
