@@ -9,3 +9,7 @@ print(c);
 if 9 < 600 && 1 < 2{
     print(a);
 }
+
+for let i = 0; i < 10; i++;{
+    
+}

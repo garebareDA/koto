@@ -42,9 +42,15 @@ fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
         let result = calculation(tokens);
         let mut result_vec: Vec<Ast::Types> = Vec::new();
         result_vec.push(result);
-        let mut if_ast = Ast::IfAST::new(result_vec);
-
+        let if_ast = Ast::IfAST::new(result_vec);
         return Ast::Types::If(if_ast);
+    }
+
+    if token == -4 {
+        tokens.remove(0);
+        let var = judge(tokens);
+        let result = calculation(tokens);
+        // ++ 演算子の実装
     }
 
     if token == -6 {
@@ -174,6 +180,10 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
             }
 
             Ast::Types::Strings(_) => {
+                number_vector.push(result);
+            }
+
+            Ast::Types::Variabel(_) => {
                 number_vector.push(result);
             }
 
