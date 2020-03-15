@@ -7,6 +7,7 @@ pub enum Types {
     Call(CallAST),
     Variabel(VariableAST),
     If(IfAST),
+    For(ForAST),
     Scope(ScopeAST),
     End(EndAST),
     Error(ErrorAST)
@@ -131,18 +132,19 @@ impl IfAST{
 
 #[derive(Debug, Clone)]
 pub struct ForAST {
-    pub init_var: Types,
-    pub conditions: Types,
-    pub increase : Types,
+    pub init_var: Vec<Types>,
     pub node: Vec<Types>
 }
 
 impl ForAST {
     pub fn new(init:Types, cond:Types, inc:Types) -> ForAST {
+        let mut for_types = Vec::new();
+        for_types.push(init);
+        for_types.push(cond);
+        for_types.push(inc);
+
         ForAST{
-            init_var: init,
-            conditions: cond,
-            increase : inc,
+            init_var: for_types,
             node: Vec::new()
         }
     }

@@ -48,11 +48,25 @@ fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
 
     if token == -4 {
         tokens.remove(0);
+
         let var = scope(tokens);
         tokens.remove(0);
+
         let result = calculation(tokens);
         tokens.remove(0);
-        // ++ 演算子の実装
+
+        let loop_op = calculation(tokens);
+        tokens.remove(0);
+
+        match var {
+            Some(var) =>{
+                let for_ast = Ast::ForAST::new(var, result, loop_op);
+                let for_types = Ast::Types::For(for_ast);
+                return for_types;
+            }
+
+            None =>{return Ast::Types::Error(Ast::ErrorAST::new("for parsing error"));}
+        }
     }
 
     if token == -6 {
@@ -201,6 +215,22 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
         }
 
         tokens.remove(0);
+    }
+
+    if number_vector.len() < binary_vector.len() {
+        let number = number_vector[0].clone();
+        let binary = binary_vector[0].clone();
+        let binary_sccond = binary_vector[1].clone();
+        match binary {
+            Ast::Types::Binary(mut bin) => {
+                bin.node.push(number);
+                bin.node.push(binary_sccond);
+                return Ast::Types::Binary(bin);
+            }
+
+            _ => {Ast::Types::Error(Ast::ErrorAST::new("binary parsing error"));}
+        }
+
     }
 
     if number_vector.len() == 1 {
