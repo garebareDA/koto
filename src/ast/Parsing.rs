@@ -56,7 +56,6 @@ fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
         tokens.remove(0);
 
         let loop_op = calculation(tokens);
-        tokens.remove(0);
 
         match var {
             Some(var) =>{
@@ -333,6 +332,39 @@ fn if_syntax(tokens: &mut Vec<Token::TokenValue>, mut if_ast: Ast::IfAST) -> Ast
     return Ast::Types::If(if_ast);
 }
 
+fn for_syntax(tokens: &mut Vec<Token::TokenValue>, mut for_ast: Ast::ForAST) -> Ast::Types {
+    loop {
+        if tokens.is_empty() {
+            break;
+        }
+
+        let token = tokens[0].token;
+        if token == 40 || token == 41 {
+            tokens.remove(0);
+            continue;
+        }
+
+        if token == 125{
+            tokens.remove(0);
+            break;
+        }
+
+        match scope(tokens) {
+            Some(types) => {
+                for_ast.node.push(types);
+            }
+
+            None => {
+                continue;
+            }
+        }
+
+        tokens.remove(0);
+    }
+
+    return Ast::Types::For(for_ast);
+}
+
 fn scope(tokens: &mut Vec<Token::TokenValue>) -> Option<Ast::Types> {
     let mut result = judge(tokens);
     match result {
@@ -357,6 +389,11 @@ fn scope(tokens: &mut Vec<Token::TokenValue>) -> Option<Ast::Types> {
 
         Ast::Types::If(ifs) => {
             let result = if_syntax(tokens, ifs);
+            return Some(result);
+        }
+
+        Ast::Types::For(fors) => {
+            let result = for_syntax(tokens, fors);
             return Some(result);
         }
 
