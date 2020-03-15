@@ -48,8 +48,10 @@ fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
 
     if token == -4 {
         tokens.remove(0);
-        let var = judge(tokens);
+        let var = scope(tokens);
+        tokens.remove(0);
         let result = calculation(tokens);
+        tokens.remove(0);
         // ++ 演算子の実装
     }
 
@@ -210,7 +212,7 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
     binary_vector.reverse();
 
     let mut index = 0;
-    let mut ast_temp = Ast::Types::Binary(Ast::BinaryAST::new('+'));
+    let mut ast_temp = Ast::Types::Error(Ast::ErrorAST::new("ast_temp parsing error"));
 
     for binary in binary_vector {
         let mut number = number_vector[index].clone();

@@ -1,15 +1,5 @@
-let a = true;
-let b = 2 + 2 + 2 - 2 -5   * 2;
-let c = "hello world";
-
-print(a);
-print(b);
-print(c);
-
-if 9 < 600 && 1 < 2{
-    print(a);
-}
-
 for let i = 0; i < 10; i++;{
     
 }
+
+let a = 9;
