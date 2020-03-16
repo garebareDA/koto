@@ -77,7 +77,20 @@ fn for_run(ast_for:Vec<Ast::Types>){
     let judg = ast_for[1].clone();
     let loop_for = ast_for[2].clone();
 
-    
+    //nameとresultで終了条件を判定する
+    match variant {
+        Ast::Types::Variabel(var) => {
+            let name = var.name;
+            let result = calculation(var.node[0].clone());
+        }
+
+        _ => {}
+    }
+
+    //変数を代入してcalicurationで増やす
+    match loop_for {
+        _ => {}
+    }
 }
 
 fn calculation(ast: Ast::Types) -> Ast::Types {
