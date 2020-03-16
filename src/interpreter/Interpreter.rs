@@ -4,7 +4,7 @@ use super::Arithmetic;
 pub fn run(root: Ast::ExprAST) {
     let mut index = 0;
     let len = root.node.len();
-    let mut vec_variable:Vec<Ast::Types> = Vec::new();
+    let mut vec_variable: Vec<Ast::Types> = Vec::new();
 
     loop {
         if index >= len {
@@ -21,9 +21,11 @@ fn variable(variable: Ast::Types) -> Ast::Types {
     match variable {
         Ast::Types::Binary(_) => {
             return calculation(variable);
-        },
+        }
 
-        _ => {return variable;}
+        _ => {
+            return variable;
+        }
     }
 }
 
@@ -49,10 +51,9 @@ fn function_run(call_ast: &Ast::CallAST, variable: &Vec<Ast::Types>) {
     }
 }
 
-fn if_run(result: &Ast::Types, ifs: &Vec<Ast::Types> ,vec_variable: &mut Vec<Ast::Types>) {
+fn if_run(result: &Ast::Types, ifs: &Vec<Ast::Types>, vec_variable: &mut Vec<Ast::Types>) {
     match result {
         Ast::Types::Boolean(boolean) => {
-
             if boolean.boolean {
                 let mut index = 0;
                 let len = ifs.len();
@@ -71,11 +72,19 @@ fn if_run(result: &Ast::Types, ifs: &Vec<Ast::Types> ,vec_variable: &mut Vec<Ast
     }
 }
 
+fn for_run(ast_for:Vec<Ast::Types>){
+    let variant = ast_for[0].clone();
+    let judg = ast_for[1].clone();
+    let loop_for = ast_for[2].clone();
+
+    
+}
+
 fn calculation(ast: Ast::Types) -> Ast::Types {
     match ast {
         Ast::Types::Binary(binary) => {
             return Arithmetic::common(binary);
-        },
+        }
         _ => {
             return Ast::Types::Error(Ast::ErrorAST::new("Binary Error"));
         }
@@ -104,7 +113,7 @@ fn serch_variable(ast_vec: &Vec<Ast::Types>, serch_word: &str) -> String {
                         Ast::Types::Boolean(bools) => {
                             if bools.boolean {
                                 return "true".to_string();
-                            }else {
+                            } else {
                                 return "false".to_string();
                             }
                         }
@@ -119,18 +128,18 @@ fn serch_variable(ast_vec: &Vec<Ast::Types>, serch_word: &str) -> String {
     return "error".to_string();
 }
 
-fn run_judg (node: &Ast::Types, vec_variable:&mut Vec<Ast::Types>) {
+fn run_judg(node: &Ast::Types, vec_variable: &mut Vec<Ast::Types>) {
     match node {
         Ast::Types::Call(function) => {
             function_run(function, &vec_variable);
-        },
+        }
 
         Ast::Types::Variabel(var) => {
             let var_contents = variable(var.node[0].clone());
             let mut var_ast = Ast::VariableAST::new(&var.name);
             var_ast.node.push(var_contents);
             vec_variable.push(Ast::Types::Variabel(var_ast));
-        },
+        }
 
         Ast::Types::If(ifs) => {
             let result = calculation(ifs.judge[0].clone());
@@ -138,6 +147,11 @@ fn run_judg (node: &Ast::Types, vec_variable:&mut Vec<Ast::Types>) {
                 if_run(&result, &ifs.node, vec_variable);
             }
         }
+
+        Ast::Types::For(fors) => {
+            
+        }
+
         _ => {}
     }
 }
