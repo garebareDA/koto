@@ -27,6 +27,10 @@ pub fn parsing(tokens: &mut Vec<Token::TokenValue>) -> Ast::ExprAST {
             }
         }
 
+        if tokens.is_empty() {
+            break;
+        }
+
         tokens.remove(0);
     }
 
