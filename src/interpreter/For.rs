@@ -36,7 +36,6 @@ pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &
                             let mut var_ast = Ast::VariableAST::new(&name);
                             var_ast.node.push(result_var.clone());
                             vec_variable.push(Ast::Types::Variabel(var_ast));
-                            println!("{:?}", vec_variable);
                             for_scope(ast, vec_variable);
                         }
                     }

@@ -85,29 +85,30 @@ pub fn calculation(ast: Ast::Types) -> Ast::Types {
 }
 
 fn serch_variable(ast_vec: &Vec<Ast::Types>, serch_word: &str) -> String {
+    let mut variable = String::new();
     for ast in ast_vec {
         match ast {
             Ast::Types::Variabel(var) => {
                 if var.name == serch_word.to_string() {
                     match var.node[0].clone() {
                         Ast::Types::Strings(strings) => {
-                            return strings.name.clone();
+                            variable = strings.name.clone();
                         }
 
                         Ast::Types::Number(num) => {
-                            return num.val.to_string();
+                            variable = num.val.to_string();
                         }
 
                         Ast::Types::Variabel(var) => {
                             let var_name = var.name;
-                            return serch_variable(&ast_vec, &var_name);
+                            variable = serch_variable(&ast_vec, &var_name);
                         }
 
                         Ast::Types::Boolean(bools) => {
                             if bools.boolean {
-                                return "true".to_string();
+                                variable = "true".to_string();
                             } else {
-                                return "false".to_string();
+                                variable = "false".to_string();
                             }
                         }
                         _ => {}
@@ -118,7 +119,7 @@ fn serch_variable(ast_vec: &Vec<Ast::Types>, serch_word: &str) -> String {
         }
     }
 
-    return "error".to_string();
+    return variable;
 }
 
 pub fn run_judg(node: &Ast::Types, vec_variable: &mut Vec<Ast::Types>) {
