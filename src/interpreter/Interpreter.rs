@@ -77,8 +77,6 @@ fn for_run(ast_for: &Vec<Ast::Types>) {
     let judge = ast_for[1].clone();
     let loop_for = ast_for[2].clone();
 
-    println!("{:?}",judge);
-
     let mut result = Ast::Types::Error(Ast::ErrorAST::new("variable error"));
     let mut name = "".to_string();
 
@@ -93,7 +91,7 @@ fn for_run(ast_for: &Vec<Ast::Types>) {
 
     match judge.clone() {
         Ast::Types::Binary(bin) => {
-            let a = for_variables(&name, result, bin.node);
+            let var = for_variables(&name, result, bin.node);
         }
 
         _ => {}
@@ -106,30 +104,40 @@ fn for_run(ast_for: &Vec<Ast::Types>) {
     }
 }
 
-fn for_variables(name: &str, result: Ast::Types, variables: Vec<Ast::Types>) {
+fn for_variables(name: &str, result: Ast::Types, variables: Vec<Ast::Types>) -> Vec<Ast::Types> {
+    let mut ast_vec:Vec<Ast::Types> = Vec::new();
+
     for node in variables {
         match node {
-            Ast::Types::Binary(bin) => {
+            Ast::Types::Binary(mut bin) => {
                 if !bin.node.is_empty() {
-                    for_variables(name, result.clone(), bin.node);
+                    let vec = for_variables(name, result.clone(), bin.node.clone());
+                    bin.node = vec;
                 }
+                ast_vec.push(Ast::Types::Binary(bin));
             }
 
-            Ast::Types::Number(num) => {
+            Ast::Types::Number(mut num) => {
                 if !num.node.is_empty() {
-                    for_variables(name, result.clone(), num.node);
+                    let vec = for_variables(name, result.clone(), num.node.clone());
+                    num.node = vec;
                 }
+                ast_vec.push(Ast::Types::Number(num));
             }
 
-            Ast::Types::Variabel(var) => {
+            Ast::Types::Variabel(mut var) => {
                 if !var.node.is_empty() {
-                    for_variables(name, result.clone(), var.node);
+                    let vec = for_variables(name, result.clone(), var.node.clone());
+                    var.node = vec;
                 }
+                ast_vec.push(Ast::Types::Variabel(var));
             }
 
             _ => {}
         }
     }
+
+    return ast_vec;
 }
 
 fn calculation(ast: Ast::Types) -> Ast::Types {
