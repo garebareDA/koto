@@ -1,5 +1,4 @@
 use super::super::ast::Ast;
-//等価演算子実装などはBooleanのパースを実装してから
 
 pub fn common(bin: Ast::BinaryAST) -> Ast::Types {
     let op = bin.op;

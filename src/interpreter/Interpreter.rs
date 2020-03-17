@@ -72,24 +72,63 @@ fn if_run(result: &Ast::Types, ifs: &Vec<Ast::Types>, vec_variable: &mut Vec<Ast
     }
 }
 
-fn for_run(ast_for:Vec<Ast::Types>){
+fn for_run(ast_for: &Vec<Ast::Types>) {
     let variant = ast_for[0].clone();
-    let judg = ast_for[1].clone();
+    let judge = ast_for[1].clone();
     let loop_for = ast_for[2].clone();
 
-    //nameとresultで終了条件を判定する
+    println!("{:?}",judge);
+
+    let mut result = Ast::Types::Error(Ast::ErrorAST::new("variable error"));
+    let mut name = "".to_string();
+
     match variant {
         Ast::Types::Variabel(var) => {
-            let name = var.name;
-            let result = calculation(var.node[0].clone());
+            name = var.name;
+            result = calculation(var.node[0].clone());
         }
 
         _ => {}
     }
 
-    //変数を代入してcalicurationで増やす
-    match loop_for {
+    match judge.clone() {
+        Ast::Types::Binary(bin) => {
+            let a = for_variables(&name, result, bin.node);
+        }
+
         _ => {}
+    }
+
+    match loop_for.clone() {
+        Ast::Types::Binary(bin) => {}
+
+        _ => {}
+    }
+}
+
+fn for_variables(name: &str, result: Ast::Types, variables: Vec<Ast::Types>) {
+    for node in variables {
+        match node {
+            Ast::Types::Binary(bin) => {
+                if !bin.node.is_empty() {
+                    for_variables(name, result.clone(), bin.node);
+                }
+            }
+
+            Ast::Types::Number(num) => {
+                if !num.node.is_empty() {
+                    for_variables(name, result.clone(), num.node);
+                }
+            }
+
+            Ast::Types::Variabel(var) => {
+                if !var.node.is_empty() {
+                    for_variables(name, result.clone(), var.node);
+                }
+            }
+
+            _ => {}
+        }
     }
 }
 
@@ -162,9 +201,8 @@ fn run_judg(node: &Ast::Types, vec_variable: &mut Vec<Ast::Types>) {
         }
 
         Ast::Types::For(fors) => {
-            
+            for_run(&fors.init_var);
         }
-
         _ => {}
     }
 }
