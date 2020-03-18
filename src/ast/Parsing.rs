@@ -349,7 +349,6 @@ fn for_syntax(tokens: &mut Vec<Token::TokenValue>, mut for_ast: Ast::ForAST) -> 
         }
 
         if token == 125{
-            tokens.remove(0);
             break;
         }
 
@@ -386,7 +385,17 @@ fn scope(tokens: &mut Vec<Token::TokenValue>) -> Option<Ast::Types> {
 
         Ast::Types::Variabel(mut var) => {
             let result_var = variable(tokens);
-            var.node.push(result_var);
+            let continue_tokne = tokens[0].token;
+
+            if continue_tokne == 59 {
+                var.node.push(result_var);
+                result = Ast::Types::Variabel(var);
+                return Some(result);
+            }
+
+
+            let result_cal = calculation(tokens);
+            var.node.push(result_cal);
             result = Ast::Types::Variabel(var);
             return Some(result);
         }

@@ -78,6 +78,7 @@ pub fn run_judg(node: &Ast::Types, vec_variable: &mut Vec<Ast::Types>) {
         Ast::Types::For(fors) => {
             For::for_run(&fors.init_var, &fors.node, vec_variable);
         }
+
         _ => {}
     }
 }
