@@ -42,9 +42,11 @@ fn if_run(result: &Ast::Types, ifs: &Vec<Ast::Types>, vec_variable: &mut Vec<Ast
     }
 }
 
-pub fn calculation(ast: Ast::Types) -> Ast::Types {
+pub fn calculation(ast: Ast::Types, variable: &Vec<Ast::Types>) -> Ast::Types {
     match ast {
-        Ast::Types::Binary(binary) => {
+        Ast::Types::Binary(mut binary) => {
+            let vec_binary = Variable::variables_allocation(binary.node, variable);
+            binary.node = vec_binary;
             return Arithmetic::common(binary);
         }
         _ => {
@@ -60,14 +62,14 @@ pub fn run_judg(node: &Ast::Types, vec_variable: &mut Vec<Ast::Types>) {
         }
 
         Ast::Types::Variabel(var) => {
-            let var_contents = Variable::variable(var.node[0].clone());
+            let var_contents = Variable::variable(var.node[0].clone(), vec_variable);
             let mut var_ast = Ast::VariableAST::new(&var.name);
             var_ast.node.push(var_contents);
             vec_variable.push(Ast::Types::Variabel(var_ast));
         }
 
         Ast::Types::If(ifs) => {
-            let result = calculation(ifs.judge[0].clone());
+            let result = calculation(ifs.judge[0].clone(), vec_variable);
             if !ifs.node.is_empty() {
                 if_run(&result, &ifs.node, vec_variable);
             }

@@ -2,10 +2,10 @@ use super::super::ast::Ast;
 use super::Interpreter;
 
 
-pub fn variable(variable: Ast::Types) -> Ast::Types {
+pub fn variable(variable: Ast::Types, variables: &Vec<Ast::Types>) -> Ast::Types {
     match variable {
         Ast::Types::Binary(_) => {
-            return Interpreter::calculation(variable);
+            return Interpreter::calculation(variable, variables);
         }
 
         _ => {
@@ -14,7 +14,7 @@ pub fn variable(variable: Ast::Types) -> Ast::Types {
     }
 }
 
-fn variables_allocation(serch: Vec<Ast::Types>, variable: &Vec<Ast::Types>) -> Vec<Ast::Types> {
+pub fn variables_allocation(serch: Vec<Ast::Types>, variable: &Vec<Ast::Types>) -> Vec<Ast::Types> {
     let mut ast_vec: Vec<Ast::Types> = Vec::new();
     for node in serch {
         match node {
@@ -42,6 +42,13 @@ fn variables_allocation(serch: Vec<Ast::Types>, variable: &Vec<Ast::Types>) -> V
                 }
 
                 let serch_result = serch_variable(variable, &var.name);
+                match serch_result {
+                    Ast::Types::Number(mut num) => {
+                        num.node = vec;
+                        ast_vec.push(Ast::Types::Number(num));
+                    }
+                    _ => {}
+                }
             }
             _ => {}
         }
