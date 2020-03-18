@@ -1,6 +1,7 @@
 use super::super::ast::Ast;
 
 pub fn common(bin: Ast::BinaryAST) -> Ast::Types {
+    
     let op = bin.op;
     let node = bin.node[0].clone();
     let mut next_node = bin.node[1].clone();

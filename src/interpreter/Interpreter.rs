@@ -30,6 +30,41 @@ fn variable(variable: Ast::Types) -> Ast::Types {
     }
 }
 
+fn variables_allocation(serch: Vec<Ast::Types>, variable: &Vec<Ast::Types>) -> Vec<Ast::Types> {
+    let mut ast_vec: Vec<Ast::Types> = Vec::new();
+    for node in serch {
+        match node {
+            Ast::Types::Binary(mut bin) => {
+                if !bin.node.is_empty() {
+                    let vec = variables_allocation(bin.node.clone(), variable);
+                    bin.node = vec;
+                }
+                ast_vec.push(Ast::Types::Binary(bin));
+            }
+
+            Ast::Types::Number(mut num) => {
+                if !num.node.is_empty() {
+                    let vec = variables_allocation(num.node.clone(), variable);
+                    num.node = vec;
+                }
+                ast_vec.push(Ast::Types::Number(num));
+            }
+
+            Ast::Types::Variabel(var) => {
+                let mut vec: Vec<Ast::Types> = Vec::new();
+
+                if !var.node.is_empty() {
+                    vec = variables_allocation(var.node.clone(), variable);
+                }
+
+                serch_variable(variable, &var.name);
+            }
+            _ => {}
+        }
+    }
+    return ast_vec;
+}
+
 fn function_run(call_ast: &Ast::CallAST, variable: &Vec<Ast::Types>) {
     let callee = call_ast.callee.clone();
     if callee == "print" {
