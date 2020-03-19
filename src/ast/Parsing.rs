@@ -119,6 +119,17 @@ fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
         }
     }
 
+    if token == -13 { 
+        tokens.remove(0);
+        let mut retrun_ast = Ast::RetrunAST::new();
+        if tokens[0].token == 59 {
+            return Ast::Types::Retrun(retrun_ast);
+        }
+        let result = judge(tokens);
+        retrun_ast.node.push(result);
+        return Ast::Types::Retrun(retrun_ast);
+    }
+
     if token == 43 || token == 45 || token == 47 || token == 37 || token == 42 {
         let bin = Ast::BinaryAST::new(string.parse().unwrap());
         let binary = Ast::Types::Binary(bin);
@@ -407,6 +418,10 @@ fn scope(tokens: &mut Vec<Token::TokenValue>) -> Option<Ast::Types> {
 
         Ast::Types::For(fors) => {
             let result = for_syntax(tokens, fors);
+            return Some(result);
+        }
+
+        Ast::Types::Retrun(_) => {
             return Some(result);
         }
 

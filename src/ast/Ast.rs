@@ -8,6 +8,7 @@ pub enum Types {
     Variabel(VariableAST),
     If(IfAST),
     For(ForAST),
+    Retrun(RetrunAST),
     Scope(ScopeAST),
     End(EndAST),
     Error(ErrorAST)
@@ -146,6 +147,19 @@ impl ForAST {
         ForAST{
             init_var: for_types,
             node: Vec::new()
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct RetrunAST {
+    pub node: Vec<Types>,
+}
+
+impl RetrunAST {
+    pub fn new() -> RetrunAST {
+        RetrunAST{
+            node:Vec::new(),
         }
     }
 }
