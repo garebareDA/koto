@@ -1,6 +1,7 @@
 use super::super::ast::Ast;
 use super::Interpreter;
 
+//TODO 全体的にリファクタリング
 pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &mut Vec<Ast::Types>) {
     let variant = ast_for[0].clone();
     let judge = ast_for[1].clone();
@@ -36,7 +37,10 @@ pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &
                             let mut var_ast = Ast::VariableAST::new(&name);
                             var_ast.node.push(result_var.clone());
                             vec_variable.push(Ast::Types::Variabel(var_ast));
-                            for_scope(ast, vec_variable);
+                            let is_continue = for_scope(ast, vec_variable);
+                            if is_continue {
+                                break;
+                            }
                         }
                     }
                     _ => panic!("error"),
@@ -116,7 +120,7 @@ fn for_variables(name: &str, result: &Ast::Types, variables: Vec<Ast::Types>) ->
     return ast_vec;
 }
 
-fn for_scope(ast: &Vec<Ast::Types>, vec_variable: &mut Vec<Ast::Types>) {
+fn for_scope(ast: &Vec<Ast::Types>, vec_variable: &mut Vec<Ast::Types>) -> bool {
     let mut index = 0;
     let len = ast.len();
 
@@ -125,7 +129,12 @@ fn for_scope(ast: &Vec<Ast::Types>, vec_variable: &mut Vec<Ast::Types>) {
             break;
         }
         let node = &ast[index];
-        Interpreter::run_judg(node, vec_variable);
+        let is_continue = Interpreter::run_judg(node, vec_variable);
+        if !is_continue {
+            return false;
+        }
         index += 1;
     }
+
+    return true;
 }

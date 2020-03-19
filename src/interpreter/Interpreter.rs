@@ -33,7 +33,10 @@ fn if_run(result: &Ast::Types, ifs: &Vec<Ast::Types>, vec_variable: &mut Vec<Ast
                         break;
                     }
                     let node = &ifs[index];
-                    run_judg(node, vec_variable);
+                    let is_continue = run_judg(node, vec_variable);
+                    if !is_continue {
+                        break;
+                    }
                     index += 1;
                 }
             }
@@ -49,13 +52,14 @@ pub fn calculation(ast: Ast::Types, variable: &Vec<Ast::Types>) -> Ast::Types {
             binary.node = vec_binary;
             return Arithmetic::common(binary);
         }
+
         _ => {
             return Ast::Types::Error(Ast::ErrorAST::new("Binary Error"));
         }
     }
 }
 
-pub fn run_judg(node: &Ast::Types, vec_variable: &mut Vec<Ast::Types>) {
+pub fn run_judg(node: &Ast::Types, vec_variable: &mut Vec<Ast::Types>) -> bool {
     match node {
         Ast::Types::Call(function) => {
             Function::function_run(function, &vec_variable);
@@ -79,6 +83,12 @@ pub fn run_judg(node: &Ast::Types, vec_variable: &mut Vec<Ast::Types>) {
             For::for_run(&fors.init_var, &fors.node, vec_variable);
         }
 
+        Ast::Types::Retrun(_) => {
+            return false;
+        }
+
         _ => {}
     }
+
+    return true;
 }
