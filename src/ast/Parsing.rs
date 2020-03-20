@@ -76,7 +76,7 @@ fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
         }
 
         let variable = Ast::VariableAST::new(&string);
-        let variable = Ast::Types::Variabel(variable);
+        let variable = Ast::Types::Variable(variable);
         return variable;
     }
 
@@ -84,7 +84,7 @@ fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
         tokens.remove(0);
         let string = tokens[0].val.clone();
         let variable = Ast::VariableAST::new(&string);
-        let variable = Ast::Types::Variabel(variable);
+        let variable = Ast::Types::Variable(variable);
         tokens.remove(0);
         tokens.remove(0);
         return variable;
@@ -149,7 +149,7 @@ fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
     }
 
     let variable = Ast::VariableAST::new(&string);
-    let variable = Ast::Types::Variabel(variable);
+    let variable = Ast::Types::Variable(variable);
     return variable;
 }
 
@@ -196,7 +196,7 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
                 number_vector.push(result);
             }
 
-            Ast::Types::Variabel(_) => {
+            Ast::Types::Variable(_) => {
                 number_vector.push(result);
             }
 
@@ -378,20 +378,20 @@ fn scope(tokens: &mut Vec<Token::TokenValue>) -> Option<Ast::Types> {
             return Some(result);
         }
 
-        Ast::Types::Variabel(mut var) => {
+        Ast::Types::Variable(mut var) => {
             let result_var = variable(tokens);
             let continue_tokne = tokens[0].token;
 
             if continue_tokne == 59 {
                 var.node.push(result_var);
-                result = Ast::Types::Variabel(var);
+                result = Ast::Types::Variable(var);
                 return Some(result);
             }
 
 
             let result_cal = calculation(tokens);
             var.node.push(result_cal);
-            result = Ast::Types::Variabel(var);
+            result = Ast::Types::Variable(var);
             return Some(result);
         }
 

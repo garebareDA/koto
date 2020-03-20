@@ -6,7 +6,7 @@ pub enum Types {
     Binary(BinaryAST),
     Call(CallAST),
     Function(FunctionAST),
-    Variabel(VariableAST),
+    Variable(VariableAST),
     If(IfAST),
     For(ForAST),
     Retrun(RetrunAST),

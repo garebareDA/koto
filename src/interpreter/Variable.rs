@@ -1,81 +1,115 @@
 use super::super::ast::Ast;
 use super::Interpreter;
 
-
-pub fn variable(variable: Ast::Types, variables: &Vec<Ast::Types>) -> Ast::Types {
-    match variable {
-        Ast::Types::Binary(_) => {
-            return Interpreter::calculation(variable, variables);
-        }
-
-        _ => {
-            return variable;
-        }
-    }
+pub struct Variable {
+    pub variables: Vec<Vec<Ast::Types>>,
+    pub inner: usize,
 }
 
-pub fn variables_allocation(serch: Vec<Ast::Types>, variable: &Vec<Ast::Types>) -> Vec<Ast::Types> {
-    let mut ast_vec: Vec<Ast::Types> = Vec::new();
-    for node in serch {
-        match node {
-            Ast::Types::Binary(mut bin) => {
-                if !bin.node.is_empty() {
-                    let vec = variables_allocation(bin.node.clone(), variable);
-                    bin.node = vec;
-                }
-                ast_vec.push(Ast::Types::Binary(bin));
+impl Variable {
+    pub fn new() -> Variable {
+        Variable {
+            variables: Vec::new(),
+            inner: 0,
+        }
+    }
+
+    pub fn last_remove(&mut self) {
+        self.variables.remove(self.variables.len() - 1);
+        self.out_var();
+    }
+
+    pub fn vec_push(&mut self) {
+        self.variables.push(Vec::new());
+        self.in_var();
+    }
+
+    fn in_var(&mut self) {
+        self.inner += 1;
+    }
+
+    fn out_var(&mut self) {
+        if self.inner == 0 {
+            return;
+        }
+        self.inner -= 1;
+    }
+
+    pub fn variable(&mut self, var: Ast::Types) -> Ast::Types {
+        let inner = self.inner;
+        let mut vars = self.variables.clone();
+
+        match var {
+            Ast::Types::Binary(_) => {
+                return Interpreter::calculation(var, self);
             }
 
-            Ast::Types::Number(mut num) => {
-                if !num.node.is_empty() {
-                    let vec = variables_allocation(num.node.clone(), variable);
-                    num.node = vec;
-                }
-                ast_vec.push(Ast::Types::Number(num));
-            }
+            _ => return var,
+        }
+    }
 
-            Ast::Types::Variabel(var) => {
-                let mut vec: Vec<Ast::Types> = Vec::new();
+    pub fn serch_variable(&mut self, serch: &str) -> Ast::Types {
+        let mut variable_retrun = Ast::Types::Error(Ast::ErrorAST::new("Vairable Error"));
+        for vars in self.variables.clone() {
+            for var in vars {
+                match var {
+                    Ast::Types::Variable(in_var) => {
+                        if in_var.name == serch.to_string() {
+                            match in_var.node[0].clone() {
+                                Ast::Types::Variable(var) => {
+                                    let var_name = var.name;
+                                    variable_retrun = self.serch_variable(&var_name);
+                                }
 
-                if !var.node.is_empty() {
-                    vec = variables_allocation(var.node.clone(), variable);
-                }
-
-                let serch_result = serch_variable(variable, &var.name);
-                match serch_result {
-                    Ast::Types::Number(mut num) => {
-                        num.node = vec;
-                        ast_vec.push(Ast::Types::Number(num));
+                                _ => {
+                                    variable_retrun = in_var.node[0].clone();
+                                }
+                            }
+                        }
                     }
                     _ => {}
                 }
             }
-            _ => {}
         }
+
+        return variable_retrun;
     }
-    return ast_vec;
-}
 
-pub fn serch_variable(ast_vec: &Vec<Ast::Types>, serch_word: &str) -> Ast::Types {
-    let mut variable = Ast::Types::Error(Ast::ErrorAST::new("Vairable Error"));
-    for ast in ast_vec {
-        match ast {
-            Ast::Types::Variabel(var) => {
-                if var.name == serch_word.to_string() {
-                    match var.node[0].clone() {
-
-                        Ast::Types::Variabel(var) => {
-                            let var_name = var.name;
-                            variable = serch_variable(&ast_vec, &var_name);
+    pub fn variables_allocation(&mut self, serch: Vec<Ast::Types>) -> Vec<Ast::Types> {
+        let mut ast_vec: Vec<Ast::Types> = Vec::new();
+        for node in serch {
+            match node {
+                Ast::Types::Binary(mut bin) => {
+                    if !bin.node.is_empty() {
+                        let vec = self.variables_allocation(bin.node.clone());
+                        bin.node = vec;
+                    }
+                    ast_vec.push(Ast::Types::Binary(bin));
+                }
+                Ast::Types::Number(mut num) => {
+                    if !num.node.is_empty() {
+                        let vec = self.variables_allocation(num.node.clone());
+                        num.node = vec;
+                    }
+                    ast_vec.push(Ast::Types::Number(num));
+                }
+                Ast::Types::Variable(var) => {
+                    let mut vec: Vec<Ast::Types> = Vec::new();
+                    if !var.node.is_empty() {
+                        vec = self.variables_allocation(var.node.clone());
+                    }
+                    let serch_result = self.serch_variable(&var.name);
+                    match serch_result {
+                        Ast::Types::Number(mut num) => {
+                            num.node = vec;
+                            ast_vec.push(Ast::Types::Number(num));
                         }
-
-                        _ => {variable = var.node[0].clone();}
+                        _ => {}
                     }
                 }
+                _ => {}
             }
-            _ => {}
         }
+        return ast_vec;
     }
-
-    return variable;
 }

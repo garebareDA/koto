@@ -1,8 +1,9 @@
 use super::super::ast::Ast;
+use super::Variable;
 use super::Interpreter;
 
 //TODO 全体的にリファクタリング
-pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &mut Vec<Ast::Types>) {
+pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &mut Variable::Variable) {
     let variant = ast_for[0].clone();
     let judge = ast_for[1].clone();
     let loop_for = ast_for[2].clone();
@@ -11,7 +12,7 @@ pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &
     let mut name = "".to_string();
 
     match variant {
-        Ast::Types::Variabel(var) => {
+        Ast::Types::Variable(var) => {
             name = var.name;
             match var.node[0].clone() {
                 Ast::Types::Number(_) => {result_var = var.node[0].clone();}
@@ -36,7 +37,7 @@ pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &
                         } else {
                             let mut var_ast = Ast::VariableAST::new(&name);
                             var_ast.node.push(result_var.clone());
-                            vec_variable.push(Ast::Types::Variabel(var_ast));
+                            vec_variable.variables[vec_variable.inner].push(Ast::Types::Variable(var_ast));
                             let is_continue = for_scope(ast, vec_variable);
                             if is_continue {
                                 break;
@@ -98,7 +99,7 @@ fn for_variables(name: &str, result: &Ast::Types, variables: Vec<Ast::Types>) ->
                 ast_vec.push(Ast::Types::Number(num));
             }
 
-            Ast::Types::Variabel(var) => {
+            Ast::Types::Variable(var) => {
                 let mut vec: Vec<Ast::Types> = Vec::new();
 
                 if !var.node.is_empty() {
@@ -120,7 +121,7 @@ fn for_variables(name: &str, result: &Ast::Types, variables: Vec<Ast::Types>) ->
     return ast_vec;
 }
 
-fn for_scope(ast: &Vec<Ast::Types>, vec_variable: &mut Vec<Ast::Types>) -> bool {
+fn for_scope(ast: &Vec<Ast::Types>, vec_variable: &mut Variable::Variable) -> bool {
     let mut index = 0;
     let len = ast.len();
 

@@ -4,11 +4,11 @@ use super::For;
 use super::Variable;
 use super::Function;
 
-
 pub fn run(root: Ast::ExprAST) {
     let mut index = 0;
     let len = root.node.len();
-    let mut vec_variable: Vec<Ast::Types> = Vec::new();
+    let mut variable = Variable::Variable::new();
+    variable.variables.push(Vec::new());
 
     loop {
         if index >= len {
@@ -16,12 +16,12 @@ pub fn run(root: Ast::ExprAST) {
         }
 
         let node = &root.node[index];
-        run_judg(node, &mut vec_variable);
+        run_judg(node, &mut variable);
         index += 1;
     }
 }
 
-fn if_run(result: &Ast::Types, ifs: &Vec<Ast::Types>, vec_variable: &mut Vec<Ast::Types>) {
+fn if_run(result: &Ast::Types, ifs: &Vec<Ast::Types>, vec_variable: &mut Variable::Variable) {
     match result {
         Ast::Types::Boolean(boolean) => {
             if boolean.boolean {
@@ -45,10 +45,10 @@ fn if_run(result: &Ast::Types, ifs: &Vec<Ast::Types>, vec_variable: &mut Vec<Ast
     }
 }
 
-pub fn calculation(ast: Ast::Types, variable: &Vec<Ast::Types>) -> Ast::Types {
+pub fn calculation(ast: Ast::Types, variable: &mut Variable::Variable) -> Ast::Types {
     match ast {
         Ast::Types::Binary(mut binary) => {
-            let vec_binary = Variable::variables_allocation(binary.node, variable);
+            let vec_binary = variable.variables_allocation(binary.node);
             binary.node = vec_binary;
             return Arithmetic::common(binary);
         }
@@ -59,28 +59,32 @@ pub fn calculation(ast: Ast::Types, variable: &Vec<Ast::Types>) -> Ast::Types {
     }
 }
 
-pub fn run_judg(node: &Ast::Types, vec_variable: &mut Vec<Ast::Types>) -> bool {
+pub fn run_judg(node: &Ast::Types, vec_variable: &mut Variable::Variable) -> bool {
     match node {
         Ast::Types::Call(function) => {
-            Function::function_run(function, &vec_variable);
+            Function::function_run(function, vec_variable);
         }
 
-        Ast::Types::Variabel(var) => {
-            let var_contents = Variable::variable(var.node[0].clone(), vec_variable);
+        Ast::Types::Variable(var) => {
+            let var_contents = vec_variable.variable(var.node[0].clone());
             let mut var_ast = Ast::VariableAST::new(&var.name);
             var_ast.node.push(var_contents);
-            vec_variable.push(Ast::Types::Variabel(var_ast));
+            vec_variable.variables[vec_variable.inner].push(Ast::Types::Variable(var_ast));
         }
 
         Ast::Types::If(ifs) => {
             let result = calculation(ifs.judge[0].clone(), vec_variable);
+            vec_variable.vec_push();
             if !ifs.node.is_empty() {
                 if_run(&result, &ifs.node, vec_variable);
             }
+            vec_variable.last_remove();
         }
 
         Ast::Types::For(fors) => {
+            vec_variable.vec_push();
             For::for_run(&fors.init_var, &fors.node, vec_variable);
+            vec_variable.last_remove();
         }
 
         Ast::Types::Retrun(_) => {
