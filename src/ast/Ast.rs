@@ -89,6 +89,7 @@ impl BinaryAST {
 #[derive(Debug, Clone)]
 pub struct CallAST {
     pub callee: String,
+    pub argument: Vec<Types>,
     pub node: Vec<Types>,
 }
 
@@ -97,10 +98,12 @@ impl CallAST {
         let string = string.to_string();
         CallAST {
             callee: string,
+            argument: Vec::new(),
             node: Vec::new(),
         }
     }
 }
+
 #[derive(Debug, Clone)]
 pub struct VariableAST{
     pub name: String,

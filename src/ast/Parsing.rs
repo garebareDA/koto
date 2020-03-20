@@ -72,6 +72,10 @@ fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
         }
     }
 
+    if token == -5 {
+        //TODO 関数の処理
+    }
+
     if token == -6 {
         let print = Ast::CallAST::new("print");
         let call = Ast::Types::Call(print);
@@ -92,6 +96,9 @@ fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
     }
 
     if token == -10 {
+        if tokens[1].token == 40{
+            //TODO 関数の処理
+        }
         let variable = Ast::VariableAST::new(&string);
         let variable = Ast::Types::Variabel(variable);
         return variable;
@@ -119,7 +126,7 @@ fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
         }
     }
 
-    if token == -13 { 
+    if token == -13 {
         tokens.remove(0);
         let mut retrun_ast = Ast::RetrunAST::new();
         if tokens[0].token == 59 {
