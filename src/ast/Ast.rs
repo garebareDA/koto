@@ -5,6 +5,7 @@ pub enum Types {
     Strings(StringAST),
     Binary(BinaryAST),
     Call(CallAST),
+    Function(FunctionAST),
     Variabel(VariableAST),
     If(IfAST),
     For(ForAST),
@@ -89,7 +90,6 @@ impl BinaryAST {
 #[derive(Debug, Clone)]
 pub struct CallAST {
     pub callee: String,
-    pub argument: Vec<Types>,
     pub node: Vec<Types>,
 }
 
@@ -98,6 +98,23 @@ impl CallAST {
         let string = string.to_string();
         CallAST {
             callee: string,
+            node: Vec::new(),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FunctionAST {
+    pub name: String,
+    pub argument: Vec<Types>,
+    pub node: Vec<Types>,
+}
+
+impl FunctionAST {
+    pub fn new(string: &str) -> FunctionAST {
+        let string = string.to_string();
+        FunctionAST{
+            name:string,
             argument: Vec::new(),
             node: Vec::new(),
         }

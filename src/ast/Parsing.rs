@@ -73,7 +73,8 @@ fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
     }
 
     if token == -5 {
-        //TODO 関数の処理
+        tokens.remove(0);
+        function(tokens);
     }
 
     if token == -6 {
@@ -97,7 +98,7 @@ fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
 
     if token == -10 {
         if tokens[1].token == 40{
-            //TODO 関数の処理
+            //TODO fuction_call
         }
         let variable = Ast::VariableAST::new(&string);
         let variable = Ast::Types::Variabel(variable);
@@ -321,6 +322,8 @@ fn variable(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
     return result;
 }
 
+
+//syntaxを関数にする
 fn if_syntax(tokens: &mut Vec<Token::TokenValue>, mut if_ast: Ast::IfAST) -> Ast::Types {
     loop {
         if tokens.is_empty() {
@@ -384,6 +387,59 @@ fn for_syntax(tokens: &mut Vec<Token::TokenValue>, mut for_ast: Ast::ForAST) -> 
     }
 
     return Ast::Types::For(for_ast);
+}
+
+fn function(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
+    let string = &tokens[0].val;
+    let token = tokens[1].token;
+    let mut function_ast = Ast::FunctionAST::new(string);
+    if token == 40 {
+        tokens.remove(0);
+        tokens.remove(0);
+        loop {
+            if tokens[0].token == -10 {
+                let result = judge(tokens);
+                function_ast.argument.push(result);
+            }
+
+            if tokens[0].token == 41{
+                break;
+            }
+
+            tokens.remove(0);
+        }
+    }
+
+    loop {
+        if tokens.is_empty() {
+            break;
+        }
+
+        let token = tokens[0].token;
+        if token == 40 || token == 41 {
+            tokens.remove(0);
+            continue;
+        }
+
+        if token == 125{
+            tokens.remove(0);
+            break;
+        }
+
+        match scope(tokens) {
+            Some(types) => {
+                function_ast.node.push(types);
+            }
+
+            None => {
+                continue;
+            }
+        }
+
+        tokens.remove(0);
+    }
+
+    return Ast::Types::Function(function_ast);
 }
 
 fn scope(tokens: &mut Vec<Token::TokenValue>) -> Option<Ast::Types> {
