@@ -70,8 +70,11 @@ fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
 
     if token == -10 {
         if tokens[1].token == 40{
-            //TODO fuction_call
+            let call = Ast::CallAST::new(&string);
+            let call = Ast::Types::Call(call);
+            return call;
         }
+
         let variable = Ast::VariableAST::new(&string);
         let variable = Ast::Types::Variabel(variable);
         return variable;
@@ -150,14 +153,13 @@ fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
     return variable;
 }
 
-fn function_call(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
-    let string = Ast::StringAST::new("");
-    let mut result = Ast::Types::Strings(string);
+fn function_call(tokens: &mut Vec<Token::TokenValue>) -> Vec<Ast::Types> {
+    let mut vec_node: Vec<Ast::Types>= Vec::new();
+    tokens.remove(0);
 
     loop {
         let token = tokens[0].token;
-
-        if token == 40 {
+        if token == 40 || token == 44{
             tokens.remove(0);
             continue;
         }
@@ -166,11 +168,12 @@ fn function_call(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
             break;
         }
 
-        result = judge(tokens);
+        let result = judge(tokens);
+        vec_node.push(result);
         tokens.remove(0);
     }
 
-    return result;
+    return vec_node;
 }
 
 fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
@@ -222,7 +225,7 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
                 return Ast::Types::Binary(bin);
             }
 
-            _ => {Ast::Types::Error(Ast::ErrorAST::new("binary parsing error"));}
+            _ => {}
         }
 
     }
@@ -361,8 +364,7 @@ fn scope(tokens: &mut Vec<Token::TokenValue>) -> Option<Ast::Types> {
     let mut result = judge(tokens);
     match result {
         Ast::Types::Call(mut function) => {
-            let result_call = function_call(tokens);
-            function.node.push(result_call);
+            function.node = function_call(tokens);
             result = Ast::Types::Call(function);
             return Some(result);
         }

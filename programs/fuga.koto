@@ -5,6 +5,11 @@ for let i = 0; i > 10; i++ {
     }
 }
 
+fib(5, 6);
+
+let a = "aaaa";
+print(a);
+
 fn fib(x, y) {
 
 }
