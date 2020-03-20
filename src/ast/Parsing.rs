@@ -4,36 +4,8 @@ use super::Ast;
 //構文解析
 pub fn parsing(tokens: &mut Vec<Token::TokenValue>) -> Ast::ExprAST {
     let mut root = Ast::ExprAST::new();
-
-    loop {
-        if tokens.is_empty() {
-            break;
-        }
-
-        let token = tokens[0].token;
-
-        if token == 40 || token == 41 {
-            tokens.remove(0);
-            continue;
-        }
-
-        match scope(tokens) {
-            Some(types) => {
-                root.node.push(types);
-            }
-
-            None => {
-                continue;
-            }
-        }
-
-        if tokens.is_empty() {
-            break;
-        }
-
-        tokens.remove(0);
-    }
-
+    let result = syntax(tokens);
+    root.node = result;
     return root;
 }
 
@@ -74,7 +46,7 @@ fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
 
     if token == -5 {
         tokens.remove(0);
-        function(tokens);
+        return function(tokens);
     }
 
     if token == -6 {
@@ -322,73 +294,6 @@ fn variable(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
     return result;
 }
 
-
-//syntaxを関数にする
-fn if_syntax(tokens: &mut Vec<Token::TokenValue>, mut if_ast: Ast::IfAST) -> Ast::Types {
-    loop {
-        if tokens.is_empty() {
-            break;
-        }
-
-        let token = tokens[0].token;
-        if token == 40 || token == 41 {
-            tokens.remove(0);
-            continue;
-        }
-
-        if token == 125{
-            tokens.remove(0);
-            break;
-        }
-
-        match scope(tokens) {
-            Some(types) => {
-                if_ast.node.push(types);
-            }
-
-            None => {
-                continue;
-            }
-        }
-
-        tokens.remove(0);
-    }
-
-    return Ast::Types::If(if_ast);
-}
-
-fn for_syntax(tokens: &mut Vec<Token::TokenValue>, mut for_ast: Ast::ForAST) -> Ast::Types {
-    loop {
-        if tokens.is_empty() {
-            break;
-        }
-
-        let token = tokens[0].token;
-        if token == 40 || token == 41 {
-            tokens.remove(0);
-            continue;
-        }
-
-        if token == 125{
-            break;
-        }
-
-        match scope(tokens) {
-            Some(types) => {
-                for_ast.node.push(types);
-            }
-
-            None => {
-                continue;
-            }
-        }
-
-        tokens.remove(0);
-    }
-
-    return Ast::Types::For(for_ast);
-}
-
 fn function(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
     let string = &tokens[0].val;
     let token = tokens[1].token;
@@ -410,6 +315,13 @@ fn function(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
         }
     }
 
+    let result = syntax(tokens);
+    function_ast.node = result;
+    return Ast::Types::Function(function_ast);
+}
+
+fn syntax(tokens: &mut Vec<Token::TokenValue>) -> Vec<Ast::Types> {
+    let mut node_vec = Vec::new();
     loop {
         if tokens.is_empty() {
             break;
@@ -422,13 +334,12 @@ fn function(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
         }
 
         if token == 125{
-            tokens.remove(0);
             break;
         }
 
         match scope(tokens) {
             Some(types) => {
-                function_ast.node.push(types);
+                node_vec.push(types);
             }
 
             None => {
@@ -436,10 +347,14 @@ fn function(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
             }
         }
 
+        if tokens.is_empty() {
+            break;
+        }
+
         tokens.remove(0);
     }
 
-    return Ast::Types::Function(function_ast);
+    return node_vec;
 }
 
 fn scope(tokens: &mut Vec<Token::TokenValue>) -> Option<Ast::Types> {
@@ -449,6 +364,10 @@ fn scope(tokens: &mut Vec<Token::TokenValue>) -> Option<Ast::Types> {
             let result_call = function_call(tokens);
             function.node.push(result_call);
             result = Ast::Types::Call(function);
+            return Some(result);
+        }
+
+        Ast::Types::Function(_) => {
             return Some(result);
         }
 
@@ -474,14 +393,16 @@ fn scope(tokens: &mut Vec<Token::TokenValue>) -> Option<Ast::Types> {
             return Some(result);
         }
 
-        Ast::Types::If(ifs) => {
-            let result = if_syntax(tokens, ifs);
-            return Some(result);
+        Ast::Types::If(mut ifs) => {
+            let result = syntax(tokens);
+            ifs.node = result;
+            return Some(Ast::Types::If(ifs));
         }
 
-        Ast::Types::For(fors) => {
-            let result = for_syntax(tokens, fors);
-            return Some(result);
+        Ast::Types::For(mut fors) => {
+            let result = syntax(tokens);
+            fors.node = result;
+            return Some(Ast::Types::For(fors));
         }
 
         Ast::Types::Retrun(_) => {
