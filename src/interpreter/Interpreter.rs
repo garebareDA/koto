@@ -24,20 +24,7 @@ fn if_run(result: &Ast::Types, ifs: &Vec<Ast::Types>, vec_variable: &mut Variabl
     match result {
         Ast::Types::Boolean(boolean) => {
             if boolean.boolean {
-                let mut index = 0;
-                let len = ifs.len();
-
-                loop {
-                    if index >= len {
-                        break;
-                    }
-                    let node = &ifs[index];
-                    let is_continue = run_judg(node, vec_variable);
-                    if !is_continue {
-                        break;
-                    }
-                    index += 1;
-                }
+                scope(ifs, vec_variable);
             }
         }
         _ => {}
@@ -91,6 +78,25 @@ pub fn run_judg(node: &Ast::Types, vec_variable: &mut Variable::Variable) -> boo
         }
 
         _ => {}
+    }
+
+    return true;
+}
+
+pub fn scope(ast: &Vec<Ast::Types>, vec_variable: &mut Variable::Variable) -> bool {
+    let mut index = 0;
+    let len = ast.len();
+
+    loop {
+        if index >= len {
+            break;
+        }
+        let node = &ast[index];
+        let is_continue = run_judg(node, vec_variable);
+        if !is_continue {
+            return false;
+        }
+        index += 1;
     }
 
     return true;

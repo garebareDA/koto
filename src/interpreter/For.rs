@@ -38,7 +38,7 @@ pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &
                             let mut var_ast = Ast::VariableAST::new(&name);
                             var_ast.node.push(result_var.clone());
                             vec_variable.push(Ast::Types::Variable(var_ast));
-                            let is_continue = for_scope(ast, vec_variable);
+                            let is_continue = Interpreter::scope(ast, vec_variable);
                             if is_continue {
                                 break;
                             }
@@ -119,23 +119,4 @@ fn for_variables(name: &str, result: &Ast::Types, variables: Vec<Ast::Types>) ->
     }
 
     return ast_vec;
-}
-
-fn for_scope(ast: &Vec<Ast::Types>, vec_variable: &mut Variable::Variable) -> bool {
-    let mut index = 0;
-    let len = ast.len();
-
-    loop {
-        if index >= len {
-            break;
-        }
-        let node = &ast[index];
-        let is_continue = Interpreter::run_judg(node, vec_variable);
-        if !is_continue {
-            return false;
-        }
-        index += 1;
-    }
-
-    return true;
 }

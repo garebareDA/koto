@@ -43,9 +43,6 @@ impl Variable {
     }
 
     pub fn variable(&mut self, var: Ast::Types) -> Ast::Types {
-        let inner = self.inner;
-        let mut vars = self.variables.clone();
-
         match var {
             Ast::Types::Binary(_) => {
                 return Interpreter::calculation(var, self);
