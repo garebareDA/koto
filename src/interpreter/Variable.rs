@@ -2,8 +2,8 @@ use super::super::ast::Ast;
 use super::Interpreter;
 
 pub struct Variable {
-    pub variables: Vec<Vec<Ast::Types>>,
-    pub inner: usize,
+    variables: Vec<Vec<Ast::Types>>,
+    inner: usize,
 }
 
 impl Variable {

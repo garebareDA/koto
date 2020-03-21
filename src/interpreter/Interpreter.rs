@@ -8,6 +8,8 @@ pub fn run(root: Ast::ExprAST) {
     let mut index = 0;
     let len = root.node.len();
     let mut variable = Variable::Variable::new();
+    let mut function = Function::Function::new();
+    function.push(root.node);
 
     loop {
         if index >= len {
