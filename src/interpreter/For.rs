@@ -37,7 +37,7 @@ pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &
                         } else {
                             let mut var_ast = Ast::VariableAST::new(&name);
                             var_ast.node.push(result_var.clone());
-                            vec_variable.variables[vec_variable.inner].push(Ast::Types::Variable(var_ast));
+                            vec_variable.push(Ast::Types::Variable(var_ast));
                             let is_continue = for_scope(ast, vec_variable);
                             if is_continue {
                                 break;

@@ -8,10 +8,13 @@ pub struct Variable {
 
 impl Variable {
     pub fn new() -> Variable {
-        Variable {
+        let mut var = Variable {
             variables: Vec::new(),
             inner: 0,
-        }
+        };
+
+        var.variables.push(Vec::new());
+        return var;
     }
 
     pub fn last_remove(&mut self) {
@@ -22,6 +25,10 @@ impl Variable {
     pub fn vec_push(&mut self) {
         self.variables.push(Vec::new());
         self.in_var();
+    }
+
+    pub fn push(&mut self, var:Ast::Types) {
+        self.variables[self.inner].push(var);
     }
 
     fn in_var(&mut self) {

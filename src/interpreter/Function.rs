@@ -14,7 +14,7 @@ pub fn function_run(call_ast: &Ast::CallAST, variable: &mut Variable::Variable) 
         }
     }
 
-
+    
 }
 
 fn print_var(var_result: &Ast::Types){

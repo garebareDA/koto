@@ -8,7 +8,6 @@ pub fn run(root: Ast::ExprAST) {
     let mut index = 0;
     let len = root.node.len();
     let mut variable = Variable::Variable::new();
-    variable.variables.push(Vec::new());
 
     loop {
         if index >= len {
@@ -69,7 +68,7 @@ pub fn run_judg(node: &Ast::Types, vec_variable: &mut Variable::Variable) -> boo
             let var_contents = vec_variable.variable(var.node[0].clone());
             let mut var_ast = Ast::VariableAST::new(&var.name);
             var_ast.node.push(var_contents);
-            vec_variable.variables[vec_variable.inner].push(Ast::Types::Variable(var_ast));
+            vec_variable.push(Ast::Types::Variable(var_ast));
         }
 
         Ast::Types::If(ifs) => {

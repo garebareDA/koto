@@ -1,6 +1,7 @@
 for let i = 0; i > 10; i++ {
     if i < 5 {
         print(i);
+        let a = 1;
         return;
     }
 }
