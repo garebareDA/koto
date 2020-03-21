@@ -12,5 +12,6 @@ let a = "aaaa";
 print(a);
 
 fn fib(x, y) {
-
+    print(x);
+    print(y);
 }

@@ -2,14 +2,14 @@ use super::super::ast::Ast;
 use super::Interpreter;
 use super::Variable;
 
-pub struct Function {
+pub struct function {
     funcstions: Vec<Vec<Ast::Types>>,
     inner: usize,
 }
 
-impl Function {
-    pub fn new() -> Function {
-        let mut fun = Function {
+impl function {
+    pub fn new() -> function {
+        let mut fun = function {
             funcstions: Vec::new(),
             inner: 0,
         };
@@ -28,11 +28,11 @@ impl Function {
         self.in_fun();
     }
 
-    fn in_fun(self) {
+    fn in_fun(&mut self) {
         self.inner += 1;
     }
 
-    fn out_fun(self) {
+    fn out_fun(&mut self) {
         if self.inner == 0 {
             return;
         }
@@ -58,7 +58,7 @@ impl Function {
         }
     }
 
-    pub fn function_run(self, call_ast: &Ast::CallAST, variable: &mut Variable::Variable) {
+    pub fn function_run(&mut self, call_ast: &Ast::CallAST, variable: &mut Variable::Variable) {
         let callee = call_ast.callee.clone();
         if callee == "print" {
             let value = &call_ast.node[0];
@@ -73,13 +73,13 @@ impl Function {
             }
         }
 
-        self.function_run(call_ast, variable);
+        self.function_serch(call_ast, variable);
     }
 
-    fn function_serch(self, call_ast: &Ast::CallAST, vec_variable: &mut Variable::Variable) {
-        let serch_string = call_ast.callee;
-        let argument = call_ast.node;
-        let functions = self.funcstions.clone();
+    fn function_serch(&mut self, call_ast: &Ast::CallAST, vec_variable: &mut Variable::Variable) {
+        let serch_string = call_ast.callee.clone();
+        let argument = call_ast.node.clone();
+        let mut functions = self.funcstions.clone();
         functions.reverse();
 
         for funcs in functions {
@@ -87,7 +87,7 @@ impl Function {
                 match fun {
                     Ast::Types::Function(fun) => {
                         if serch_string == fun.name {
-                            self.function(fun.argument, argument, fun.node, vec_variable);
+                            self.function(fun.argument, &argument, fun.node, vec_variable);
                         }
                     }
 
@@ -98,10 +98,10 @@ impl Function {
     }
 
     fn function(
-        self,
+        &mut self,
         function_arguments: Vec<Ast::Types>,
-        argument: Vec<Ast::Types>,
-        node: Vec<Ast::Types>,
+        argument: &Vec<Ast::Types>,
+        mut node: Vec<Ast::Types>,
         vec_variable: &mut Variable::Variable,
     ) {
         vec_variable.vec_push();
@@ -110,7 +110,7 @@ impl Function {
         for function_argument in function_arguments {
             match function_argument {
                 Ast::Types::Variable(mut variable) => {
-                    variable.node.push(argument[index]);
+                    variable.node.push(argument[index].clone());
                     let variable = Ast::Types::Variable(variable);
                     vec_variable.push(variable);
                 }
@@ -121,11 +121,11 @@ impl Function {
             index += 1;
         }
 
-        Interpreter::scope(&mut node, vec_variable);
+        Interpreter::scope(&mut node, vec_variable, self);
         vec_variable.last_remove();
     }
 
-    fn print_var(self, var_result: &Ast::Types) {
+    fn print_var(&self, var_result: &Ast::Types) {
         match var_result {
             Ast::Types::Strings(value) => {
                 println!("{}", value.name);

@@ -1,9 +1,10 @@
 use super::super::ast::Ast;
 use super::Variable;
+use super::Function;
 use super::Interpreter;
 
 //TODO 全体的にリファクタリング
-pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &mut Variable::Variable) {
+pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &mut Variable::Variable, vec_function: &mut Function::function) {
     let variant = ast_for[0].clone();
     let judge = ast_for[1].clone();
     let loop_for = ast_for[2].clone();
@@ -38,7 +39,7 @@ pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &
                             let mut var_ast = Ast::VariableAST::new(&name);
                             var_ast.node.push(result_var.clone());
                             vec_variable.push(Ast::Types::Variable(var_ast));
-                            let is_continue = Interpreter::scope(ast, vec_variable);
+                            let is_continue = Interpreter::scope(ast, vec_variable, vec_function);
                             if is_continue {
                                 break;
                             }
