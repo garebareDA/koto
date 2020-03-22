@@ -4,7 +4,7 @@ use super::Function;
 use super::Interpreter;
 
 //TODO 全体的にリファクタリング
-pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &mut Variable::Variable, vec_function: &mut Function::function) {
+pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &mut Variable::Variable, vec_function: &mut Function::function) -> Option<Ast::Types>{
     let variant = ast_for[0].clone();
     let judge = ast_for[1].clone();
     let loop_for = ast_for[2].clone();
@@ -17,7 +17,7 @@ pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &
             name = var.name;
             match var.node[0].clone() {
                 Ast::Types::Number(_) => {result_var = var.node[0].clone();}
-                Ast::Types::Binary(_) => {result_var = Interpreter::calculation(var.node[0].clone(), vec_variable);}
+                Ast::Types::Binary(_) => {result_var = Interpreter::calculation(var.node[0].clone(), vec_variable, vec_function);}
                 _ => {}
             }
         }
@@ -30,7 +30,7 @@ pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &
             Ast::Types::Binary(mut bin) => {
                 let var = for_variables(&name, &result_var, bin.node);
                 bin.node = var;
-                let result = Interpreter::calculation(Ast::Types::Binary(bin), vec_variable);
+                let result = Interpreter::calculation(Ast::Types::Binary(bin), vec_variable, vec_function);
                 match result {
                     Ast::Types::Boolean(bools) => {
                         if bools.boolean {
@@ -39,8 +39,14 @@ pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &
                             let mut var_ast = Ast::VariableAST::new(&name);
                             var_ast.node.push(result_var.clone());
                             vec_variable.push(Ast::Types::Variable(var_ast));
-                            let is_continue = Interpreter::scope(ast, vec_variable, vec_function);
+                            let (is_continue, result) = Interpreter::scope(ast, vec_variable, vec_function);
                             if is_continue {
+                                match result {
+                                    Some(_) => {
+                                        return result;
+                                    }
+                                    None => {}
+                                }
                                 break;
                             }
                         }
@@ -73,11 +79,13 @@ pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &
                     _ => {}
                 }
                 bin.node = result;
-                result_var = Interpreter::calculation(Ast::Types::Binary(bin), vec_variable);
+                result_var = Interpreter::calculation(Ast::Types::Binary(bin), vec_variable, vec_function);
             }
             _ => {}
         }
     }
+
+    return None;
 }
 
 fn for_variables(name: &str, result: &Ast::Types, variables: Vec<Ast::Types>) -> Vec<Ast::Types> {

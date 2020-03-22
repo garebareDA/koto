@@ -58,13 +58,13 @@ impl function {
         }
     }
 
-    pub fn function_run(&mut self, call_ast: &Ast::CallAST, variable: &mut Variable::Variable) {
+    pub fn function_run(&mut self, call_ast: &Ast::CallAST, variable: &mut Variable::Variable) ->Option<Ast::Types> {
         let callee = call_ast.callee.clone();
         if callee == "print" {
             let value = &call_ast.node[0];
             match value {
                 Ast::Types::Variable(var) => {
-                    let var_result = variable.serch_variable(&var.name);
+                    let var_result = variable.serch_variable(&var.name, self);
                     self.print_var(&var_result);
                 }
                 _ => {
@@ -73,10 +73,6 @@ impl function {
             }
         }
 
-        self.function_serch(call_ast, variable);
-    }
-
-    fn function_serch(&mut self, call_ast: &Ast::CallAST, vec_variable: &mut Variable::Variable) {
         let serch_string = call_ast.callee.clone();
         let argument = call_ast.node.clone();
         let mut functions = self.funcstions.clone();
@@ -87,7 +83,7 @@ impl function {
                 match fun {
                     Ast::Types::Function(fun) => {
                         if serch_string == fun.name {
-                            self.function(fun.argument, &argument, fun.node, vec_variable);
+                            return self.function(fun.argument, &argument, fun.node, variable);
                         }
                     }
 
@@ -95,6 +91,8 @@ impl function {
                 }
             }
         }
+
+        return None;
     }
 
     fn function(
@@ -103,7 +101,7 @@ impl function {
         argument: &Vec<Ast::Types>,
         mut node: Vec<Ast::Types>,
         vec_variable: &mut Variable::Variable,
-    ) {
+    ) -> Option<Ast::Types> {
         vec_variable.vec_push();
         let mut index = 0;
 
@@ -121,8 +119,9 @@ impl function {
             index += 1;
         }
 
-        Interpreter::scope(&mut node, vec_variable, self);
+        let (_, result) = Interpreter::scope(&mut node, vec_variable, self);
         vec_variable.last_remove();
+        return result;
     }
 
     fn print_var(&self, var_result: &Ast::Types) {

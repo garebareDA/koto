@@ -200,6 +200,18 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
                 number_vector.push(result);
             }
 
+            Ast::Types::Call(_) => {
+                match result {
+                    Ast::Types::Call(mut function) => {
+                        function.node = function_call(tokens);
+                        let result = Ast::Types::Call(function);
+                        number_vector.push(result);
+                    }
+
+                    _ => {break}
+                }
+            }
+
             Ast::Types::Scope(_) => {
                 break;
             }
@@ -208,7 +220,7 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
                 break;
             }
 
-            _ => {}
+            _ => {number_vector.push(result);}
         }
 
         tokens.remove(0);
