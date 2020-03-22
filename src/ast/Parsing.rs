@@ -2,6 +2,7 @@ use super::super::lexer::Token;
 use super::Ast;
 
 //構文解析
+//関数の引数を計算
 pub fn parsing(tokens: &mut Vec<Token::TokenValue>) -> Ast::ExprAST {
     let mut root = Ast::ExprAST::new();
     let result = syntax(tokens);

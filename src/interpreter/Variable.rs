@@ -91,6 +91,7 @@ impl Variable {
         return variable_retrun;
     }
 
+    //関数も対応
     pub fn variables_allocation(&mut self, serch: Vec<Ast::Types>, vec_function: &mut Function::function) -> Vec<Ast::Types> {
         let mut ast_vec: Vec<Ast::Types> = Vec::new();
         for node in serch {
