@@ -61,12 +61,18 @@ impl function {
     pub fn function_run(&mut self, call_ast: &Ast::CallAST, variable: &mut Variable::Variable) ->Option<Ast::Types> {
         let callee = call_ast.callee.clone();
         if callee == "print" {
-            let value = &call_ast.node[0];
+            let value = &call_ast.argument[0];
             match value {
                 Ast::Types::Variable(var) => {
                     let var_result = variable.serch_variable(&var.name, self);
                     self.print_var(&var_result);
                 }
+
+                Ast::Types::Binary(_) => {
+                    let result = Interpreter::calculation(value.clone(), variable, self);
+                    self.print_var(&result);
+                }
+
                 _ => {
                     self.print_var(&value);
                 }
@@ -74,7 +80,7 @@ impl function {
         }
 
         let serch_string = call_ast.callee.clone();
-        let argument = call_ast.node.clone();
+        let argument = call_ast.argument.clone();
         let mut functions = self.funcstions.clone();
         functions.reverse();
 
@@ -108,7 +114,8 @@ impl function {
         for function_argument in function_arguments {
             match function_argument {
                 Ast::Types::Variable(mut variable) => {
-                    variable.node.push(argument[index].clone());
+                    let result = Interpreter::calculation(argument[index].clone(), vec_variable, self);
+                    variable.node.push(result);
                     let variable = Ast::Types::Variable(variable);
                     vec_variable.push(variable);
                 }

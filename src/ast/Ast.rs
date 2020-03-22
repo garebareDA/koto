@@ -11,6 +11,8 @@ pub enum Types {
     For(ForAST),
     Retrun(RetrunAST),
     Scope(ScopeAST),
+    Comma(CommaAST),
+    Parent(ParenthesesAST),
     End(EndAST),
     Error(ErrorAST)
 }
@@ -90,6 +92,7 @@ impl BinaryAST {
 #[derive(Debug, Clone)]
 pub struct CallAST {
     pub callee: String,
+    pub argument: Vec<Types>,
     pub node: Vec<Types>,
 }
 
@@ -98,6 +101,7 @@ impl CallAST {
         let string = string.to_string();
         CallAST {
             callee: string,
+            argument: Vec::new(),
             node: Vec::new(),
         }
     }
@@ -180,6 +184,32 @@ impl RetrunAST {
     pub fn new() -> RetrunAST {
         RetrunAST{
             node:Vec::new(),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CommaAST {
+    pub comma: char
+}
+
+impl CommaAST {
+    pub fn new(comma: char) -> CommaAST {
+        CommaAST {
+            comma: comma
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ParenthesesAST {
+    pub parent:char,
+}
+
+impl ParenthesesAST {
+    pub fn new(parent:char) -> ParenthesesAST {
+        ParenthesesAST{
+            parent: parent
         }
     }
 }

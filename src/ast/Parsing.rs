@@ -2,7 +2,6 @@ use super::super::lexer::Token;
 use super::Ast;
 
 //構文解析
-//関数の引数を計算
 pub fn parsing(tokens: &mut Vec<Token::TokenValue>) -> Ast::ExprAST {
     let mut root = Ast::ExprAST::new();
     let result = syntax(tokens);
@@ -35,13 +34,15 @@ fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
         let loop_op = calculation(tokens);
 
         match var {
-            Some(var) =>{
+            Some(var) => {
                 let for_ast = Ast::ForAST::new(var, result, loop_op);
                 let for_types = Ast::Types::For(for_ast);
                 return for_types;
             }
 
-            None =>{return Ast::Types::Error(Ast::ErrorAST::new("for parsing error"));}
+            None => {
+                return Ast::Types::Error(Ast::ErrorAST::new("for parsing error"));
+            }
         }
     }
 
@@ -70,7 +71,7 @@ fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
     }
 
     if token == -10 {
-        if tokens[1].token == 40{
+        if tokens[1].token == 40 {
             let call = Ast::CallAST::new(&string);
             let call = Ast::Types::Call(call);
             return call;
@@ -96,7 +97,7 @@ fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
             let bools = Ast::BooleanAST::new(true);
             let bools = Ast::Types::Boolean(bools);
             return bools;
-        }else if string == "false" {
+        } else if string == "false" {
             let bools = Ast::BooleanAST::new(false);
             let bools = Ast::Types::Boolean(bools);
             return bools;
@@ -112,6 +113,18 @@ fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
         let result = judge(tokens);
         retrun_ast.node.push(result);
         return Ast::Types::Retrun(retrun_ast);
+    }
+
+    if token == 40 || token == 41 {
+        let parent = Ast::ParenthesesAST::new(string.chars().nth(0).unwrap());
+        let parent = Ast::Types::Parent(parent);
+        return parent;
+    }
+
+    if token == 44 {
+        let comma = Ast::CommaAST::new(',');
+        let comma = Ast::Types::Comma(comma);
+        return comma;
     }
 
     if token == 43 || token == 45 || token == 47 || token == 37 || token == 42 {
@@ -155,12 +168,12 @@ fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
 }
 
 fn function_call(tokens: &mut Vec<Token::TokenValue>) -> Vec<Ast::Types> {
-    let mut vec_node: Vec<Ast::Types>= Vec::new();
+    let mut vec_node: Vec<Ast::Types> = Vec::new();
     tokens.remove(0);
 
     loop {
         let token = tokens[0].token;
-        if token == 40 || token == 44{
+        if token == 40 || token == 44 {
             tokens.remove(0);
             continue;
         }
@@ -169,9 +182,8 @@ fn function_call(tokens: &mut Vec<Token::TokenValue>) -> Vec<Ast::Types> {
             break;
         }
 
-        let result = judge(tokens);
+        let result = calculation(tokens);
         vec_node.push(result);
-        tokens.remove(0);
     }
 
     return vec_node;
@@ -201,18 +213,15 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
                 number_vector.push(result);
             }
 
-            Ast::Types::Call(_) => {
-                match result {
-                    Ast::Types::Call(mut function) => {
-                        function.node = function_call(tokens);
-                        let result = Ast::Types::Call(function);
-                        number_vector.push(result);
-                    }
-
-                    _ => {break}
+            Ast::Types::Call(_) => match result {
+                Ast::Types::Call(mut function) => {
+                    function.argument = function_call(tokens);
+                    let result = Ast::Types::Call(function);
+                    number_vector.push(result);
                 }
-            }
 
+                _ => break,
+            },
             Ast::Types::Scope(_) => {
                 break;
             }
@@ -220,8 +229,21 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
             Ast::Types::End(_) => {
                 break;
             }
+            Ast::Types::Comma(_) => {
+                break;
+            }
 
-            _ => {number_vector.push(result);}
+            Ast::Types::Parent(pra) => {
+                if pra.parent == '(' {
+                    tokens.remove(0);
+                    continue;
+                }else if pra.parent == ')'{
+                    break;
+                }
+            }
+            _ => {
+                number_vector.push(result);
+            }
         }
 
         tokens.remove(0);
@@ -240,7 +262,6 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
 
             _ => {}
         }
-
     }
 
     if number_vector.len() == 1 {
@@ -323,7 +344,7 @@ fn function(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
                 function_ast.argument.push(result);
             }
 
-            if tokens[0].token == 41{
+            if tokens[0].token == 41 {
                 break;
             }
 
@@ -349,7 +370,7 @@ fn syntax(tokens: &mut Vec<Token::TokenValue>) -> Vec<Ast::Types> {
             continue;
         }
 
-        if token == 125{
+        if token == 125 {
             break;
         }
 
@@ -377,7 +398,7 @@ fn scope(tokens: &mut Vec<Token::TokenValue>) -> Option<Ast::Types> {
     let mut result = judge(tokens);
     match result {
         Ast::Types::Call(mut function) => {
-            function.node = function_call(tokens);
+            function.argument = function_call(tokens);
             result = Ast::Types::Call(function);
             return Some(result);
         }
@@ -400,7 +421,6 @@ fn scope(tokens: &mut Vec<Token::TokenValue>) -> Option<Ast::Types> {
                 result = Ast::Types::Variable(var);
                 return Some(result);
             }
-
 
             let result_cal = calculation(tokens);
             var.node.push(result_cal);

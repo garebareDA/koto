@@ -32,6 +32,7 @@ fn if_run(
         Ast::Types::Boolean(boolean) => {
             if boolean.boolean {
                 let (_, result) = scope(ifs, vec_variable, vec_function);
+
                 return result;
             }
         }
@@ -54,7 +55,7 @@ pub fn calculation(
         }
 
         _ => {
-            return Ast::Types::Error(Ast::ErrorAST::new("Binary Error"));
+            return ast;
         }
     }
 }
@@ -140,6 +141,11 @@ pub fn run_judg(
 
                 Ast::Types::Variable(var) => {
                     let result = vec_variable.serch_variable(&var.name, vec_function);
+                    return (false, Some(result));
+                }
+
+                Ast::Types::Number(_) => {
+                    let result = ret.node[0].clone();
                     return (false, Some(result));
                 }
 

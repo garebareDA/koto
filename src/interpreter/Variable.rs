@@ -1,6 +1,6 @@
 use super::super::ast::Ast;
-use super::Interpreter;
 use super::Function;
+use super::Interpreter;
 
 pub struct Variable {
     variables: Vec<Vec<Ast::Types>>,
@@ -28,7 +28,7 @@ impl Variable {
         self.in_var();
     }
 
-    pub fn push(&mut self, var:Ast::Types) {
+    pub fn push(&mut self, var: Ast::Types) {
         self.variables[self.inner].push(var);
     }
 
@@ -43,7 +43,11 @@ impl Variable {
         self.inner -= 1;
     }
 
-    pub fn variable(&mut self, var: Ast::Types, vec_function: &mut Function::function) -> Ast::Types {
+    pub fn variable(
+        &mut self,
+        var: Ast::Types,
+        vec_function: &mut Function::function,
+    ) -> Ast::Types {
         match var {
             Ast::Types::Binary(_) => {
                 return Interpreter::calculation(var, self, vec_function);
@@ -53,9 +57,15 @@ impl Variable {
         }
     }
 
-    pub fn serch_variable(&mut self, serch: &str, vec_function: &mut Function::function) -> Ast::Types {
+    pub fn serch_variable(
+        &mut self,
+        serch: &str,
+        vec_function: &mut Function::function,
+    ) -> Ast::Types {
         let mut variable_retrun = Ast::Types::Error(Ast::ErrorAST::new("Vairable Error"));
-        for vars in self.variables.clone() {
+        let mut var_vec = self.variables.clone();
+
+        for vars in var_vec {
             for var in vars {
                 match var {
                     Ast::Types::Variable(in_var) => {
@@ -73,7 +83,7 @@ impl Variable {
                                             variable_retrun = somes;
                                         }
 
-                                        None =>{}
+                                        None => {}
                                     }
                                 }
 
@@ -91,8 +101,11 @@ impl Variable {
         return variable_retrun;
     }
 
-    //関数も対応
-    pub fn variables_allocation(&mut self, serch: Vec<Ast::Types>, vec_function: &mut Function::function) -> Vec<Ast::Types> {
+    pub fn variables_allocation(
+        &mut self,
+        serch: Vec<Ast::Types>,
+        vec_function: &mut Function::function,
+    ) -> Vec<Ast::Types> {
         let mut ast_vec: Vec<Ast::Types> = Vec::new();
         for node in serch {
             match node {
@@ -122,6 +135,17 @@ impl Variable {
                             ast_vec.push(Ast::Types::Number(num));
                         }
                         _ => {}
+                    }
+                }
+
+                Ast::Types::Call(call) => {
+                    let result = vec_function.function_run(&call, self);
+                    match result {
+                        Some(result) => {
+                            ast_vec.push(result);
+                        }
+
+                        None => {}
                     }
                 }
                 _ => {}

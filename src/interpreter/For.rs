@@ -40,14 +40,13 @@ pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &
                             var_ast.node.push(result_var.clone());
                             vec_variable.push(Ast::Types::Variable(var_ast));
                             let (is_continue, result) = Interpreter::scope(ast, vec_variable, vec_function);
-                            if is_continue {
+                            if !is_continue {
                                 match result {
                                     Some(_) => {
                                         return result;
                                     }
-                                    None => {}
+                                    None => {break;}
                                 }
-                                break;
                             }
                         }
                     }
