@@ -12,7 +12,7 @@ use std::io::BufReader;
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    if &args[1] == "run" {
+    if args.len() == 3 && &args[1] == "run" {
         let mut index = 0;
         let path = &args[2];
         let file = File::open(path).expect("file not found");
