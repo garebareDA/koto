@@ -365,7 +365,7 @@ fn syntax(tokens: &mut Vec<Token::TokenValue>) -> Vec<Ast::Types> {
         }
 
         let token = tokens[0].token;
-        if token == 40 || token == 41 {
+        if token == 40 || token == 41 || token == 0{
             tokens.remove(0);
             continue;
         }
