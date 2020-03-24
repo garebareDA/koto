@@ -130,6 +130,7 @@ impl FunctionAST {
 #[derive(Debug, Clone)]
 pub struct VariableAST{
     pub name: String,
+    pub index:Option<Vec<Types>>,
     pub node: Vec<Types>,
 }
 
@@ -138,6 +139,7 @@ impl VariableAST {
         let string = string.to_string();
         VariableAST {
             name: string,
+            index:None,
             node: Vec::new(),
         }
     }

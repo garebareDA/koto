@@ -77,6 +77,17 @@ fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
             return call;
         }
 
+        if tokens[1].token == 91 {
+            let mut vec_tokens = tokens.clone();
+            vec_tokens.remove(0);
+            let index = calculation(&mut vec_tokens);
+
+            let mut variable = Ast::VariableAST::new(&string);
+            variable.index = Some(vec![index]);
+            let variable = Ast::Types::Variable(variable);
+            return variable;
+        }
+
         let variable = Ast::VariableAST::new(&string);
         let variable = Ast::Types::Variable(variable);
         return variable;
@@ -209,6 +220,7 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
 
     loop {
         let result = judge(tokens);
+        println!("{:?}", result);
 
         match result {
             Ast::Types::Binary(_) => {
@@ -223,8 +235,16 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
                 number_vector.push(result);
             }
 
-            Ast::Types::Variable(_) => {
-                number_vector.push(result);
+            Ast::Types::Variable(var) => {
+                match var.index {
+                    Some(_) => {
+                        tokens.remove(0);
+                        tokens.remove(0);
+                        tokens.remove(0);
+                        number_vector.push(Ast::Types::Variable(var))
+                    }
+                    None => {number_vector.push(Ast::Types::Variable(var))}
+                }
             }
 
             Ast::Types::Call(_) => match result {
@@ -272,6 +292,9 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
 
         tokens.remove(0);
     }
+
+    println!("{:?}", number_vector);
+    println!("{:?}", binary_vector);
 
     if number_vector.len() < binary_vector.len() {
         let number = number_vector[0].clone();
@@ -479,6 +502,10 @@ fn scope(tokens: &mut Vec<Token::TokenValue>) -> Option<Ast::Types> {
             let result = syntax(tokens);
             fors.node = result;
             return Some(Ast::Types::For(fors));
+        }
+
+        Ast::Types::Vector(_) => {
+            return Some(result);
         }
 
         Ast::Types::Retrun(_) => {

@@ -140,7 +140,7 @@ pub fn run_judg(
                 }
 
                 Ast::Types::Variable(var) => {
-                    let result = vec_variable.serch_variable(&var.name, vec_function);
+                    let result = vec_variable.serch_variable(&var, vec_function);
                     return (false, Some(result));
                 }
 

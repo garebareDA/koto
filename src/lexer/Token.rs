@@ -36,7 +36,7 @@ impl Token {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TokenValue {
     pub token: i64,
     pub val: String,

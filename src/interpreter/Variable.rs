@@ -59,45 +59,63 @@ impl Variable {
 
     pub fn serch_variable(
         &mut self,
-        serch: &str,
+        serch: &Ast::VariableAST,
         vec_function: &mut Function::function,
     ) -> Ast::Types {
         let mut variable_retrun = Ast::Types::Error(Ast::ErrorAST::new("Vairable Error"));
-        let mut var_vec = self.variables.clone();
+        let var_vec = self.variables.clone();
+        let serch = serch.clone();
+        let serch_word = serch.name;
 
         for vars in var_vec {
             for var in vars {
+                let mut in_var = Ast::VariableAST::new("");
+
                 match var {
-                    Ast::Types::Variable(in_var) => {
-                        if in_var.name == serch.to_string() {
-                            match in_var.node[0].clone() {
-                                Ast::Types::Variable(var) => {
-                                    let var_name = var.name;
-                                    variable_retrun = self.serch_variable(&var_name, vec_function);
-                                }
-
-                                Ast::Types::Call(_) => {
-                                    let (_, result) = Interpreter::run_judg(&in_var.node[0], self, vec_function);
-                                    match result {
-                                        Some(somes) => {
-                                            variable_retrun = somes;
-                                        }
-
-                                        None => {}
-                                    }
-                                }
-
-                                _ => {
-                                    variable_retrun = in_var.node[0].clone();
-                                }
-                            }
-                        }
+                    Ast::Types::Variable(in_vars) => {
+                        in_var = in_vars;
                     }
                     _ => {}
                 }
+
+                if in_var.name == serch_word {
+                    match in_var.node[0].clone() {
+                        Ast::Types::Variable(var) => {
+                            variable_retrun = self.serch_variable(&var, vec_function);
+                        }
+
+                        Ast::Types::Call(_) => {
+                            let (_, result) =
+                                Interpreter::run_judg(&in_var.node[0], self, vec_function);
+                            match result {
+                                Some(somes) => {
+                                    variable_retrun = somes;
+                                }
+
+                                None => {}
+                            }
+                        }
+
+                        Ast::Types::Vector(vector) => match &serch.index {
+                            Some(index) => match &index[0] {
+                                Ast::Types::Number(num) => {
+                                    let vector_num = num.val;
+                                    let var = &vector.node[vector_num as usize];
+                                    variable_retrun = var.clone();
+                                }
+
+                                _ => {}
+                            },
+                            None => {}
+                        },
+
+                        _ => {
+                            variable_retrun = in_var.node[0].clone();
+                        }
+                    }
+                }
             }
         }
-
         return variable_retrun;
     }
 
@@ -128,7 +146,7 @@ impl Variable {
                     if !var.node.is_empty() {
                         vec = self.variables_allocation(var.node.clone(), vec_function);
                     }
-                    let serch_result = self.serch_variable(&var.name, vec_function);
+                    let serch_result = self.serch_variable(&var, vec_function);
                     match serch_result {
                         Ast::Types::Number(mut num) => {
                             num.node = vec;

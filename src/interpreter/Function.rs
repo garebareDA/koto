@@ -64,7 +64,7 @@ impl function {
             let value = &call_ast.argument[0];
             match value {
                 Ast::Types::Variable(var) => {
-                    let var_result = variable.serch_variable(&var.name, self);
+                    let var_result = variable.serch_variable(&var, self);
                     self.print_var(&var_result);
                 }
 
