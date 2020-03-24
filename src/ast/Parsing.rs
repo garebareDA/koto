@@ -220,7 +220,6 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
 
     loop {
         let result = judge(tokens);
-        println!("{:?}", result);
 
         match result {
             Ast::Types::Binary(_) => {
@@ -295,9 +294,6 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
 
         tokens.remove(0);
     }
-
-    println!("{:?}", number_vector);
-    println!("{:?}", binary_vector);
 
     if number_vector.len() < binary_vector.len() {
         let number = number_vector[0].clone();
