@@ -43,11 +43,11 @@ fn if_run(
 }
 
 pub fn calculation(
-    ast: Ast::Types,
+    ast: &Ast::Types,
     vec_variable: &mut Variable::Variable,
     vec_function: &mut Function::function,
 ) -> Ast::Types {
-    match ast {
+    match ast.clone() {
         Ast::Types::Binary(mut binary) => {
             let vec_binary = vec_variable.variables_allocation(binary.node, vec_function);
             binary.node = vec_binary;
@@ -55,7 +55,7 @@ pub fn calculation(
         }
 
         _ => {
-            return ast;
+            return ast.clone();
         }
     }
 }
@@ -87,7 +87,7 @@ pub fn run_judg(
         }
 
         Ast::Types::If(ifs) => {
-            let result = calculation(ifs.judge[0].clone(), vec_variable, vec_function);
+            let result = calculation(&ifs.judge[0], vec_variable, vec_function);
             let mut result_if = None;
             vec_variable.vec_push();
             vec_function.vec_push();
@@ -135,7 +135,7 @@ pub fn run_judg(
 
             match ret.node[0].clone() {
                 Ast::Types::Binary(_) => {
-                    let result = calculation(ret.node[0].clone(), vec_variable, vec_function);
+                    let result = calculation(&ret.node[0], vec_variable, vec_function);
                     return (false, Some(result));
                 }
 

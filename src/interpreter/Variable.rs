@@ -50,7 +50,7 @@ impl Variable {
     ) -> Ast::Types {
         match var {
             Ast::Types::Binary(_) => {
-                return Interpreter::calculation(var, self, vec_function);
+                return Interpreter::calculation(&var, self, vec_function);
             }
 
             _ => return var,
@@ -102,6 +102,18 @@ impl Variable {
                                     let vector_num = num.val;
                                     let var = &vector.node[vector_num as usize];
                                     variable_retrun = var.clone();
+                                }
+
+                                Ast::Types::Binary(_) => {
+                                    let result = Interpreter::calculation(&index[0], self, vec_function);
+                                    match result {
+                                        Ast::Types::Number(num) => {
+                                            let vector_num = num.val;
+                                            let var = &vector.node[vector_num as usize];
+                                            variable_retrun = var.clone();
+                                        }
+                                        _ => {}
+                                    }
                                 }
 
                                 _ => {}

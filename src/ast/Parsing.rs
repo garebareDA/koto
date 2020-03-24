@@ -238,9 +238,12 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
             Ast::Types::Variable(var) => {
                 match var.index {
                     Some(_) => {
-                        tokens.remove(0);
-                        tokens.remove(0);
-                        tokens.remove(0);
+                        loop{
+                            tokens.remove(0);
+                            if tokens[0].token == 93 {
+                                break;
+                            }
+                        }
                         number_vector.push(Ast::Types::Variable(var))
                     }
                     None => {number_vector.push(Ast::Types::Variable(var))}

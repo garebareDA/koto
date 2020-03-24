@@ -17,7 +17,7 @@ pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &
             name = var.name;
             match var.node[0].clone() {
                 Ast::Types::Number(_) => {result_var = var.node[0].clone();}
-                Ast::Types::Binary(_) => {result_var = Interpreter::calculation(var.node[0].clone(), vec_variable, vec_function);}
+                Ast::Types::Binary(_) => {result_var = Interpreter::calculation(&var.node[0], vec_variable, vec_function);}
                 _ => {}
             }
         }
@@ -30,7 +30,7 @@ pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &
             Ast::Types::Binary(mut bin) => {
                 let var = for_variables(&name, &result_var, bin.node);
                 bin.node = var;
-                let result = Interpreter::calculation(Ast::Types::Binary(bin), vec_variable, vec_function);
+                let result = Interpreter::calculation(&Ast::Types::Binary(bin), vec_variable, vec_function);
                 match result {
                     Ast::Types::Boolean(bools) => {
                         if bools.boolean {
@@ -78,7 +78,7 @@ pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &
                     _ => {}
                 }
                 bin.node = result;
-                result_var = Interpreter::calculation(Ast::Types::Binary(bin), vec_variable, vec_function);
+                result_var = Interpreter::calculation(&Ast::Types::Binary(bin), vec_variable, vec_function);
             }
             _ => {}
         }

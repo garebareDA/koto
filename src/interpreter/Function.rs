@@ -69,7 +69,7 @@ impl function {
                 }
 
                 Ast::Types::Binary(_) => {
-                    let result = Interpreter::calculation(value.clone(), variable, self);
+                    let result = Interpreter::calculation(&value, variable, self);
                     self.print_var(&result);
                 }
 
@@ -114,7 +114,7 @@ impl function {
         for function_argument in function_arguments {
             match function_argument {
                 Ast::Types::Variable(mut variable) => {
-                    let result = Interpreter::calculation(argument[index].clone(), vec_variable, self);
+                    let result = Interpreter::calculation(&argument[index], vec_variable, self);
                     variable.node.push(result);
                     let variable = Ast::Types::Variable(variable);
                     vec_variable.push(variable);
