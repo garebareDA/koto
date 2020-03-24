@@ -12,6 +12,7 @@ pub struct Token {
     pub _let: i64,
     pub _bool:i64,
     pub _return: i64,
+    pub _vec: i64,
 }
 
 impl Token {
@@ -29,7 +30,8 @@ impl Token {
             _identifier: -10,
             _let: -11,
             _bool:-12,
-            _return: -13
+            _return: -13,
+            _vec: -14,
         }
     }
 }

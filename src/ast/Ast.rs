@@ -7,6 +7,7 @@ pub enum Types {
     Call(CallAST),
     Function(FunctionAST),
     Variable(VariableAST),
+    Vector(VectorAST),
     If(IfAST),
     For(ForAST),
     Retrun(RetrunAST),
@@ -140,6 +141,20 @@ impl VariableAST {
         }
     }
 }
+
+#[derive(Debug, Clone)]
+pub struct VectorAST {
+    pub node: Vec<Types>,
+}
+
+impl VectorAST {
+    pub fn new() -> VectorAST {
+        VectorAST{
+            node: Vec::new(),
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct IfAST {
     pub judge:Vec<Types>,

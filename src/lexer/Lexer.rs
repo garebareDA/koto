@@ -79,6 +79,11 @@ pub fn get(content: &str, mut index: usize) -> (Token::TokenValue, usize) {
                 return (token_value, index);
             }
 
+            if identifier_str == "vec" {
+                let token_value = Token::TokenValue::new(TOKEN._vec, &identifier_str);
+                return (token_value, index);
+            }
+
             let token_value = Token::TokenValue::new(TOKEN._identifier, &identifier_str);
             return (token_value, index);
         }
