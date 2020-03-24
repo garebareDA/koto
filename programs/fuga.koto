@@ -1,9 +1,4 @@
-for let i = 0; i > 10; i++; {
-    let a = fib(i);
-    print(a)
-}
-
-let a = vec[];
+let a = vec[1, 2, 3, 4, 5];
 
 fn fib(n) {
     if n < 3 {

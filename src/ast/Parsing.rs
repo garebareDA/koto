@@ -115,6 +115,14 @@ fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
         return Ast::Types::Retrun(retrun_ast);
     }
 
+    if token == -14 {
+        tokens.remove(0);
+        let result = vector(tokens);
+        let mut vector_ast = Ast::VectorAST::new();
+        vector_ast.node = result;
+        return Ast::Types::Vector(vector_ast);
+    }
+
     if token == 40 || token == 41 {
         let parent = Ast::ParenthesesAST::new(string.chars().nth(0).unwrap());
         let parent = Ast::Types::Parent(parent);
@@ -156,8 +164,14 @@ fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
         return end;
     }
 
+    if token == 91 || token == 93 {
+        let squar = Ast::SquareAST::new(string.parse().unwrap());
+        let squar = Ast::Types::Square(squar);
+        return squar;
+    }
+
     if token == 123 || token == 125 {
-        let scope_ast = Ast::ScopeAST::new(string.chars().nth(0).unwrap());
+        let scope_ast = Ast::ScopeAST::new(string.parse().unwrap());
         let scope = Ast::Types::Scope(scope_ast);
         return scope;
     }
@@ -237,12 +251,22 @@ fn calculation(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
                 if pra.parent == '(' {
                     tokens.remove(0);
                     continue;
-                }else if pra.parent == ')'{
+                } else if pra.parent == ')' {
                     break;
                 }
             }
+
+            Ast::Types::Square(square) => {
+                if square.square == '[' {
+                    tokens.remove(0);
+                    continue;
+                }else if square.square == ']' {
+                    break;
+                }
+            }
+
             _ => {
-                number_vector.push(result);
+                break;
             }
         }
 
@@ -357,6 +381,23 @@ fn function(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
     return Ast::Types::Function(function_ast);
 }
 
+fn vector(tokens: &mut Vec<Token::TokenValue>) -> Vec<Ast::Types> {
+    let mut vec: Vec<Ast::Types> = Vec::new();
+    if tokens[0].token == 91 {
+        loop {
+            let result = calculation(tokens);
+            vec.push(result);
+            if tokens[0].token == 93 {
+                tokens.remove(0);
+                break;
+            }
+            tokens.remove(0);
+        }
+    }
+
+    return vec;
+}
+
 fn syntax(tokens: &mut Vec<Token::TokenValue>) -> Vec<Ast::Types> {
     let mut node_vec = Vec::new();
     loop {
@@ -365,7 +406,7 @@ fn syntax(tokens: &mut Vec<Token::TokenValue>) -> Vec<Ast::Types> {
         }
 
         let token = tokens[0].token;
-        if token == 40 || token == 41 || token == 0{
+        if token == 40 || token == 41 || token == 0 {
             tokens.remove(0);
             continue;
         }

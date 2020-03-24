@@ -12,6 +12,7 @@ pub enum Types {
     For(ForAST),
     Retrun(RetrunAST),
     Scope(ScopeAST),
+    Square(SquareAST),
     Comma(CommaAST),
     Parent(ParenthesesAST),
     End(EndAST),
@@ -225,6 +226,19 @@ impl ParenthesesAST {
     pub fn new(parent:char) -> ParenthesesAST {
         ParenthesesAST{
             parent: parent
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SquareAST {
+    pub square: char,
+}
+
+impl SquareAST {
+    pub fn new(square: char) -> SquareAST {
+        SquareAST{
+            square:square
         }
     }
 }
