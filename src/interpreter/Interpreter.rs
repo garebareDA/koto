@@ -3,6 +3,7 @@ use super::Arithmetic;
 use super::For;
 use super::Function;
 use super::Variable;
+use super::Error;
 
 pub fn run(root: Ast::ExprAST) {
     let mut index = 0;
