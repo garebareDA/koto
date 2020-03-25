@@ -1,6 +1,7 @@
 use super::super::ast::Ast;
 use super::Interpreter;
 use super::Variable;
+use super::Error;
 
 pub struct function {
     funcstions: Vec<Vec<Ast::Types>>,
@@ -52,7 +53,10 @@ impl function {
                 Ast::Types::Function(_) => {
                     self.funcstions[self.inner].push(node);
                 }
-                _ => {}
+                _ => {
+                    let err = Error::Error::new(&node);
+                    err.exit();
+                }
             }
             index += 1;
         }
@@ -120,7 +124,10 @@ impl function {
                     vec_variable.push(variable);
                 }
 
-                _ => {}
+                _ => {
+                    let err = Error::Error::new(&function_argument);
+                    err.exit();
+                }
             }
 
             index += 1;
@@ -142,7 +149,10 @@ impl function {
             Ast::Types::Boolean(bools) => {
                 println!("{}", bools.boolean);
             }
-            _ => {}
+            _ => {
+                let err = Error::Error::new(&var_result);
+                err.exit();
+            }
         }
     }
 }

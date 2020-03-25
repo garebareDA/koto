@@ -150,7 +150,10 @@ pub fn run_judg(
                     return (false, Some(result));
                 }
 
-                _ => {}
+                _ => {
+                    let err = Error::Error::new(& ret.node[0]);
+                    err.exit();
+                }
             }
         }
 
