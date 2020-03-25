@@ -10,8 +10,14 @@ pub fn parsing(tokens: &mut Vec<Token::TokenValue>) -> Ast::ExprAST {
 }
 
 fn judge(tokens: &mut Vec<Token::TokenValue>) -> Ast::Types {
-    let token = tokens[0].token;
-    let string = tokens[0].val.clone();
+    let mut token = tokens[0].token;
+    let mut string = tokens[0].val.clone();
+
+    if token == -9 {
+        tokens.remove(0);
+        token = tokens[0].token;
+        string = tokens[0].val.clone();
+    }
 
     if token == -1 {
         tokens.remove(0);

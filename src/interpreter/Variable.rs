@@ -48,8 +48,17 @@ impl Variable {
         var: Ast::Types,
         vec_function: &mut Function::function,
     ) -> Ast::Types {
-        match var {
-            Ast::Types::Binary(_) => {
+        match var.clone() {
+            Ast::Types::Binary(bin) => {
+                if bin.op == '='{
+                    match bin.node[0] {
+                        Ast::Types::Variable(_) =>{
+                            return bin.node[bin.node.len() - 1].clone();
+                        }
+
+                        _ => {}
+                    }
+                }
                 return Interpreter::calculation(&var, self, vec_function);
             }
 

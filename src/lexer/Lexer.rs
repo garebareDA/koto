@@ -142,7 +142,7 @@ pub fn get(content: &str, mut index: usize) -> (Token::TokenValue, usize) {
     };
 
     //コメント
-    let reg = Regex::new(r"#").expect("Faild");
+    let reg = Regex::new(r#"#"#).expect("Faild");
     match reg.captures(&last_str) {
         Some(_) => {
             loop{

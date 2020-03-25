@@ -1,3 +1,30 @@
-let a = vec[1, 2, 3, 4, 5];
-let b = a[0 + a[2]] + 1;
-print(b);
+#comment
+
+let number = 1;
+
+let string = "hello, world";
+
+let vector = vec[1, 2, 3, 4, 5];
+let index = vector[2];
+
+let cal = number + 1 - 1 / 2 % 2 * 2;
+
+let result = index;
+
+result = cal;
+
+print(result);
+
+for let i = 0; i > 5; i++;{
+    let reslut = function(i);
+    print(reslut);
+}
+
+fn function(n) {
+    if n < 3 {
+        return 1;
+    }
+
+    let b = function(n - 1) + function(n - 2);
+    return b;
+}
