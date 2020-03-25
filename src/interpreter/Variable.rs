@@ -1,6 +1,7 @@
 use super::super::ast::Ast;
 use super::Function;
 use super::Interpreter;
+use super::Error;
 
 pub struct Variable {
     variables: Vec<Vec<Ast::Types>>,
@@ -74,7 +75,7 @@ impl Variable {
         let mut variable_retrun = Ast::Types::Error(Ast::ErrorAST::new("Vairable Error"));
         let var_vec = self.variables.clone();
         let serch = serch.clone();
-        let serch_word = serch.name;
+        let serch_word = &serch.name;
 
         for vars in var_vec {
             for var in vars {
@@ -84,10 +85,14 @@ impl Variable {
                     Ast::Types::Variable(in_vars) => {
                         in_var = in_vars;
                     }
-                    _ => {}
+
+                    _ => {
+                        let err = Error::Error::new(&var);
+                        err.exit();
+                    }
                 }
 
-                if in_var.name == serch_word {
+                if &in_var.name == serch_word {
                     match in_var.node[0].clone() {
                         Ast::Types::Variable(var) => {
                             variable_retrun = self.serch_variable(&var, vec_function);
@@ -101,7 +106,10 @@ impl Variable {
                                     variable_retrun = somes;
                                 }
 
-                                None => {}
+                                None => {
+                                    let err = Error::Error::new(&in_var.node[0]);
+                                    err.exit()
+                                }
                             }
                         }
 
@@ -121,13 +129,22 @@ impl Variable {
                                             let var = &vector.node[vector_num as usize];
                                             variable_retrun = var.clone();
                                         }
-                                        _ => {}
+                                        _ => {
+                                            let err = Error::Error::new(&result);
+                                            err.exit();
+                                        }
                                     }
                                 }
 
-                                _ => {}
+                                _ => {
+                                    let err = Error::Error::new(&index[0]);
+                                    err.exit();
+                                }
                             },
-                            None => {}
+                            None => {
+                                let err = Error::Error::new(&Ast::Types::Variable(serch.clone()));
+                                err.exit();
+                            }
                         },
 
                         _ => {
@@ -147,7 +164,7 @@ impl Variable {
     ) -> Vec<Ast::Types> {
         let mut ast_vec: Vec<Ast::Types> = Vec::new();
         for node in serch {
-            match node {
+            match node.clone() {
                 Ast::Types::Binary(mut bin) => {
                     if !bin.node.is_empty() {
                         let vec = self.variables_allocation(bin.node.clone(), vec_function);
@@ -173,7 +190,10 @@ impl Variable {
                             num.node = vec;
                             ast_vec.push(Ast::Types::Number(num));
                         }
-                        _ => {}
+                        _ => {
+                            let err = Error::Error::new(&node);
+                            err.exit();
+                        }
                     }
                 }
 
@@ -184,10 +204,16 @@ impl Variable {
                             ast_vec.push(result);
                         }
 
-                        None => {}
+                        None => {
+                            let err = Error::Error::new(&node);
+                            err.exit();
+                        }
                     }
                 }
-                _ => {}
+                _ => {
+                    let err = Error::Error::new(&node);
+                    err.exit();
+                }
             }
         }
         return ast_vec;
