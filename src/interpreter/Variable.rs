@@ -80,7 +80,6 @@ impl Variable {
         for vars in var_vec {
             for var in vars {
                 let mut in_var = Ast::VariableAST::new("");
-
                 match var {
                     Ast::Types::Variable(in_vars) => {
                         in_var = in_vars;
@@ -88,7 +87,7 @@ impl Variable {
 
                     _ => {
                         let err = Error::Error::new(&var);
-                        err.exit();
+                        err.exit("This is not a variable");
                     }
                 }
 
@@ -108,7 +107,7 @@ impl Variable {
 
                                 None => {
                                     let err = Error::Error::new(&in_var.node[0]);
-                                    err.exit()
+                                    err.exit("vaiable not found");
                                 }
                             }
                         }
@@ -131,19 +130,19 @@ impl Variable {
                                         }
                                         _ => {
                                             let err = Error::Error::new(&result);
-                                            err.exit();
+                                            err.exit("not a Number");
                                         }
                                     }
                                 }
 
                                 _ => {
                                     let err = Error::Error::new(&index[0]);
-                                    err.exit();
+                                    err.exit("not a vector");
                                 }
                             },
                             None => {
                                 let err = Error::Error::new(&Ast::Types::Variable(serch.clone()));
-                                err.exit();
+                                err.exit("not a vector");
                             }
                         },
 
@@ -192,7 +191,7 @@ impl Variable {
                         }
                         _ => {
                             let err = Error::Error::new(&node);
-                            err.exit();
+                            err.exit("variable not found");
                         }
                     }
                 }
@@ -206,13 +205,13 @@ impl Variable {
 
                         None => {
                             let err = Error::Error::new(&node);
-                            err.exit();
+                            err.exit("not a function");
                         }
                     }
                 }
                 _ => {
                     let err = Error::Error::new(&node);
-                    err.exit();
+                    err.exit("not a function");
                 }
             }
         }

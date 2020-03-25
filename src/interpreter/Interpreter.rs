@@ -152,7 +152,7 @@ pub fn run_judg(
 
                 _ => {
                     let err = Error::Error::new(& ret.node[0]);
-                    err.exit();
+                    err.exit("retrun error");
                 }
             }
         }

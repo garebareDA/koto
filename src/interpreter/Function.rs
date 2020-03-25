@@ -54,8 +54,6 @@ impl function {
                     self.funcstions[self.inner].push(node);
                 }
                 _ => {
-                    let err = Error::Error::new(&node);
-                    err.exit();
                 }
             }
             index += 1;
@@ -126,7 +124,7 @@ impl function {
 
                 _ => {
                     let err = Error::Error::new(&function_argument);
-                    err.exit();
+                    err.exit("argument error");
                 }
             }
 
@@ -151,7 +149,7 @@ impl function {
             }
             _ => {
                 let err = Error::Error::new(&var_result);
-                err.exit();
+                err.exit("print error");
             }
         }
     }

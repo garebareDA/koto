@@ -13,43 +13,43 @@ impl Error {
         }
     }
 
-    pub fn exit(self) {
-        self.error_message();
+    pub fn exit(self, message: &str) {
+        self.error_message(message);
         exit(0);
     }
 
-    fn error_message(self) {
+    fn error_message(self, error_message:&str) {
         match self.error.clone() {
             Ast::Types::Binary(bin) => {
-                eprintln!("{}",bin.op);
+                eprintln!("{} {}",bin.op, error_message);
             }
 
             Ast::Types::Strings(string) => {
-                eprintln!("{}",string.name);
+                eprintln!("{} {}",string.name, error_message);
             }
 
             Ast::Types::Vector(vec) => {
-                eprintln!("{:?}",vec.node);
+                eprintln!("{:?} {}",vec.node, error_message);
             }
 
             Ast::Types::Number(num) => {
-                eprintln!("{:?}", num.val);
+                eprintln!("{} {:?}", num.val, error_message);
             }
 
             Ast::Types::Variable(var) => {
-                eprintln!("{:?}", var.name);
+                eprintln!("{:?} {}", var.name, error_message);
             }
 
             Ast::Types::If(ifs) => {
-                eprintln!("{:?}", ifs.judge);
+                eprintln!("{:?} {}", ifs.judge, error_message);
             }
 
             Ast::Types::For(fors) => {
-                eprintln!("{:?}", fors.init_var);
+                eprintln!("{:?} {}", fors.init_var, error_message);
             }
 
             Ast::Types::Error(err) => {
-                eprintln!("{}", err.error);
+                eprintln!("{} {}", err.error, error_message);
             }
 
             _ => {}
