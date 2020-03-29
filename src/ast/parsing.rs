@@ -42,7 +42,7 @@ impl Parsing {
             self.tokens.remove(0);
             let result = self.calculation();
             self.tokens.remove(0);
-            let loop_op = self.calculation();
+            let loop_op = self.judge();
             match var {
                 Some(var) => {
                     let for_ast = Ast::ForAST::new(var, result, loop_op);
@@ -91,6 +91,11 @@ impl Parsing {
                 self.tokens = before;
                 return variable;
             }
+
+            if self.tokens[2].token == 43 || self.tokens[2].token == 45 {
+                return self.reassignment();
+            }
+
             let variable = Ast::VariableAST::new(&string);
             let variable = Ast::Types::Variable(variable);
             return variable;
@@ -180,6 +185,7 @@ impl Parsing {
         let variable = Ast::Types::Variable(variable);
         return variable;
     }
+
     fn function_call(&mut self) -> Vec<Ast::Types> {
         let mut vec_node: Vec<Ast::Types> = Vec::new();
         self.tokens.remove(0);
@@ -197,6 +203,7 @@ impl Parsing {
         }
         return vec_node;
     }
+
     fn calculation(&mut self) -> Ast::Types {
         let mut number_vector: Vec<Ast::Types> = Vec::new();
         let mut binary_vector: Vec<Ast::Types> = Vec::new();
@@ -315,6 +322,7 @@ impl Parsing {
             _ => return Ast::Types::Error(Ast::ErrorAST::new("Binary parsing error")),
         }
     }
+
     fn variable(&mut self) -> Ast::Types {
         let token = self.tokens[0].token;
         if token == 40 || token == 41 {
@@ -329,6 +337,27 @@ impl Parsing {
         }
         return result;
     }
+
+    fn reassignment(&mut self) -> Ast::Types {
+        let var_val = Ast::VariableAST::new(&self.tokens[0].val);
+        self.tokens.remove(0);
+        let first_bin = self.judge();
+        self.tokens.remove(0);
+        let second_bin = self.judge();
+        self.tokens.remove(0);
+
+        match first_bin {
+            Ast::Types::Binary(mut bin) => {
+                bin.node.push(Ast::Types::Variable(var_val));
+                bin.node.push(second_bin);
+                println!("{:?}", bin);
+                return Ast::Types::Binary(bin);
+            }
+
+            _ =>{return Ast::Types::Error(Ast::ErrorAST::new("Reassignment operater error"));}
+        }
+    }
+
     fn function(&mut self) -> Ast::Types {
         let string = &self.tokens[0].val;
         let token = self.tokens[1].token;
@@ -352,6 +381,7 @@ impl Parsing {
         function_ast.node = result;
         return Ast::Types::Function(function_ast);
     }
+
     fn vector(&mut self) -> Vec<Ast::Types> {
         let mut vec: Vec<Ast::Types> = Vec::new();
         if self.tokens[0].token == 91 {
@@ -367,10 +397,11 @@ impl Parsing {
         }
         return vec;
     }
+
     fn syntax(&mut self) -> Vec<Ast::Types> {
         let mut node_vec = Vec::new();
         loop {
-            if  self.tokens.is_empty() {
+            if self.tokens.is_empty() {
                 break;
             }
             let token = self.tokens[0].token;
@@ -396,6 +427,7 @@ impl Parsing {
         }
         return node_vec;
     }
+
     fn scope(&mut self) -> Option<Ast::Types> {
         let mut result = self.judge();
         match result {

@@ -8,6 +8,7 @@ let vector = vec[1, 2, 3, 4, 5];
 let index = vector[1];
 
 let cal = number + 1 - 1 / 2 % 2 * 2;
+cal++;
 
 let result = index;
 
