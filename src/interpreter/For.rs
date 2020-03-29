@@ -4,7 +4,6 @@ use super::Function;
 use super::Interpreter;
 use super::Error;
 
-//TODO 全体的にリファクタリング
 pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &mut Variable::Variable, vec_function: &mut Function::function) -> Option<Ast::Types>{
     let variant = ast_for[0].clone();
     let judge = ast_for[1].clone();

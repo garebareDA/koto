@@ -1,4 +1,5 @@
 use super::super::ast::Ast;
+use super::Error;
 
 pub fn common(bin: Ast::BinaryAST) -> Ast::Types {
     let op = bin.op;
@@ -185,10 +186,13 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
             bool_a = bools.boolean;
             node_first = bools.node[0].clone();
         }
-        _ => {}
+        _ => {
+            let err = Error::Error::new(&numbers);
+            err.exit("number error");
+        }
     }
 
-    match node_first {
+    match node_first.clone() {
         Ast::Types::Binary(binary) => {
             bin = binary.op;
             let len = binary.node.len();
@@ -199,7 +203,8 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
                 comparison_node = binary.node[0].clone();
                 node_seccond = binary.node[1].clone();
             } else {
-                panic!("binary erorr");
+                let err = Error::Error::new(&node_first);
+                err.exit("number operater error");
             }
         }
         _ => {}
@@ -267,7 +272,8 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
                     }
 
                     _ => {
-                        panic!("error");
+                        let err = Error::Error::new(&comparison_node);
+                        err.exit("number error");
                     }
                 }
             }
@@ -280,7 +286,8 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
                     }
 
                     _ => {
-                        panic!("error");
+                        let err = Error::Error::new(&comparison_node);
+                        err.exit("number error");
                     }
                 }
             }
@@ -294,7 +301,10 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
                     Ast::Types::Binary(_) => {
                         binarys.node.push(comparison_node);
                     }
-                    _ => {}
+                    _ => {
+                        let err = Error::Error::new(&comparison_node);
+                        err.exit("number error");
+                    }
                 }
 
                 binarys.node.push(result);
@@ -315,7 +325,10 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
                         ast_retruns = ast_return
                     }
 
-                    _ => {}
+                    _ => {
+                        let err = Error::Error::new(&numbers);
+                        err.exit("number error");
+                    }
                 }
                 return ast_retruns;
             }
@@ -333,7 +346,8 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
                     }
 
                     _ => {
-                        panic!("error");
+                        let err = Error::Error::new(&comparison_node);
+                        err.exit("Comparison operator error")
                     }
                 }
             }
@@ -346,7 +360,8 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
                     }
 
                     _ => {
-                        panic!("error");
+                        let err = Error::Error::new(&comparison_node);
+                        err.exit("Comparison operator error")
                     }
                 }
             }
@@ -360,7 +375,8 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
                     }
 
                     _ => {
-                        panic!("error");
+                        let err = Error::Error::new(&comparison_node);
+                        err.exit("Comparison operator error")
                     }
                 }
             }
@@ -373,7 +389,8 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
                     }
 
                     _ => {
-                        panic!("error");
+                        let err = Error::Error::new(&comparison_node);
+                        err.exit("Comparison operator error")
                     }
                 }
             }
@@ -387,7 +404,10 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
                     Ast::Types::Binary(_) => {
                         binarys.node.push(comparison_node);
                     }
-                    _ => {}
+                    _ => {
+                        let err = Error::Error::new(&comparison_node);
+                        err.exit("Comparison operator error")
+                    }
                 }
 
                 binarys.node.push(result);
@@ -409,14 +429,20 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
                         ast_retruns = ast_return
                     }
 
-                    _ => {}
+                    _ => {
+                        let err = Error::Error::new(&numbers);
+                        err.exit("Comparison operator error")
+                    }
                 }
                 return ast_retruns;
             }
 
             return numbers;
         }
-        _ => {}
+        _ => {
+            let err = Error::Error::new(&comparison_node);
+            err.exit("operator or Number error");
+        }
     }
 
     return numbers;
@@ -480,7 +506,10 @@ fn match_type(node: Ast::Types, next_node: Ast::Types) -> (Vec<i64>, Vec<Ast::Ty
         Ast::Types::Number(num) => {
             numbers.push(num.val);
         }
-        _ => {}
+        _ => {
+            let err = Error::Error::new(&node);
+            err.exit( "number error");
+        }
     }
 
     match next_node {
@@ -490,7 +519,10 @@ fn match_type(node: Ast::Types, next_node: Ast::Types) -> (Vec<i64>, Vec<Ast::Ty
                 types.push(num.node[0].clone());
             }
         }
-        _ => {}
+        _ => {
+            let err = Error::Error::new(&next_node);
+            err.exit("number node error");
+        }
     }
 
     return (numbers, types);
