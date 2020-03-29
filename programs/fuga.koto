@@ -1,5 +1,4 @@
 #comment
-
 let number = 1;
 
 let string = "hello, world";
@@ -9,11 +8,10 @@ let index = vector[1];
 
 let cal = number + 1 - 1 / 2 % 2 * 2;
 cal++;
+print(cal);
 
 let result = index;
-
 result = cal;
-
 print(result);
 
 for let i = 0; i > 5; i++;{

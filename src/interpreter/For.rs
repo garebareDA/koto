@@ -64,45 +64,11 @@ pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &
             }
             _ => {
                 let err = Error::Error::new(&judge);
-                err.exit("for judg error");
+                err.exit("For judge error");
             }
         }
 
-        match loop_for.clone() {
-            Ast::Types::Binary(mut bin) => {
-                let result = for_variables(&name, &result_var, bin.node.clone());
-                let innner_bin = bin.node[1].clone();
-                match innner_bin {
-                    Ast::Types::Binary(bin) => {
-                        match result_var.clone() {
-                            Ast::Types::Number(mut num) =>{
-                                if bin.op == '+'{
-                                    num.val += 1;
-                                }else if bin.op == '-'{
-                                    num.val -= 1;
-                                }
-                                result_var = Ast::Types::Number(num);
-                                continue;
-                            }
-                            _ => {
-                                let err = Error::Error::new(&result_var);
-                                err.exit("for binary error");
-                            }
-                        }
-                    }
-                    _ => {
-                        let err = Error::Error::new(&innner_bin);
-                        err.exit("for binary error");
-                    }
-                }
-                bin.node = result;
-                result_var = Interpreter::calculation(&Ast::Types::Binary(bin), vec_variable, vec_function);
-            }
-            _ => {
-                let err = Error::Error::new(&loop_for);
-                err.exit("for binary error");
-            }
-        }
+        result_var = Interpreter::calculation(&loop_for, vec_variable, vec_function);
     }
 
     return None;

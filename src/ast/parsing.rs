@@ -350,7 +350,6 @@ impl Parsing {
             Ast::Types::Binary(mut bin) => {
                 bin.node.push(Ast::Types::Variable(var_val));
                 bin.node.push(second_bin);
-                println!("{:?}", bin);
                 return Ast::Types::Binary(bin);
             }
 
@@ -465,6 +464,9 @@ impl Parsing {
                 let result = self.syntax();
                 fors.node = result;
                 return Some(Ast::Types::For(fors));
+            }
+            Ast::Types::Binary(_) => {
+                return Some(result);
             }
             Ast::Types::Vector(_) => {
                 return Some(result);

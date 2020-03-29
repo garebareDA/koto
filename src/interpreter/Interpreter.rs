@@ -80,6 +80,33 @@ pub fn run_judg(
             }
         }
 
+        Ast::Types::Binary(bin) => {
+            let result = calculation(node, vec_variable, vec_function);
+            let mut is_continue = false;
+            if bin.node.len() == 2 {
+                match &bin.node[1] {
+                    Ast::Types::Binary(inner_bin) => {
+                        if bin.op == inner_bin.op {
+                            is_continue = true;
+                        }
+                    }
+
+                    _ =>{}
+                }
+            }
+
+            if is_continue{
+                match bin.node[0].clone() {
+                    Ast::Types::Variable(mut var) => {
+                        var.node.push(result);
+                        let varibles = Ast::Types::Variable(var);
+                        vec_variable.push(varibles);
+                    }
+                    _ => {}
+                }
+            }
+        }
+
         Ast::Types::Variable(var) => {
             let var_contents = vec_variable.variable(var.node[0].clone(), vec_function);
             let mut var_ast = Ast::VariableAST::new(&var.name);
