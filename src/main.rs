@@ -1,6 +1,6 @@
 use std::env;
 
-use koto::ast::Parsing;
+use koto::ast::parsing;
 use koto::interpreter;
 use koto::lexer::Lexer;
 use koto::lexer::Token;
@@ -30,7 +30,8 @@ fn main() {
             println!("{:?}", result);
             tokens.push(result);
         }
-        let result = Parsing::parsing(&mut tokens);
+        let mut pars = parsing::Parsing::new(&tokens);
+        let result = pars.parsing();
         println!("{:?}", result);
 
         interpreter::Interpreter::run(result);
