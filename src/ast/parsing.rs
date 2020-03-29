@@ -21,12 +21,14 @@ impl Parsing {
     fn judge(&mut self) -> Ast::Types {
         let mut token = self.tokens[0].token;
         let mut string = self.tokens[0].val.clone();
-        if token == -9 {
+        let token_constant = Token::Token::new();
+
+        if token == token_constant._comment {
             self.tokens.remove(0);
             token = self.tokens[0].token;
             string = self.tokens[0].val.clone();
         }
-        if token == -1 {
+        if token == token_constant._if {
             self.tokens.remove(0);
             let result = self.calculation();
             let mut result_vec: Vec<Ast::Types> = Vec::new();
@@ -34,7 +36,7 @@ impl Parsing {
             let if_ast = Ast::IfAST::new(result_vec);
             return Ast::Types::If(if_ast);
         }
-        if token == -4 {
+        if token == token_constant._for {
             self.tokens.remove(0);
             let var = self.scope();
             self.tokens.remove(0);
@@ -52,27 +54,27 @@ impl Parsing {
                 }
             }
         }
-        if token == -5 {
+        if token == token_constant._fun {
             self.tokens.remove(0);
             return self.function();
         }
-        if token == -6 {
+        if token == token_constant._print {
             let print = Ast::CallAST::new("print");
             let call = Ast::Types::Call(print);
             return call;
         }
-        if token == -7 {
+        if token == token_constant._string {
             let string = Ast::StringAST::new(&string);
             let strings = Ast::Types::Strings(string);
             return strings;
         }
-        if token == -8 {
+        if token == token_constant._number {
             let num = string.parse().unwrap();
             let num = Ast::NumberAST::new(num);
             let number = Ast::Types::Number(num);
             return number;
         }
-        if token == -10 {
+        if token == token_constant._identifier {
             if self.tokens[1].token == 40 {
                 let call = Ast::CallAST::new(&string);
                 let call = Ast::Types::Call(call);
@@ -93,7 +95,7 @@ impl Parsing {
             let variable = Ast::Types::Variable(variable);
             return variable;
         }
-        if token == -11 {
+        if token == token_constant._let {
             self.tokens.remove(0);
             let string = &self.tokens[0].val;
             let variable = Ast::VariableAST::new(string);
@@ -102,7 +104,7 @@ impl Parsing {
             self.tokens.remove(0);
             return variable;
         }
-        if token == -12 {
+        if token == token_constant._bool {
             if string == "true" {
                 let bools = Ast::BooleanAST::new(true);
                 let bools = Ast::Types::Boolean(bools);
@@ -113,7 +115,7 @@ impl Parsing {
                 return bools;
             }
         }
-        if token == -13 {
+        if token == token_constant._return {
             self.tokens.remove(0);
             let mut retrun_ast = Ast::RetrunAST::new();
             if self.tokens[0].token == 59 {
@@ -123,7 +125,7 @@ impl Parsing {
             retrun_ast.node.push(result);
             return Ast::Types::Retrun(retrun_ast);
         }
-        if token == -14 {
+        if token == token_constant._vec {
             self.tokens.remove(0);
             let result = self.vector();
             let mut vector_ast = Ast::VectorAST::new();
