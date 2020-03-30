@@ -16,9 +16,11 @@ fn main() {
         let file = File::open(path).expect("file not found");
         let mut file_buffer = BufReader::new(&file);
         let mut content = String::new();
-        file_buffer.read_to_string(&mut content);
+        file_buffer.read_to_string(&mut content).expect("file not found");
+
         let mut lexer = Lexer::Lexer::new(&content);
         let tokens = lexer.start();
+
         let mut pars = parsing::Parsing::new(&tokens);
         let result = pars.parsing();
         println!("{:?}", result);
