@@ -49,22 +49,28 @@ impl Variable {
         var: Ast::Types,
         vec_function: &mut Function::function,
     ) -> Ast::Types {
+        let bin_op:char;
+        let bin_node:Vec<Ast::Types>;
+
         match var.clone() {
             Ast::Types::Binary(bin) => {
-                if bin.op == '='{
-                    match bin.node[0] {
-                        Ast::Types::Variable(_) =>{
-                            return bin.node[bin.node.len() - 1].clone();
-                        }
-
-                        _ => {}
-                    }
-                }
-                return Interpreter::calculation(&var, self, vec_function);
+                bin_op = bin.op;
+                bin_node = bin.node;
             }
 
             _ => return var,
         }
+
+        if bin_op == '='{
+            match bin_node[0] {
+                Ast::Types::Variable(_) =>{
+                    return bin_node[bin_node.len() - 1].clone();
+                }
+
+                _ => {}
+            }
+        }
+        return Interpreter::calculation(&var, self, vec_function);
     }
 
     pub fn serch_variable(

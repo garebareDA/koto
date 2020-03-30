@@ -71,6 +71,7 @@ pub fn common(bin: Ast::BinaryAST) -> Ast::Types {
         }
     }
 
+    // + と比較演算子の文字列の対応
     if op == '+' {
         let (numbers, types) = match_type(node.clone(), next_node.clone());
         let result = plus(numbers[0], numbers[1]);
