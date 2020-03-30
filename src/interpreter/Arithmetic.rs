@@ -88,7 +88,7 @@ pub fn common(bin: Ast::BinaryAST) -> Ast::Types {
 
     if op == '<' {
         let (numbers, types) = match_type(node.clone(), next_node.clone());
-        let mut result = false;
+        let result:bool;
 
         if bin.node.len() == 3 {
             result = greater_than_equal(numbers[0], numbers[1]);
@@ -107,7 +107,7 @@ pub fn common(bin: Ast::BinaryAST) -> Ast::Types {
 
     if op == '>' {
         let (numbers, types) = match_type(node.clone(), next_node.clone());
-        let mut result = false;
+        let result:bool;
 
         if bin.node.len() == 3 {
             result = less_than_equal(numbers[0], numbers[1]);
