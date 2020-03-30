@@ -2,11 +2,13 @@
 let number = 1;
 
 let string = "hello, world";
+print(string);
 
 let vector = vec[1, 2, 3, 4, 5];
 let index = vector[1];
+print(index);
 
-let cal = number + 1 - 1 / 2 % 2 * 2;
+let cal = number + 1 - 1 / 2 * 5;
 cal++;
 print(cal);
 
