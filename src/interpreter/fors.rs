@@ -1,51 +1,51 @@
-use super::super::ast::Ast;
-use super::Variable;
-use super::Function;
-use super::Interpreter;
-use super::Error;
+use super::super::ast::asts;
+use super::variable;
+use super::function;
+use super::interpreters;
+use super::error;
 
-pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &mut Variable::Variable, vec_function: &mut Function::function) -> Option<Ast::Types>{
+pub fn for_run(ast_for: &Vec<asts::Types>, ast: &Vec<asts::Types>, vec_variable: &mut variable::Variable, vec_function: &mut function::Function) -> Option<asts::Types>{
     let variant = ast_for[0].clone();
     let judge = ast_for[1].clone();
     let loop_for = ast_for[2].clone();
 
-    let mut result_var = Ast::Types::Error(Ast::ErrorAST::new("variable error"));
+    let mut result_var = asts::Types::Error(asts::ErrorAST::new("variable error"));
     let mut name = "".to_string();
 
     match variant {
-        Ast::Types::Variable(var) => {
+        asts::Types::Variable(var) => {
             name = var.name;
             match var.node[0].clone() {
-                Ast::Types::Number(_) => {result_var = var.node[0].clone();}
-                Ast::Types::Binary(_) => {result_var = Interpreter::calculation(&var.node[0], vec_variable, vec_function);}
+                asts::Types::Number(_) => {result_var = var.node[0].clone();}
+                asts::Types::Binary(_) => {result_var = interpreters::calculation(&var.node[0], vec_variable, vec_function);}
                 _ => {
-                    let err = Error::Error::new(&var.node[0]);
+                    let err = error::Error::new(&var.node[0]);
                     err.exit("for init variable error");
                 }
             }
         }
 
         _ => {
-            let err = Error::Error::new(&variant);
+            let err = error::Error::new(&variant);
             err.exit("fot init error");
         }
     }
 
     loop {
         match judge.clone() {
-            Ast::Types::Binary(mut bin) => {
+            asts::Types::Binary(mut bin) => {
                 let var = for_variables(&name, &result_var, bin.node);
                 bin.node = var;
-                let result = Interpreter::calculation(&Ast::Types::Binary(bin), vec_variable, vec_function);
+                let result = interpreters::calculation(&asts::Types::Binary(bin), vec_variable, vec_function);
                 match result {
-                    Ast::Types::Boolean(bools) => {
+                    asts::Types::Boolean(bools) => {
                         if bools.boolean {
                             break;
                         } else {
-                            let mut var_ast = Ast::VariableAST::new(&name);
+                            let mut var_ast = asts::VariableAST::new(&name);
                             var_ast.node.push(result_var.clone());
-                            vec_variable.push(Ast::Types::Variable(var_ast));
-                            let (is_continue, result) = Interpreter::scope(ast, vec_variable, vec_function);
+                            vec_variable.push(asts::Types::Variable(var_ast));
+                            let (is_continue, result) = interpreters::scope(ast, vec_variable, vec_function);
                             if !is_continue {
                                 match result {
                                     Some(_) => {
@@ -57,57 +57,57 @@ pub fn for_run(ast_for: &Vec<Ast::Types>, ast: &Vec<Ast::Types>, vec_variable: &
                         }
                     }
                     _ => {
-                        let err = Error::Error::new(&result);
+                        let err = error::Error::new(&result);
                         err.exit("Binary error");
                     },
                 }
             }
             _ => {
-                let err = Error::Error::new(&judge);
+                let err = error::Error::new(&judge);
                 err.exit("For judge error");
             }
         }
 
-        result_var = Interpreter::calculation(&loop_for, vec_variable, vec_function);
+        result_var = interpreters::calculation(&loop_for, vec_variable, vec_function);
     }
 
     return None;
 }
 
-fn for_variables(name: &str, result: &Ast::Types, variables: Vec<Ast::Types>) -> Vec<Ast::Types> {
-    let mut ast_vec: Vec<Ast::Types> = Vec::new();
+fn for_variables(name: &str, result: &asts::Types, variables: Vec<asts::Types>) -> Vec<asts::Types> {
+    let mut ast_vec: Vec<asts::Types> = Vec::new();
     for node in variables {
         match node {
-            Ast::Types::Binary(mut bin) => {
+            asts::Types::Binary(mut bin) => {
                 if !bin.node.is_empty() {
                     let vec = for_variables(name, result, bin.node.clone());
                     bin.node = vec;
                 }
-                ast_vec.push(Ast::Types::Binary(bin));
+                ast_vec.push(asts::Types::Binary(bin));
             }
 
-            Ast::Types::Number(mut num) => {
+            asts::Types::Number(mut num) => {
                 if !num.node.is_empty() {
                     let vec = for_variables(name, result, num.node.clone());
                     num.node = vec;
                 }
-                ast_vec.push(Ast::Types::Number(num));
+                ast_vec.push(asts::Types::Number(num));
             }
 
-            Ast::Types::Variable(var) => {
-                let mut vec: Vec<Ast::Types> = Vec::new();
+            asts::Types::Variable(var) => {
+                let mut vec: Vec<asts::Types> = Vec::new();
 
                 if !var.node.is_empty() {
                     vec = for_variables(name, result, var.node.clone());
                 }
 
                 match result.clone() {
-                    Ast::Types::Number(mut inner_num) => {
+                    asts::Types::Number(mut inner_num) => {
                         inner_num.node = vec;
-                        ast_vec.push(Ast::Types::Number(inner_num));
+                        ast_vec.push(asts::Types::Number(inner_num));
                     }
                     _ => {
-                        let err = Error::Error::new(&result);
+                        let err = error::Error::new(&result);
                         err.exit("for variable error");
                     }
                 }

@@ -1,16 +1,16 @@
-use super::super::ast::Ast;
-use super::Interpreter;
-use super::Variable;
-use super::Error;
+use super::super::ast::asts;
+use super::interpreters;
+use super::variable;
+use super::error;
 
-pub struct function {
-    funcstions: Vec<Vec<Ast::Types>>,
+pub struct Function {
+    funcstions: Vec<Vec<asts::Types>>,
     inner: usize,
 }
 
-impl function {
-    pub fn new() -> function {
-        let mut fun = function {
+impl Function {
+    pub fn new() -> Function {
+        let mut fun = Function {
             funcstions: Vec::new(),
             inner: 0,
         };
@@ -40,7 +40,7 @@ impl function {
         self.inner -= 1;
     }
 
-    pub fn push(&mut self, nodes: Vec<Ast::Types>) {
+    pub fn push(&mut self, nodes: Vec<asts::Types>) {
         let mut index = 0;
         let len = nodes.len();
         loop {
@@ -50,7 +50,7 @@ impl function {
 
             let node = nodes[index].clone();
             match node {
-                Ast::Types::Function(_) => {
+                asts::Types::Function(_) => {
                     self.funcstions[self.inner].push(node);
                 }
                 _ => {
@@ -60,18 +60,18 @@ impl function {
         }
     }
 
-    pub fn function_run(&mut self, call_ast: &Ast::CallAST, variable: &mut Variable::Variable) ->Option<Ast::Types> {
+    pub fn function_run(&mut self, call_ast: &asts::CallAST, variable: &mut variable::Variable) ->Option<asts::Types> {
         let callee = call_ast.callee.clone();
         if callee == "print" {
             let value = &call_ast.argument[0];
             match value {
-                Ast::Types::Variable(var) => {
+                asts::Types::Variable(var) => {
                     let var_result = variable.serch_variable(&var, self);
                     self.print_var(&var_result);
                 }
 
-                Ast::Types::Binary(_) => {
-                    let result = Interpreter::calculation(&value, variable, self);
+                asts::Types::Binary(_) => {
+                    let result = interpreters::calculation(&value, variable, self);
                     self.print_var(&result);
                 }
 
@@ -89,7 +89,7 @@ impl function {
         for funcs in functions {
             for fun in funcs {
                 match fun {
-                    Ast::Types::Function(fun) => {
+                    asts::Types::Function(fun) => {
                         if serch_string == fun.name {
                             return self.function(fun.argument, &argument, fun.node, variable);
                         }
@@ -105,25 +105,25 @@ impl function {
 
     fn function(
         &mut self,
-        function_arguments: Vec<Ast::Types>,
-        argument: &Vec<Ast::Types>,
-        mut node: Vec<Ast::Types>,
-        vec_variable: &mut Variable::Variable,
-    ) -> Option<Ast::Types> {
+        function_arguments: Vec<asts::Types>,
+        argument: &Vec<asts::Types>,
+        mut node: Vec<asts::Types>,
+        vec_variable: &mut variable::Variable,
+    ) -> Option<asts::Types> {
         vec_variable.vec_push();
         let mut index = 0;
 
         for function_argument in function_arguments {
             match function_argument {
-                Ast::Types::Variable(mut variable) => {
-                    let result = Interpreter::calculation(&argument[index], vec_variable, self);
+                asts::Types::Variable(mut variable) => {
+                    let result = interpreters::calculation(&argument[index], vec_variable, self);
                     variable.node.push(result);
-                    let variable = Ast::Types::Variable(variable);
+                    let variable = asts::Types::Variable(variable);
                     vec_variable.push(variable);
                 }
 
                 _ => {
-                    let err = Error::Error::new(&function_argument);
+                    let err = error::Error::new(&function_argument);
                     err.exit("argument error");
                 }
             }
@@ -131,24 +131,24 @@ impl function {
             index += 1;
         }
 
-        let (_, result) = Interpreter::scope(&mut node, vec_variable, self);
+        let (_, result) = interpreters::scope(&mut node, vec_variable, self);
         vec_variable.last_remove();
         return result;
     }
 
-    fn print_var(&self, var_result: &Ast::Types) {
+    fn print_var(&self, var_result: &asts::Types) {
         match var_result {
-            Ast::Types::Strings(value) => {
+            asts::Types::Strings(value) => {
                 println!("{}", value.name);
             }
-            Ast::Types::Number(number) => {
+            asts::Types::Number(number) => {
                 println!("{}", number.val);
             }
-            Ast::Types::Boolean(bools) => {
+            asts::Types::Boolean(bools) => {
                 println!("{}", bools.boolean);
             }
             _ => {
-                let err = Error::Error::new(&var_result);
+                let err = error::Error::new(&var_result);
                 err.exit("print error");
             }
         }

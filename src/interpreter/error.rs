@@ -1,12 +1,12 @@
-use super::super::ast::Ast;
+use super::super::ast::asts;
 use std::process::exit;
 
 pub struct Error {
-    pub error:Ast::Types,
+    pub error:asts::Types,
 }
 
 impl Error {
-    pub fn new(ast: &Ast::Types) -> Error {
+    pub fn new(ast: &asts::Types) -> Error {
         let ast = ast.clone();
         Error {
             error: ast,
@@ -20,35 +20,35 @@ impl Error {
 
     fn error_message(self, error_message:&str) {
         match self.error.clone() {
-            Ast::Types::Binary(bin) => {
+            asts::Types::Binary(bin) => {
                 eprintln!("{} {}",bin.op, error_message);
             }
 
-            Ast::Types::Strings(string) => {
+            asts::Types::Strings(string) => {
                 eprintln!("{} {}",string.name, error_message);
             }
 
-            Ast::Types::Vector(vec) => {
+            asts::Types::Vector(vec) => {
                 eprintln!("{:?} {}",vec.node, error_message);
             }
 
-            Ast::Types::Number(num) => {
+            asts::Types::Number(num) => {
                 eprintln!("{} {:?}", num.val, error_message);
             }
 
-            Ast::Types::Variable(var) => {
+            asts::Types::Variable(var) => {
                 eprintln!("{:?} {}", var.name, error_message);
             }
 
-            Ast::Types::If(ifs) => {
+            asts::Types::If(ifs) => {
                 eprintln!("{:?} {}", ifs.judge, error_message);
             }
 
-            Ast::Types::For(fors) => {
+            asts::Types::For(fors) => {
                 eprintln!("{:?} {}", fors.init_var, error_message);
             }
 
-            Ast::Types::Error(err) => {
+            asts::Types::Error(err) => {
                 eprintln!("{} {}", err.error, error_message);
             }
 

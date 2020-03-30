@@ -2,7 +2,7 @@ use std::env;
 
 use koto::ast::parsing;
 use koto::interpreter;
-use koto::lexer::Lexer;
+use koto::lexer::lexers;
 
 use std::fs::File;
 use std::io::prelude::*;
@@ -18,14 +18,14 @@ fn main() {
         let mut content = String::new();
         file_buffer.read_to_string(&mut content).expect("file not found");
 
-        let mut lexer = Lexer::Lexer::new(&content);
+        let mut lexer = lexers::Lexer::new(&content);
         let tokens = lexer.start();
 
         let mut pars = parsing::Parsing::new(&tokens);
         let result = pars.parsing();
         println!("{:?}", result);
 
-        interpreter::Interpreter::run(result);
+        interpreter::interpreters::run(result);
     } else {
         println!("file run");
         println!("./koto run [file name]");

@@ -1,15 +1,15 @@
-use super::super::ast::Ast;
-use super::Arithmetic;
-use super::For;
-use super::Function;
-use super::Variable;
-use super::Error;
+use super::super::ast::asts;
+use super::arithmetic;
+use super::fors;
+use super::function;
+use super::variable;
+use super::error;
 
-pub fn run(root: Ast::ExprAST) {
+pub fn run(root: asts::ExprAST) {
     let mut index = 0;
     let len = root.node.len();
-    let mut variable = Variable::Variable::new();
-    let mut function = Function::function::new();
+    let mut variable = variable::Variable::new();
+    let mut function = function::Function::new();
     function.push(root.node.clone());
 
     loop {
@@ -24,13 +24,13 @@ pub fn run(root: Ast::ExprAST) {
 }
 
 fn if_run(
-    result: &Ast::Types,
-    ifs: &Vec<Ast::Types>,
-    vec_variable: &mut Variable::Variable,
-    vec_function: &mut Function::function,
-) -> Option<Ast::Types> {
+    result: &asts::Types,
+    ifs: &Vec<asts::Types>,
+    vec_variable: &mut variable::Variable,
+    vec_function: &mut function::Function,
+) -> Option<asts::Types> {
     match result {
-        Ast::Types::Boolean(boolean) => {
+        asts::Types::Boolean(boolean) => {
             if boolean.boolean {
                 let (_, result) = scope(ifs, vec_variable, vec_function);
 
@@ -44,15 +44,15 @@ fn if_run(
 }
 
 pub fn calculation(
-    ast: &Ast::Types,
-    vec_variable: &mut Variable::Variable,
-    vec_function: &mut Function::function,
-) -> Ast::Types {
+    ast: &asts::Types,
+    vec_variable: &mut variable::Variable,
+    vec_function: &mut function::Function,
+) -> asts::Types {
     match ast.clone() {
-        Ast::Types::Binary(mut binary) => {
+        asts::Types::Binary(mut binary) => {
             let vec_binary = vec_variable.variables_allocation(binary.node, vec_function);
             binary.node = vec_binary;
-            return Arithmetic::common(binary);
+            return arithmetic::common(binary);
         }
 
         _ => {
@@ -62,12 +62,12 @@ pub fn calculation(
 }
 
 pub fn run_judg(
-    node: &Ast::Types,
-    vec_variable: &mut Variable::Variable,
-    vec_function: &mut Function::function,
-) -> (bool, Option<Ast::Types>) {
+    node: &asts::Types,
+    vec_variable: &mut variable::Variable,
+    vec_function: &mut function::Function,
+) -> (bool, Option<asts::Types>) {
     match node {
-        Ast::Types::Call(function) => {
+        asts::Types::Call(function) => {
             let result = vec_function.function_run(function, vec_variable);
             match result {
                 Some(_) => {
@@ -80,12 +80,12 @@ pub fn run_judg(
             }
         }
 
-        Ast::Types::Binary(bin) => {
+        asts::Types::Binary(bin) => {
             let result = calculation(node, vec_variable, vec_function);
             let mut is_continue = false;
             if bin.node.len() == 2 {
                 match &bin.node[1] {
-                    Ast::Types::Binary(inner_bin) => {
+                    asts::Types::Binary(inner_bin) => {
                         if bin.op == inner_bin.op {
                             is_continue = true;
                         }
@@ -97,9 +97,9 @@ pub fn run_judg(
 
             if is_continue{
                 match bin.node[0].clone() {
-                    Ast::Types::Variable(mut var) => {
+                    asts::Types::Variable(mut var) => {
                         var.node.push(result);
-                        let varibles = Ast::Types::Variable(var);
+                        let varibles = asts::Types::Variable(var);
                         vec_variable.push(varibles);
                     }
                     _ => {}
@@ -107,14 +107,14 @@ pub fn run_judg(
             }
         }
 
-        Ast::Types::Variable(var) => {
+        asts::Types::Variable(var) => {
             let var_contents = vec_variable.variable(var.node[0].clone(), vec_function);
-            let mut var_ast = Ast::VariableAST::new(&var.name);
+            let mut var_ast = asts::VariableAST::new(&var.name);
             var_ast.node.push(var_contents);
-            vec_variable.push(Ast::Types::Variable(var_ast));
+            vec_variable.push(asts::Types::Variable(var_ast));
         }
 
-        Ast::Types::If(ifs) => {
+        asts::Types::If(ifs) => {
             let result = calculation(&ifs.judge[0], vec_variable, vec_function);
             let mut result_if = None;
             vec_variable.vec_push();
@@ -137,11 +137,11 @@ pub fn run_judg(
             }
         }
 
-        Ast::Types::For(fors) => {
+        asts::Types::For(fors) => {
             vec_variable.vec_push();
             vec_function.vec_push();
             vec_function.push(fors.node.clone());
-            let result = For::for_run(&fors.init_var, &fors.node, vec_variable, vec_function);
+            let result = fors::for_run(&fors.init_var, &fors.node, vec_variable, vec_function);
             vec_variable.last_remove();
             vec_function.last_remove();
 
@@ -156,29 +156,29 @@ pub fn run_judg(
             }
         }
 
-        Ast::Types::Retrun(ret) => {
+        asts::Types::Retrun(ret) => {
             if ret.node.is_empty() {
                 return (false, None);
             }
 
             match ret.node[0].clone() {
-                Ast::Types::Binary(_) => {
+                asts::Types::Binary(_) => {
                     let result = calculation(&ret.node[0], vec_variable, vec_function);
                     return (false, Some(result));
                 }
 
-                Ast::Types::Variable(var) => {
+                asts::Types::Variable(var) => {
                     let result = vec_variable.serch_variable(&var, vec_function);
                     return (false, Some(result));
                 }
 
-                Ast::Types::Number(_) => {
+                asts::Types::Number(_) => {
                     let result = ret.node[0].clone();
                     return (false, Some(result));
                 }
 
                 _ => {
-                    let err = Error::Error::new(& ret.node[0]);
+                    let err = error::Error::new(& ret.node[0]);
                     err.exit("retrun error");
                 }
             }
@@ -191,10 +191,10 @@ pub fn run_judg(
 }
 
 pub fn scope(
-    ast: &Vec<Ast::Types>,
-    vec_variable: &mut Variable::Variable,
-    vec_function: &mut Function::function,
-) -> (bool, Option<Ast::Types>) {
+    ast: &Vec<asts::Types>,
+    vec_variable: &mut variable::Variable,
+    vec_function: &mut function::Function,
+) -> (bool, Option<asts::Types>) {
     let mut index = 0;
     let len = ast.len();
 

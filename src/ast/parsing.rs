@@ -1,27 +1,27 @@
-use super::super::lexer::Token;
-use super::Ast;
+use super::super::lexer::token;
+use super::asts;
 
 pub struct Parsing {
-    pub tokens: Vec<Token::TokenValue>,
+    pub tokens: Vec<token::TokenValue>,
 }
 
 impl Parsing {
-    pub fn new(tokens: &Vec<Token::TokenValue>) -> Parsing {
+    pub fn new(tokens: &Vec<token::TokenValue>) -> Parsing {
         let tokens = tokens.clone();
         Parsing { tokens: tokens }
     }
 
-    pub fn parsing(&mut self) -> Ast::ExprAST {
-        let mut root = Ast::ExprAST::new();
+    pub fn parsing(&mut self) -> asts::ExprAST {
+        let mut root = asts::ExprAST::new();
         let result = self.syntax();
         root.node = result;
         return root;
     }
 
-    fn judge(&mut self) -> Ast::Types {
+    fn judge(&mut self) -> asts::Types {
         let mut token = self.tokens[0].token;
         let mut string = self.tokens[0].val.clone();
-        let token_constant = Token::Token::new();
+        let token_constant = token::Token::new();
 
         if token == token_constant._comment {
             self.tokens.remove(0);
@@ -31,10 +31,10 @@ impl Parsing {
         if token == token_constant._if {
             self.tokens.remove(0);
             let result = self.calculation();
-            let mut result_vec: Vec<Ast::Types> = Vec::new();
+            let mut result_vec: Vec<asts::Types> = Vec::new();
             result_vec.push(result);
-            let if_ast = Ast::IfAST::new(result_vec);
-            return Ast::Types::If(if_ast);
+            let if_ast = asts::IfAST::new(result_vec);
+            return asts::Types::If(if_ast);
         }
         if token == token_constant._for {
             self.tokens.remove(0);
@@ -45,12 +45,12 @@ impl Parsing {
             let loop_op = self.judge();
             match var {
                 Some(var) => {
-                    let for_ast = Ast::ForAST::new(var, result, loop_op);
-                    let for_types = Ast::Types::For(for_ast);
+                    let for_ast = asts::ForAST::new(var, result, loop_op);
+                    let for_types = asts::Types::For(for_ast);
                     return for_types;
                 }
                 None => {
-                    return Ast::Types::Error(Ast::ErrorAST::new("for parsing error"));
+                    return asts::Types::Error(asts::ErrorAST::new("for parsing error"));
                 }
             }
         }
@@ -59,25 +59,25 @@ impl Parsing {
             return self.function();
         }
         if token == token_constant._print {
-            let print = Ast::CallAST::new("print");
-            let call = Ast::Types::Call(print);
+            let print = asts::CallAST::new("print");
+            let call = asts::Types::Call(print);
             return call;
         }
         if token == token_constant._string {
-            let string = Ast::StringAST::new(&string);
-            let strings = Ast::Types::Strings(string);
+            let string = asts::StringAST::new(&string);
+            let strings = asts::Types::Strings(string);
             return strings;
         }
         if token == token_constant._number {
             let num = string.parse().unwrap();
-            let num = Ast::NumberAST::new(num);
-            let number = Ast::Types::Number(num);
+            let num = asts::NumberAST::new(num);
+            let number = asts::Types::Number(num);
             return number;
         }
         if token == token_constant._identifier {
             if self.tokens[1].token == 40 {
-                let call = Ast::CallAST::new(&string);
-                let call = Ast::Types::Call(call);
+                let call = asts::CallAST::new(&string);
+                let call = asts::Types::Call(call);
                 return call;
             }
             if self.tokens[1].token == 91 {
@@ -85,9 +85,9 @@ impl Parsing {
                 let before = self.tokens.clone();
                 self.tokens.remove(0);
                 let index = self.calculation();
-                let mut variable = Ast::VariableAST::new(&string);
+                let mut variable = asts::VariableAST::new(&string);
                 variable.index = Some(vec![index]);
-                let variable = Ast::Types::Variable(variable);
+                let variable = asts::Types::Variable(variable);
                 self.tokens = before;
                 return variable;
             }
@@ -96,98 +96,98 @@ impl Parsing {
                 return self.reassignment();
             }
 
-            let variable = Ast::VariableAST::new(&string);
-            let variable = Ast::Types::Variable(variable);
+            let variable = asts::VariableAST::new(&string);
+            let variable = asts::Types::Variable(variable);
             return variable;
         }
         if token == token_constant._let {
             self.tokens.remove(0);
             let string = &self.tokens[0].val;
-            let variable = Ast::VariableAST::new(string);
-            let variable = Ast::Types::Variable(variable);
+            let variable = asts::VariableAST::new(string);
+            let variable = asts::Types::Variable(variable);
             self.tokens.remove(0);
             self.tokens.remove(0);
             return variable;
         }
         if token == token_constant._bool {
             if string == "true" {
-                let bools = Ast::BooleanAST::new(true);
-                let bools = Ast::Types::Boolean(bools);
+                let bools = asts::BooleanAST::new(true);
+                let bools = asts::Types::Boolean(bools);
                 return bools;
             } else if string == "false" {
-                let bools = Ast::BooleanAST::new(false);
-                let bools = Ast::Types::Boolean(bools);
+                let bools = asts::BooleanAST::new(false);
+                let bools = asts::Types::Boolean(bools);
                 return bools;
             }
         }
         if token == token_constant._return {
             self.tokens.remove(0);
-            let mut retrun_ast = Ast::RetrunAST::new();
+            let mut retrun_ast = asts::RetrunAST::new();
             if self.tokens[0].token == 59 {
-                return Ast::Types::Retrun(retrun_ast);
+                return asts::Types::Retrun(retrun_ast);
             }
             let result = self.judge();
             retrun_ast.node.push(result);
-            return Ast::Types::Retrun(retrun_ast);
+            return asts::Types::Retrun(retrun_ast);
         }
         if token == token_constant._vec {
             self.tokens.remove(0);
             let result = self.vector();
-            let mut vector_ast = Ast::VectorAST::new();
+            let mut vector_ast = asts::VectorAST::new();
             vector_ast.node = result;
-            return Ast::Types::Vector(vector_ast);
+            return asts::Types::Vector(vector_ast);
         }
         if token == 40 || token == 41 {
-            let parent = Ast::ParenthesesAST::new(string.chars().nth(0).unwrap());
-            let parent = Ast::Types::Parent(parent);
+            let parent = asts::ParenthesesAST::new(string.chars().nth(0).unwrap());
+            let parent = asts::Types::Parent(parent);
             return parent;
         }
         if token == 44 {
-            let comma = Ast::CommaAST::new(',');
-            let comma = Ast::Types::Comma(comma);
+            let comma = asts::CommaAST::new(',');
+            let comma = asts::Types::Comma(comma);
             return comma;
         }
         if token == 43 || token == 45 || token == 47 || token == 37 || token == 42 {
-            let bin = Ast::BinaryAST::new(string.parse().unwrap());
-            let binary = Ast::Types::Binary(bin);
+            let bin = asts::BinaryAST::new(string.parse().unwrap());
+            let binary = asts::Types::Binary(bin);
             return binary;
         }
         if token == 60 || token == 62 || token == 124 || token == 61 || token == 33 || token == 38 {
-            let mut bin = Ast::BinaryAST::new(string.parse().unwrap());
+            let mut bin = asts::BinaryAST::new(string.parse().unwrap());
             let token = self.tokens[1].token;
             if token == 61 || token == 38 || token == 124 {
                 self.tokens.remove(0);
                 let string = self.tokens[0].val.clone();
-                let in_binary = Ast::BinaryAST::new(string.parse().unwrap());
-                let in_binary = Ast::Types::Binary(in_binary);
+                let in_binary = asts::BinaryAST::new(string.parse().unwrap());
+                let in_binary = asts::Types::Binary(in_binary);
                 bin.node.push(in_binary);
             }
-            let binary = Ast::Types::Binary(bin);
+            let binary = asts::Types::Binary(bin);
             return binary;
         }
         if token == 59 {
-            let end = Ast::EndAST::new();
-            let end = Ast::Types::End(end);
+            let end = asts::EndAST::new();
+            let end = asts::Types::End(end);
             return end;
         }
         if token == 91 || token == 93 {
-            let squar = Ast::SquareAST::new(string.parse().unwrap());
-            let squar = Ast::Types::Square(squar);
+            let squar = asts::SquareAST::new(string.parse().unwrap());
+            let squar = asts::Types::Square(squar);
             return squar;
         }
         if token == 123 || token == 125 {
-            let scope_ast = Ast::ScopeAST::new(string.parse().unwrap());
-            let scope = Ast::Types::Scope(scope_ast);
+            let scope_ast = asts::ScopeAST::new(string.parse().unwrap());
+            let scope = asts::Types::Scope(scope_ast);
             return scope;
         }
 
-        let variable = Ast::VariableAST::new(&string);
-        let variable = Ast::Types::Variable(variable);
+        let variable = asts::VariableAST::new(&string);
+        let variable = asts::Types::Variable(variable);
         return variable;
     }
 
-    fn function_call(&mut self) -> Vec<Ast::Types> {
-        let mut vec_node: Vec<Ast::Types> = Vec::new();
+    fn function_call(&mut self) -> Vec<asts::Types> {
+        let mut vec_node: Vec<asts::Types> = Vec::new();
         self.tokens.remove(0);
         loop {
             let token = self.tokens[0].token;
@@ -204,23 +204,23 @@ impl Parsing {
         return vec_node;
     }
 
-    fn calculation(&mut self) -> Ast::Types {
-        let mut number_vector: Vec<Ast::Types> = Vec::new();
-        let mut binary_vector: Vec<Ast::Types> = Vec::new();
+    fn calculation(&mut self) -> asts::Types {
+        let mut number_vector: Vec<asts::Types> = Vec::new();
+        let mut binary_vector: Vec<asts::Types> = Vec::new();
         loop {
             let result = self.judge();
             match result {
-                Ast::Types::Binary(_) => {
+                asts::Types::Binary(_) => {
                     binary_vector.push(result);
                 }
-                Ast::Types::Number(_) => {
+                asts::Types::Number(_) => {
                     number_vector.push(result);
                 }
-                Ast::Types::Strings(_) => {
+                asts::Types::Strings(_) => {
                     number_vector.push(result);
                 }
 
-                Ast::Types::Variable(var) => match var.index {
+                asts::Types::Variable(var) => match var.index {
                     Some(_) => {
                         loop {
                             self.tokens.remove(0);
@@ -228,28 +228,28 @@ impl Parsing {
                                 break;
                             }
                         }
-                        number_vector.push(Ast::Types::Variable(var))
+                        number_vector.push(asts::Types::Variable(var))
                     }
-                    None => number_vector.push(Ast::Types::Variable(var)),
+                    None => number_vector.push(asts::Types::Variable(var)),
                 },
-                Ast::Types::Call(_) => match result {
-                    Ast::Types::Call(mut function) => {
+                asts::Types::Call(_) => match result {
+                    asts::Types::Call(mut function) => {
                         function.argument = self.function_call();
-                        let result = Ast::Types::Call(function);
+                        let result = asts::Types::Call(function);
                         number_vector.push(result);
                     }
                     _ => break,
                 },
-                Ast::Types::Scope(_) => {
+                asts::Types::Scope(_) => {
                     break;
                 }
-                Ast::Types::End(_) => {
+                asts::Types::End(_) => {
                     break;
                 }
-                Ast::Types::Comma(_) => {
+                asts::Types::Comma(_) => {
                     break;
                 }
-                Ast::Types::Parent(pra) => {
+                asts::Types::Parent(pra) => {
                     if pra.parent == '(' {
                         self.tokens.remove(0);
                         continue;
@@ -257,7 +257,7 @@ impl Parsing {
                         break;
                     }
                 }
-                Ast::Types::Square(square) => {
+                asts::Types::Square(square) => {
                     if square.square == '[' {
                         self.tokens.remove(0);
                         continue;
@@ -276,10 +276,10 @@ impl Parsing {
             let binary = binary_vector[0].clone();
             let binary_sccond = binary_vector[1].clone();
             match binary {
-                Ast::Types::Binary(mut bin) => {
+                asts::Types::Binary(mut bin) => {
                     bin.node.push(number);
                     bin.node.push(binary_sccond);
-                    return Ast::Types::Binary(bin);
+                    return asts::Types::Binary(bin);
                 }
                 _ => {}
             }
@@ -291,46 +291,46 @@ impl Parsing {
         number_vector.reverse();
         binary_vector.reverse();
         let mut index = 0;
-        let mut ast_temp = Ast::Types::Error(Ast::ErrorAST::new("ast_temp parsing error"));
+        let mut ast_temp = asts::Types::Error(asts::ErrorAST::new("ast_temp parsing error"));
         for binary in binary_vector {
             let mut number = number_vector[index].clone();
             if index > 0 {
                 match number {
-                    Ast::Types::Number(mut numbers) => {
+                    asts::Types::Number(mut numbers) => {
                         numbers.node.push(ast_temp.clone());
-                        number = Ast::Types::Number(numbers);
+                        number = asts::Types::Number(numbers);
                     }
                     _ => {}
                 }
             }
             match binary {
-                Ast::Types::Binary(mut binary) => {
+                asts::Types::Binary(mut binary) => {
                     binary.node.push(number.clone());
-                    ast_temp = Ast::Types::Binary(binary);
+                    ast_temp = asts::Types::Binary(binary);
                 }
                 _ => {}
             }
             index += 1;
         }
         match ast_temp {
-            Ast::Types::Binary(mut binary) => {
+            asts::Types::Binary(mut binary) => {
                 binary.node.push(number_vector[index].clone());
                 binary.node.reverse();
-                let ast_binary = Ast::Types::Binary(binary);
+                let ast_binary = asts::Types::Binary(binary);
                 return ast_binary;
             }
-            _ => return Ast::Types::Error(Ast::ErrorAST::new("Binary parsing error")),
+            _ => return asts::Types::Error(asts::ErrorAST::new("Binary parsing error")),
         }
     }
 
-    fn variable(&mut self) -> Ast::Types {
+    fn variable(&mut self) -> asts::Types {
         let token = self.tokens[0].token;
         if token == 40 || token == 41 {
             self.tokens.remove(0);
         }
         let mut result = self.judge();
         match result {
-            Ast::Types::Number(_) => {
+            asts::Types::Number(_) => {
                 result = self.calculation();
             }
             _ => {}
@@ -338,8 +338,8 @@ impl Parsing {
         return result;
     }
 
-    fn reassignment(&mut self) -> Ast::Types {
-        let var_val = Ast::VariableAST::new(&self.tokens[0].val);
+    fn reassignment(&mut self) -> asts::Types {
+        let var_val = asts::VariableAST::new(&self.tokens[0].val);
         self.tokens.remove(0);
         let first_bin = self.judge();
         self.tokens.remove(0);
@@ -347,20 +347,20 @@ impl Parsing {
         self.tokens.remove(0);
 
         match first_bin {
-            Ast::Types::Binary(mut bin) => {
-                bin.node.push(Ast::Types::Variable(var_val));
+            asts::Types::Binary(mut bin) => {
+                bin.node.push(asts::Types::Variable(var_val));
                 bin.node.push(second_bin);
-                return Ast::Types::Binary(bin);
+                return asts::Types::Binary(bin);
             }
 
-            _ =>{return Ast::Types::Error(Ast::ErrorAST::new("Reassignment operater error"));}
+            _ =>{return asts::Types::Error(asts::ErrorAST::new("Reassignment operater error"));}
         }
     }
 
-    fn function(&mut self) -> Ast::Types {
+    fn function(&mut self) -> asts::Types {
         let string = &self.tokens[0].val;
         let token = self.tokens[1].token;
-        let mut function_ast = Ast::FunctionAST::new(string);
+        let mut function_ast = asts::FunctionAST::new(string);
         if token == 40 {
             self.tokens.remove(0);
             self.tokens.remove(0);
@@ -378,11 +378,11 @@ impl Parsing {
         }
         let result = self.syntax();
         function_ast.node = result;
-        return Ast::Types::Function(function_ast);
+        return asts::Types::Function(function_ast);
     }
 
-    fn vector(&mut self) -> Vec<Ast::Types> {
-        let mut vec: Vec<Ast::Types> = Vec::new();
+    fn vector(&mut self) -> Vec<asts::Types> {
+        let mut vec: Vec<asts::Types> = Vec::new();
         if self.tokens[0].token == 91 {
             loop {
                 let result = self.calculation();
@@ -397,7 +397,7 @@ impl Parsing {
         return vec;
     }
 
-    fn syntax(&mut self) -> Vec<Ast::Types> {
+    fn syntax(&mut self) -> Vec<asts::Types> {
         let mut node_vec = Vec::new();
         loop {
             if self.tokens.is_empty() {
@@ -427,54 +427,54 @@ impl Parsing {
         return node_vec;
     }
 
-    fn scope(&mut self) -> Option<Ast::Types> {
+    fn scope(&mut self) -> Option<asts::Types> {
         let mut result = self.judge();
         match result {
-            Ast::Types::Call(mut function) => {
+            asts::Types::Call(mut function) => {
                 function.argument = self.function_call();
-                result = Ast::Types::Call(function);
+                result = asts::Types::Call(function);
                 return Some(result);
             }
-            Ast::Types::Function(_) => {
+            asts::Types::Function(_) => {
                 return Some(result);
             }
-            Ast::Types::Number(_) => {
+            asts::Types::Number(_) => {
                 result = self.calculation();
                 return Some(result);
             }
-            Ast::Types::Variable(mut var) => {
+            asts::Types::Variable(mut var) => {
                 let result_var = self.variable();
                 let continue_tokne = self.tokens[0].token;
                 if continue_tokne == 59 {
                     var.node.push(result_var);
-                    result = Ast::Types::Variable(var);
+                    result = asts::Types::Variable(var);
                     return Some(result);
                 }
                 let result_cal = self.calculation();
                 var.node.push(result_cal);
-                result = Ast::Types::Variable(var);
+                result = asts::Types::Variable(var);
                 return Some(result);
             }
-            Ast::Types::If(mut ifs) => {
+            asts::Types::If(mut ifs) => {
                 let result = self.syntax();
                 ifs.node = result;
-                return Some(Ast::Types::If(ifs));
+                return Some(asts::Types::If(ifs));
             }
-            Ast::Types::For(mut fors) => {
+            asts::Types::For(mut fors) => {
                 let result = self.syntax();
                 fors.node = result;
-                return Some(Ast::Types::For(fors));
+                return Some(asts::Types::For(fors));
             }
-            Ast::Types::Binary(_) => {
+            asts::Types::Binary(_) => {
                 return Some(result);
             }
-            Ast::Types::Vector(_) => {
+            asts::Types::Vector(_) => {
                 return Some(result);
             }
-            Ast::Types::Retrun(_) => {
+            asts::Types::Retrun(_) => {
                 return Some(result);
             }
-            Ast::Types::End(_) => {
+            asts::Types::End(_) => {
                 self.tokens.remove(0);
             }
             _ => {

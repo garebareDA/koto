@@ -1,17 +1,17 @@
-use super::super::ast::Ast;
-use super::Error;
+use super::super::ast::asts;
+use super::error;
 
-pub fn common(bin: Ast::BinaryAST) -> Ast::Types {
+pub fn common(bin: asts::BinaryAST) -> asts::Types {
     let op = bin.op;
     let node = bin.node[0].clone();
     let mut next_node = bin.node[1].clone();
 
     if bin.op == '-' || bin.op == '+' {
         match &next_node {
-            Ast::Types::Binary(bin) => {
+            asts::Types::Binary(bin) => {
                 match comparison_operator(bin.op, &node)  {
                     Some(num) => {
-                        return Ast::Types::Number(Ast::NumberAST::new(num));
+                        return asts::Types::Number(asts::NumberAST::new(num));
                     }
                     None =>{}
                 }
@@ -24,36 +24,36 @@ pub fn common(bin: Ast::BinaryAST) -> Ast::Types {
     if op == '%' {
         let (numbers, types) = match_type(node.clone(), next_node.clone());
         let result = modulo(numbers[0], numbers[1]);
-        let mut ast = Ast::NumberAST::new(result);
+        let mut ast = asts::NumberAST::new(result);
         if !types.is_empty() {
             ast.node.push(types[0].clone());
-            next_node = Ast::Types::Number(ast);
+            next_node = asts::Types::Number(ast);
         } else {
-            next_node = Ast::Types::Number(ast);
+            next_node = asts::Types::Number(ast);
         }
     }
 
     if op == '*' {
         let (numbers, types) = match_type(node.clone(), next_node.clone());
         let result = multiplication(numbers[0], numbers[1]);
-        let mut ast = Ast::NumberAST::new(result);
+        let mut ast = asts::NumberAST::new(result);
         if !types.is_empty() {
             ast.node.push(types[0].clone());
-            next_node = Ast::Types::Number(ast);
+            next_node = asts::Types::Number(ast);
         } else {
-            next_node = Ast::Types::Number(ast);
+            next_node = asts::Types::Number(ast);
         }
     }
 
     if op == '/' {
         let (numbers, types) = match_type(node.clone(), next_node.clone());
         let result = division(numbers[0], numbers[1]);
-        let mut ast = Ast::NumberAST::new(result);
+        let mut ast = asts::NumberAST::new(result);
         if !types.is_empty() {
             ast.node.push(types[0].clone());
-            next_node = Ast::Types::Number(ast);
+            next_node = asts::Types::Number(ast);
         } else {
-            next_node = Ast::Types::Number(ast);
+            next_node = asts::Types::Number(ast);
         }
     }
 
@@ -62,12 +62,12 @@ pub fn common(bin: Ast::BinaryAST) -> Ast::Types {
     if op == '-' {
         let (numbers, types) = match_type(node.clone(), next_node.clone());
         let result = minus(numbers[0], numbers[1]);
-        let mut ast = Ast::NumberAST::new(result);
+        let mut ast = asts::NumberAST::new(result);
         if !types.is_empty() {
             ast.node.push(types[0].clone());
-            next_node = Ast::Types::Number(ast);
+            next_node = asts::Types::Number(ast);
         } else {
-            next_node = Ast::Types::Number(ast);
+            next_node = asts::Types::Number(ast);
         }
     }
 
@@ -75,12 +75,12 @@ pub fn common(bin: Ast::BinaryAST) -> Ast::Types {
     if op == '+' {
         let (numbers, types) = match_type(node.clone(), next_node.clone());
         let result = plus(numbers[0], numbers[1]);
-        let mut ast = Ast::NumberAST::new(result);
+        let mut ast = asts::NumberAST::new(result);
         if !types.is_empty() {
             ast.node.push(types[0].clone());
-            next_node = Ast::Types::Number(ast);
+            next_node = asts::Types::Number(ast);
         } else {
-            next_node = Ast::Types::Number(ast);
+            next_node = asts::Types::Number(ast);
         }
     }
 
@@ -96,12 +96,12 @@ pub fn common(bin: Ast::BinaryAST) -> Ast::Types {
             result = greater_than(numbers[0], numbers[1]);
         }
 
-        let mut ast = Ast::BooleanAST::new(result);
+        let mut ast = asts::BooleanAST::new(result);
         if !types.is_empty() {
             ast.node.push(types[0].clone());
-            next_node = Ast::Types::Boolean(ast);
+            next_node = asts::Types::Boolean(ast);
         } else {
-            next_node = Ast::Types::Boolean(ast);
+            next_node = asts::Types::Boolean(ast);
         }
     }
 
@@ -115,12 +115,12 @@ pub fn common(bin: Ast::BinaryAST) -> Ast::Types {
             result = less_than(numbers[0], numbers[1]);
         }
 
-        let mut ast = Ast::BooleanAST::new(result);
+        let mut ast = asts::BooleanAST::new(result);
         if !types.is_empty() {
             ast.node.push(types[0].clone());
-            next_node = Ast::Types::Boolean(ast);
+            next_node = asts::Types::Boolean(ast);
         } else {
-            next_node = Ast::Types::Boolean(ast);
+            next_node = asts::Types::Boolean(ast);
         }
     }
 
@@ -133,16 +133,16 @@ pub fn common(bin: Ast::BinaryAST) -> Ast::Types {
         if bin.node.len() == 3 {
             result = equivalence(numbers[0], numbers[1]);
         } else {
-            let err = Error::Error::new(&next_node);
+            let err = error::Error::new(&next_node);
             err.exit("Comparison operator error");
         }
 
-        let mut ast = Ast::BooleanAST::new(result);
+        let mut ast = asts::BooleanAST::new(result);
         if !types.is_empty() {
             ast.node.push(types[0].clone());
-            next_node = Ast::Types::Boolean(ast);
+            next_node = asts::Types::Boolean(ast);
         } else {
-            next_node = Ast::Types::Boolean(ast);
+            next_node = asts::Types::Boolean(ast);
         }
     }
 
@@ -153,16 +153,16 @@ pub fn common(bin: Ast::BinaryAST) -> Ast::Types {
         if bin.node.len() == 3 {
             result = inequality(numbers[0], numbers[1]);
         } else {
-            let err = Error::Error::new(&next_node);
+            let err = error::Error::new(&next_node);
             err.exit("Comparison operator error");
         }
 
-        let mut ast = Ast::BooleanAST::new(result);
+        let mut ast = asts::BooleanAST::new(result);
         if !types.is_empty() {
             ast.node.push(types[0].clone());
-            next_node = Ast::Types::Boolean(ast);
+            next_node = asts::Types::Boolean(ast);
         } else {
-            next_node = Ast::Types::Boolean(ast);
+            next_node = asts::Types::Boolean(ast);
         }
     }
 
@@ -172,14 +172,14 @@ pub fn common(bin: Ast::BinaryAST) -> Ast::Types {
     return next_node;
 }
 
-fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
+fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
     let mut number_a = 0;
     let mut bool_a = false;
     let mut bin = ' ';
 
-    let mut node_first = Ast::Types::Error(Ast::ErrorAST::new("variable error"));
-    let mut node_seccond = Ast::Types::Error(Ast::ErrorAST::new("variable error"));
-    let mut comparison_node = Ast::Types::Error(Ast::ErrorAST::new("variable error"));
+    let mut node_first = asts::Types::Error(asts::ErrorAST::new("variable error"));
+    let mut node_seccond = asts::Types::Error(asts::ErrorAST::new("variable error"));
+    let mut comparison_node = asts::Types::Error(asts::ErrorAST::new("variable error"));
 
     let priority_first = 1;
     let priority_seccond = 2;
@@ -189,7 +189,7 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
     let priority_sixs = 6;
 
     match numbers.clone() {
-        Ast::Types::Number(num) => {
+        asts::Types::Number(num) => {
             if num.node.is_empty() {
                 return numbers;
             }
@@ -197,7 +197,7 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
             node_first = num.node[0].clone();
         }
 
-        Ast::Types::Boolean(bools) => {
+        asts::Types::Boolean(bools) => {
             if bools.node.is_empty() {
                 return numbers;
             }
@@ -205,13 +205,13 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
             node_first = bools.node[0].clone();
         }
         _ => {
-            let err = Error::Error::new(&numbers);
+            let err = error::Error::new(&numbers);
             err.exit("number error");
         }
     }
 
     match node_first.clone() {
-        Ast::Types::Binary(binary) => {
+        asts::Types::Binary(binary) => {
             bin = binary.op;
             let len = binary.node.len();
 
@@ -221,7 +221,7 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
                 comparison_node = binary.node[0].clone();
                 node_seccond = binary.node[1].clone();
             } else {
-                let err = Error::Error::new(&node_first);
+                let err = error::Error::new(&node_first);
                 err.exit("number operater error");
             }
         }
@@ -229,7 +229,7 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
     }
 
     match node_seccond.clone() {
-        Ast::Types::Number(num) => {
+        asts::Types::Number(num) => {
             let number_b = num.val;
             if bin == '%' && select_binary == priority_first {
                 let result = modulo(number_a, number_b);
@@ -258,7 +258,7 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
 
             if bin == '<' && select_binary == priority_therd {
                 match comparison_node {
-                    Ast::Types::Binary(_) => {
+                    asts::Types::Binary(_) => {
                         let result = greater_than_equal(number_a, number_b);
                         return calculation_comparison_continue(num, result, select_binary);
                     }
@@ -271,7 +271,7 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
 
             if bin == '>' && select_binary == priority_therd {
                 match comparison_node {
-                    Ast::Types::Binary(_) => {
+                    asts::Types::Binary(_) => {
                         let result = less_than_equal(number_a, number_b);
                         return calculation_comparison_continue(num, result, select_binary);
                     }
@@ -284,13 +284,13 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
 
             if bin == '=' && select_binary == priority_forth {
                 match comparison_node {
-                    Ast::Types::Binary(_) => {
+                    asts::Types::Binary(_) => {
                         let result = equivalence(number_a, number_b);
                         return calculation_comparison_continue(num, result, select_binary);
                     }
 
                     _ => {
-                        let err = Error::Error::new(&comparison_node);
+                        let err = error::Error::new(&comparison_node);
                         err.exit("number error");
                     }
                 }
@@ -298,13 +298,13 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
 
             if bin == '!' && select_binary == priority_forth {
                 match comparison_node {
-                    Ast::Types::Binary(_) => {
+                    asts::Types::Binary(_) => {
                         let result = inequality(number_a, number_b);
                         return calculation_comparison_continue(num, result, select_binary);
                     }
 
                     _ => {
-                        let err = Error::Error::new(&comparison_node);
+                        let err = error::Error::new(&comparison_node);
                         err.exit("number error");
                     }
                 }
@@ -313,35 +313,35 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
             if !num.node.is_empty() {
                 let result = calculattions(node_seccond.clone(), select_binary);
 
-                let mut binarys = Ast::BinaryAST::new(bin);
+                let mut binarys = asts::BinaryAST::new(bin);
 
                 match comparison_node {
-                    Ast::Types::Binary(_) => {
+                    asts::Types::Binary(_) => {
                         binarys.node.push(comparison_node);
                     }
                     _ => {}
                 }
 
                 binarys.node.push(result);
-                let mut ast_retruns = Ast::Types::Error(Ast::ErrorAST::new("variable error"));
+                let mut ast_retruns = asts::Types::Error(asts::ErrorAST::new("variable error"));
 
                 match numbers.clone() {
-                    Ast::Types::Number(_) => {
-                        let mut numbers = Ast::NumberAST::new(number_a);
-                        numbers.node.push(Ast::Types::Binary(binarys));
-                        let ast_return = Ast::Types::Number(numbers);
+                    asts::Types::Number(_) => {
+                        let mut numbers = asts::NumberAST::new(number_a);
+                        numbers.node.push(asts::Types::Binary(binarys));
+                        let ast_return = asts::Types::Number(numbers);
                         ast_retruns = ast_return
                     }
 
-                    Ast::Types::Boolean(_) => {
-                        let mut booleans = Ast::BooleanAST::new(bool_a);
-                        booleans.node.push(Ast::Types::Binary(binarys));
-                        let ast_return = Ast::Types::Boolean(booleans);
+                    asts::Types::Boolean(_) => {
+                        let mut booleans = asts::BooleanAST::new(bool_a);
+                        booleans.node.push(asts::Types::Binary(binarys));
+                        let ast_return = asts::Types::Boolean(booleans);
                         ast_retruns = ast_return
                     }
 
                     _ => {
-                        let err = Error::Error::new(&numbers);
+                        let err = error::Error::new(&numbers);
                         err.exit("number error");
                     }
                 }
@@ -351,17 +351,17 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
             return numbers;
         }
 
-        Ast::Types::Boolean(bools) => {
+        asts::Types::Boolean(bools) => {
             let bool_b = bools.boolean;
             if bin == '=' && select_binary == priority_forth {
                 match comparison_node {
-                    Ast::Types::Binary(_) => {
+                    asts::Types::Binary(_) => {
                         let result = equivalence_bool(bool_a, bool_b);
                         return calculation_comparison_continue_bool(bools, result, select_binary);
                     }
 
                     _ => {
-                        let err = Error::Error::new(&comparison_node);
+                        let err = error::Error::new(&comparison_node);
                         err.exit("Comparison operator error")
                     }
                 }
@@ -369,13 +369,13 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
 
             if bin == '!' && select_binary == priority_forth {
                 match comparison_node {
-                    Ast::Types::Binary(_) => {
+                    asts::Types::Binary(_) => {
                         let result = inequality_bool(bool_a, bool_b);
                         return calculation_comparison_continue_bool(bools, result, select_binary);
                     }
 
                     _ => {
-                        let err = Error::Error::new(&comparison_node);
+                        let err = error::Error::new(&comparison_node);
                         err.exit("Comparison operator error")
                     }
                 }
@@ -383,13 +383,13 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
 
             if bin == '&' && select_binary == priority_fifth {
                 match comparison_node {
-                    Ast::Types::Binary(_) => {
+                    asts::Types::Binary(_) => {
                         let result = logical_and(bool_a, bool_b);
                         return calculation_comparison_continue_bool(bools, result, select_binary);
                     }
 
                     _ => {
-                        let err = Error::Error::new(&comparison_node);
+                        let err = error::Error::new(&comparison_node);
                         err.exit("Comparison operator error")
                     }
                 }
@@ -397,13 +397,13 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
 
             if bin == '|' && select_binary == priority_sixs {
                 match comparison_node {
-                    Ast::Types::Binary(_) => {
+                    asts::Types::Binary(_) => {
                         let result = logical_or(bool_a, bool_b);
                         return calculation_comparison_continue_bool(bools, result, select_binary);
                     }
 
                     _ => {
-                        let err = Error::Error::new(&comparison_node);
+                        let err = error::Error::new(&comparison_node);
                         err.exit("Comparison operator error")
                     }
                 }
@@ -412,39 +412,39 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
             if !bools.node.is_empty() {
                 let result = calculattions(node_seccond.clone(), select_binary);
 
-                let mut binarys = Ast::BinaryAST::new(bin);
+                let mut binarys = asts::BinaryAST::new(bin);
 
                 match comparison_node {
-                    Ast::Types::Binary(_) => {
+                    asts::Types::Binary(_) => {
                         binarys.node.push(comparison_node);
                     }
                     _ => {
-                        let err = Error::Error::new(&comparison_node);
+                        let err = error::Error::new(&comparison_node);
                         err.exit("Comparison operator error")
                     }
                 }
 
                 binarys.node.push(result);
 
-                let mut ast_retruns = Ast::Types::Error(Ast::ErrorAST::new("variable error"));
+                let mut ast_retruns = asts::Types::Error(asts::ErrorAST::new("variable error"));
 
                 match numbers.clone() {
-                    Ast::Types::Number(_) => {
-                        let mut numbers = Ast::NumberAST::new(number_a);
-                        numbers.node.push(Ast::Types::Binary(binarys));
-                        let ast_return = Ast::Types::Number(numbers);
+                    asts::Types::Number(_) => {
+                        let mut numbers = asts::NumberAST::new(number_a);
+                        numbers.node.push(asts::Types::Binary(binarys));
+                        let ast_return = asts::Types::Number(numbers);
                         ast_retruns = ast_return
                     }
 
-                    Ast::Types::Boolean(_) => {
-                        let mut booleans = Ast::BooleanAST::new(bool_a);
-                        booleans.node.push(Ast::Types::Binary(binarys));
-                        let ast_return = Ast::Types::Boolean(booleans);
+                    asts::Types::Boolean(_) => {
+                        let mut booleans = asts::BooleanAST::new(bool_a);
+                        booleans.node.push(asts::Types::Binary(binarys));
+                        let ast_return = asts::Types::Boolean(booleans);
                         ast_retruns = ast_return
                     }
 
                     _ => {
-                        let err = Error::Error::new(&numbers);
+                        let err = error::Error::new(&numbers);
                         err.exit("Comparison operator error")
                     }
                 }
@@ -454,7 +454,7 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
             return numbers;
         }
         _ => {
-            let err = Error::Error::new(&comparison_node);
+            let err = error::Error::new(&comparison_node);
             err.exit("operator or Number error")
         }
     }
@@ -462,73 +462,73 @@ fn calculattions(numbers: Ast::Types, select_binary: i64) -> Ast::Types {
     return numbers;
 }
 
-fn calculattions_continue(num: Ast::NumberAST, result: i64, select_binary: i64) -> Ast::Types {
+fn calculattions_continue(num: asts::NumberAST, result: i64, select_binary: i64) -> asts::Types {
     if num.node.is_empty() {
-        let ast = Ast::NumberAST::new(result);
-        return Ast::Types::Number(ast);
+        let ast = asts::NumberAST::new(result);
+        return asts::Types::Number(ast);
     }
 
-    let mut number_ast = Ast::NumberAST::new(result);
+    let mut number_ast = asts::NumberAST::new(result);
     let node_number = num.node[0].clone();
     number_ast.node.push(node_number);
 
-    let number_result = calculattions(Ast::Types::Number(number_ast), select_binary);
+    let number_result = calculattions(asts::Types::Number(number_ast), select_binary);
     return number_result;
 }
 
 fn calculation_comparison_continue(
-    num: Ast::NumberAST,
+    num: asts::NumberAST,
     result: bool,
     select_binary: i64,
-) -> Ast::Types {
+) -> asts::Types {
     if num.node.is_empty() {
-        let ast = Ast::BooleanAST::new(result);
-        return Ast::Types::Boolean(ast);
+        let ast = asts::BooleanAST::new(result);
+        return asts::Types::Boolean(ast);
     }
 
-    let mut bool_ast = Ast::BooleanAST::new(result);
+    let mut bool_ast = asts::BooleanAST::new(result);
     let node_bool = num.node[0].clone();
     bool_ast.node.push(node_bool);
 
-    let bool_result = calculattions(Ast::Types::Boolean(bool_ast), select_binary);
+    let bool_result = calculattions(asts::Types::Boolean(bool_ast), select_binary);
     return bool_result;
 }
 
 fn calculation_comparison_continue_bool(
-    bools: Ast::BooleanAST,
+    bools: asts::BooleanAST,
     result: bool,
     select_binary: i64,
-) -> Ast::Types {
+) -> asts::Types {
     if bools.node.is_empty() {
-        let ast = Ast::BooleanAST::new(result);
-        return Ast::Types::Boolean(ast);
+        let ast = asts::BooleanAST::new(result);
+        return asts::Types::Boolean(ast);
     }
 
-    let mut bool_ast = Ast::BooleanAST::new(result);
+    let mut bool_ast = asts::BooleanAST::new(result);
     let node_bool = bools.node[0].clone();
     bool_ast.node.push(node_bool);
 
-    let bool_result = calculattions(Ast::Types::Boolean(bool_ast), select_binary);
+    let bool_result = calculattions(asts::Types::Boolean(bool_ast), select_binary);
     return bool_result;
 }
 
-fn match_type(node: Ast::Types, next_node: Ast::Types) -> (Vec<i64>, Vec<Ast::Types>) {
+fn match_type(node: asts::Types, next_node: asts::Types) -> (Vec<i64>, Vec<asts::Types>) {
     let mut numbers: Vec<i64> = Vec::new();
-    let mut types: Vec<Ast::Types> = Vec::new();
+    let mut types: Vec<asts::Types> = Vec::new();
 
     match node {
-        Ast::Types::Number(num) => {
+        asts::Types::Number(num) => {
             numbers.push(num.val);
         }
 
         _ => {
-            let err = Error::Error::new(&node);
+            let err = error::Error::new(&node);
             err.exit("not a number error");
         }
     }
 
     match next_node {
-        Ast::Types::Number(num) => {
+        asts::Types::Number(num) => {
             numbers.push(num.val);
             if !num.node.is_empty() {
                 types.push(num.node[0].clone());
@@ -536,7 +536,7 @@ fn match_type(node: Ast::Types, next_node: Ast::Types) -> (Vec<i64>, Vec<Ast::Ty
         }
 
         _ => {
-            let err = Error::Error::new(&next_node);
+            let err = error::Error::new(&next_node);
             err.exit("number node error");
         }
     }
@@ -544,9 +544,9 @@ fn match_type(node: Ast::Types, next_node: Ast::Types) -> (Vec<i64>, Vec<Ast::Ty
     return (numbers, types);
 }
 
-fn comparison_operator(op: char, number: &Ast::Types) -> Option<i64> {
+fn comparison_operator(op: char, number: &asts::Types) -> Option<i64> {
     match number {
-        Ast::Types::Number(num) => {
+        asts::Types::Number(num) => {
             if op == '+' {
                 let result = plus(num.val, 1);
                 return Some(result);
@@ -557,7 +557,7 @@ fn comparison_operator(op: char, number: &Ast::Types) -> Option<i64> {
         }
 
         _ => {
-            let err = Error::Error::new(&number);
+            let err = error::Error::new(&number);
             err.exit("not a number error");
         }
     }

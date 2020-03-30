@@ -1,6 +1,6 @@
-pub mod Interpreter;
-pub mod Arithmetic;
-pub mod For;
-pub mod Variable;
-pub mod Function;
-pub mod Error;
+pub mod interpreters;
+pub mod arithmetic;
+pub mod fors;
+pub mod variable;
+pub mod function;
+pub mod error;

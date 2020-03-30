@@ -1,2 +1,2 @@
-pub mod Lexer;
-pub mod Token;
+pub mod lexers;
+pub mod token;
