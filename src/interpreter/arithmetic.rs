@@ -135,11 +135,13 @@ pub fn common(bin: asts::BinaryAST) -> asts::Types {
     next_node = calculattions(next_node, 3);
 
     if op == '=' {
-        let (numbers, types) = match_type(node.clone(), next_node.clone());
+        let (numbers, strings, types) = match_type_possible(node.clone(), next_node.clone());
         let mut result = false;
 
-        if bin.node.len() == 3 {
+        if strings.len() == 0 && bin.node.len() == 3 {
             result = equivalence(numbers[0], numbers[1]);
+        } else if bin.node.len() == 3 {
+            result = equivalence_string(&strings[0], &strings[1]);
         } else {
             let err = error::Error::new(&next_node);
             err.exit("Comparison operator error");
@@ -155,12 +157,14 @@ pub fn common(bin: asts::BinaryAST) -> asts::Types {
     }
 
     if op == '!' {
-        let (numbers, types) = match_type(node.clone(), next_node.clone());
+        let (numbers, strings, types) = match_type_possible(node.clone(), next_node.clone());
         let mut result = false;
 
-        if bin.node.len() == 3 {
+        if strings.len() == 0 && bin.node.len() == 3 {
             result = inequality(numbers[0], numbers[1]);
-        } else {
+        } else if bin.node.len() == 3{
+            result = inequality_string(&strings[0], &strings[1]);
+        }else {
             let err = error::Error::new(&next_node);
             err.exit("Comparison operator error");
         }

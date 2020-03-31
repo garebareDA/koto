@@ -271,6 +271,7 @@ impl Parsing {
             }
             self.tokens.remove(0);
         }
+
         if number_vector.len() < binary_vector.len() {
             let number = number_vector[0].clone();
             let binary = binary_vector[0].clone();
@@ -300,9 +301,15 @@ impl Parsing {
                         numbers.node.push(ast_temp.clone());
                         number = asts::Types::Number(numbers);
                     }
+
+                    asts::Types::Strings(mut strings) => {
+                        strings.node.push(ast_temp.clone());
+                        number = asts::Types::Strings(strings);
+                    }
                     _ => {}
                 }
             }
+
             match binary {
                 asts::Types::Binary(mut binary) => {
                     binary.node.push(number.clone());
@@ -312,6 +319,7 @@ impl Parsing {
             }
             index += 1;
         }
+
         match ast_temp {
             asts::Types::Binary(mut binary) => {
                 binary.node.push(number_vector[index].clone());
