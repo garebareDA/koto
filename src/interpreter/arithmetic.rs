@@ -162,9 +162,9 @@ pub fn common(bin: asts::BinaryAST) -> asts::Types {
 
         if strings.len() == 0 && bin.node.len() == 3 {
             result = inequality(numbers[0], numbers[1]);
-        } else if bin.node.len() == 3{
+        } else if bin.node.len() == 3 {
             result = inequality_string(&strings[0], &strings[1]);
-        }else {
+        } else {
             let err = error::Error::new(&next_node);
             err.exit("Comparison operator error");
         }
@@ -255,51 +255,60 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
             let number_b = num.val;
             if bin == '%' && select_binary == priority_first {
                 let result = modulo(number_a, number_b);
-                return calculattions_continue(num, result, select_binary);
+                let modulo_reslut = asts::Types::Number(asts::NumberAST::new(result));
+                return calculations_continue(num.node, modulo_reslut, select_binary);
             }
 
             if bin == '*' && select_binary == priority_first {
                 let result = multiplication(number_a, number_b);
-                return calculattions_continue(num, result, select_binary);
+                let multiplication_reslut = asts::Types::Number(asts::NumberAST::new(result));
+                return calculations_continue(num.node, multiplication_reslut, select_binary);
             }
 
             if bin == '/' && select_binary == priority_first {
                 let result = division(number_a, number_b);
-                return calculattions_continue(num, result, select_binary);
+                let division_reslut = asts::Types::Number(asts::NumberAST::new(result));
+                return calculations_continue(num.node, division_reslut, select_binary);
             }
 
             if bin == '-' && select_binary == priority_seccond {
                 let result = minus(number_a, number_b);
-                return calculattions_continue(num, result, select_binary);
+                let minus_result = asts::Types::Number(asts::NumberAST::new(result));
+                return calculations_continue(num.node, minus_result, select_binary);
             }
 
             if bin == '+' && select_binary == priority_seccond {
                 if string_a.len() > 0 {
                     let result = &concatenation(&string_a, &number_b.to_string());
-                    if num.node.is_empty() {
-                        let ast = asts::StringAST::new(result);
-                        return asts::Types::Strings(ast);
-                    }
-                    let mut string_ast = asts::StringAST::new(result);
-                    let node_string = num.node[0].clone();
-                    string_ast.node.push(node_string);
-                    let string_result =
-                        calculattions(asts::Types::Strings(string_ast), select_binary);
-                    return string_result;
+                    let concatenation_result = asts::Types::Strings(asts::StringAST::new(result));
+                    return calculations_continue(num.node, concatenation_result, select_binary);
                 }
                 let result = plus(number_a, number_b);
-                return calculattions_continue(num, result, select_binary);
+                let plus_result = asts::Types::Number(asts::NumberAST::new(result));
+                return calculations_continue(num.node, plus_result, select_binary);
             }
 
             if bin == '<' && select_binary == priority_therd {
                 match comparison_node {
                     asts::Types::Binary(_) => {
                         let result = greater_than_equal(number_a, number_b);
-                        return calculation_comparison_continue(num, result, select_binary);
+                        let greater_than_equal_result =
+                            asts::Types::Boolean(asts::BooleanAST::new(result));
+                        return calculations_continue(
+                            num.node,
+                            greater_than_equal_result,
+                            select_binary,
+                        );
                     }
                     _ => {
                         let result = greater_than(number_a, number_b);
-                        return calculation_comparison_continue(num, result, select_binary);
+                        let greater_than_result =
+                            asts::Types::Boolean(asts::BooleanAST::new(result));
+                        return calculations_continue(
+                            num.node,
+                            greater_than_result,
+                            select_binary,
+                        );
                     }
                 }
             }
@@ -308,11 +317,18 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
                 match comparison_node {
                     asts::Types::Binary(_) => {
                         let result = less_than_equal(number_a, number_b);
-                        return calculation_comparison_continue(num, result, select_binary);
+                        let less_than_equal_result =
+                            asts::Types::Boolean(asts::BooleanAST::new(result));
+                        return calculations_continue(
+                            num.node,
+                            less_than_equal_result,
+                            select_binary,
+                        );
                     }
                     _ => {
                         let result = less_than(number_a, number_b);
-                        return calculation_comparison_continue(num, result, select_binary);
+                        let less_than_result = asts::Types::Boolean(asts::BooleanAST::new(result));
+                        return calculations_continue(num.node, less_than_result, select_binary);
                     }
                 }
             }
@@ -322,14 +338,18 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
                     asts::Types::Binary(_) => {
                         if string_a.len() > 0 {
                             let result = equivalence_string(&string_a, &number_b.to_string());
-                            return calculation_comparison_continue(
-                                num.clone(),
-                                result,
+                            let equivalence_string_result =
+                                asts::Types::Boolean(asts::BooleanAST::new(result));
+                            return calculations_continue(
+                                num.node,
+                                equivalence_string_result,
                                 select_binary,
                             );
                         }
                         let result = equivalence(number_a, number_b);
-                        return calculation_comparison_continue(num, result, select_binary);
+                        let equivalence_result =
+                            asts::Types::Boolean(asts::BooleanAST::new(result));
+                        return calculations_continue(num.node, equivalence_result, select_binary);
                     }
 
                     _ => {
@@ -344,14 +364,16 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
                     asts::Types::Binary(_) => {
                         if string_a.len() > 0 {
                             let result = inequality_string(&string_a, &number_b.to_string());
-                            return calculation_comparison_continue(
-                                num.clone(),
-                                result,
+                            let inequality_string_result = asts::Types::Boolean(asts::BooleanAST::new(result));
+                            return calculations_continue(
+                                num.node,
+                                inequality_string_result,
                                 select_binary,
                             );
                         }
                         let result = inequality(number_a, number_b);
-                        return calculation_comparison_continue(num, result, select_binary);
+                        let inequality_result = asts::Types::Boolean(asts::BooleanAST::new(result));
+                        return calculations_continue(num.node, inequality_result, select_binary);
                     }
 
                     _ => {
@@ -416,14 +438,16 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
                     asts::Types::Binary(_) => {
                         if string_a.len() > 0 {
                             let result = equivalence_string(&string_a, &bool_b.to_string());
-                            return calculation_comparison_continue_bool(
-                                bools,
-                                result,
+                            let equivalence_string_result = asts::Types::Boolean(asts::BooleanAST::new(result));
+                            return calculations_continue(
+                                bools.node,
+                                equivalence_string_result,
                                 select_binary,
                             );
                         }
                         let result = equivalence_bool(bool_a, bool_b);
-                        return calculation_comparison_continue_bool(bools, result, select_binary);
+                        let equivalence_bool_result = asts::Types::Boolean(asts::BooleanAST::new(result));
+                        return calculations_continue(bools.node, equivalence_bool_result, select_binary);
                     }
 
                     _ => {
@@ -438,14 +462,16 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
                     asts::Types::Binary(_) => {
                         if string_a.len() > 0 {
                             let result = inequality_string(&string_a, &bool_b.to_string());
-                            return calculation_comparison_continue_bool(
-                                bools,
-                                result,
+                            let inequality_string_result = asts::Types::Boolean(asts::BooleanAST::new(result));
+                            return calculations_continue(
+                                bools.node,
+                                inequality_string_result,
                                 select_binary,
                             );
                         }
                         let result = inequality_bool(bool_a, bool_b);
-                        return calculation_comparison_continue_bool(bools, result, select_binary);
+                        let inequality_bool_result = asts::Types::Boolean(asts::BooleanAST::new(result));
+                        return calculations_continue(bools.node, inequality_bool_result, select_binary);
                     }
 
                     _ => {
@@ -459,7 +485,8 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
                 match comparison_node {
                     asts::Types::Binary(_) => {
                         let result = logical_and(bool_a, bool_b);
-                        return calculation_comparison_continue_bool(bools, result, select_binary);
+                        let logical_and_result = asts::Types::Boolean(asts::BooleanAST::new(result));
+                        return calculations_continue(bools.node, logical_and_result, select_binary);
                     }
 
                     _ => {
@@ -473,7 +500,8 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
                 match comparison_node {
                     asts::Types::Binary(_) => {
                         let result = logical_or(bool_a, bool_b);
-                        return calculation_comparison_continue_bool(bools, result, select_binary);
+                        let logical_or_result = asts::Types::Boolean(asts::BooleanAST::new(result));
+                        return calculations_continue(bools.node, logical_or_result, select_binary);
                     }
 
                     _ => {
@@ -541,17 +569,20 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
                 match numbers.clone() {
                     asts::Types::Strings(_) => {
                         let result = &concatenation(&string_a, string_b);
-                        return calculation_continue_string(string, result, select_binary);
+                        let concatenation_result = asts::Types::Strings(asts::StringAST::new(result));
+                        return calculations_continue(string.node, concatenation_result, select_binary);
                     }
 
                     asts::Types::Number(_) => {
                         let result = &concatenation(&number_a.to_string(), string_b);
-                        return calculation_continue_string(string, result, select_binary);
+                        let concatenation_result = asts::Types::Strings(asts::StringAST::new(result));
+                        return calculations_continue(string.node, concatenation_result, select_binary);
                     }
 
                     asts::Types::Boolean(_) => {
                         let result = &concatenation(&bool_a.to_string(), string_b);
-                        return calculation_continue_string(string, result, select_binary);
+                        let concatenation_result = asts::Types::Strings(asts::StringAST::new(result));
+                        return calculations_continue(string.node, concatenation_result, select_binary);
                     }
 
                     _ => {}
@@ -563,17 +594,20 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
                     asts::Types::Binary(_) => match numbers.clone() {
                         asts::Types::Strings(_) => {
                             let result = equivalence_string(&string_a, string_b);
-                            return calculation_continue_string_op(string, result, select_binary);
+                            let equivalence_string_result = asts::Types::Boolean(asts::BooleanAST::new(result));
+                            return calculations_continue(string.node, equivalence_string_result , select_binary);
                         }
 
                         asts::Types::Number(_) => {
                             let result = equivalence_string(&number_a.to_string(), string_b);
-                            return calculation_continue_string_op(string, result, select_binary);
+                            let equivalence_string_result = asts::Types::Boolean(asts::BooleanAST::new(result));
+                            return calculations_continue(string.node, equivalence_string_result , select_binary);
                         }
 
                         asts::Types::Boolean(_) => {
                             let result = equivalence_string(&bool_a.to_string(), string_b);
-                            return calculation_continue_string_op(string, result, select_binary);
+                            let equivalence_string_result = asts::Types::Boolean(asts::BooleanAST::new(result));
+                            return calculations_continue(string.node, equivalence_string_result , select_binary);
                         }
 
                         _ => {}
@@ -587,17 +621,20 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
                     asts::Types::Binary(_) => match numbers.clone() {
                         asts::Types::Strings(_) => {
                             let result = inequality_string(&string_a, string_b);
-                            return calculation_continue_string_op(string, result, select_binary);
+                            let inequality_string_result = asts::Types::Boolean(asts::BooleanAST::new(result));
+                            return calculations_continue(string.node, inequality_string_result, select_binary);
                         }
 
                         asts::Types::Number(_) => {
                             let result = inequality_string(&number_a.to_string(), string_b);
-                            return calculation_continue_string_op(string, result, select_binary);
+                            let inequality_string_result = asts::Types::Boolean(asts::BooleanAST::new(result));
+                            return calculations_continue(string.node, inequality_string_result, select_binary);
                         }
 
                         asts::Types::Boolean(_) => {
                             let result = inequality_string(&bool_a.to_string(), string_b);
-                            return calculation_continue_string_op(string, result, select_binary);
+                            let inequality_string_result = asts::Types::Boolean(asts::BooleanAST::new(result));
+                            return calculations_continue(string.node, inequality_string_result, select_binary);
                         }
 
                         _ => {}
@@ -654,87 +691,36 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
     return numbers;
 }
 
-//似た関数が多すぎるので何とかする
-fn calculattions_continue(num: asts::NumberAST, result: i64, select_binary: i64) -> asts::Types {
-    if num.node.is_empty() {
-        let ast = asts::NumberAST::new(result);
-        return asts::Types::Number(ast);
-    }
-
-    let mut number_ast = asts::NumberAST::new(result);
-    let node_number = num.node[0].clone();
-    number_ast.node.push(node_number);
-
-    let number_result = calculattions(asts::Types::Number(number_ast), select_binary);
-    return number_result;
-}
-
-fn calculation_comparison_continue(
-    num: asts::NumberAST,
-    result: bool,
+fn calculations_continue(
+    node: Vec<asts::Types>,
+    result: asts::Types,
     select_binary: i64,
 ) -> asts::Types {
-    if num.node.is_empty() {
-        let ast = asts::BooleanAST::new(result);
-        return asts::Types::Boolean(ast);
+    if node.is_empty() {
+        return result;
     }
 
-    let mut bool_ast = asts::BooleanAST::new(result);
-    let node_bool = num.node[0].clone();
-    bool_ast.node.push(node_bool);
+    match result {
+        asts::Types::Number(mut number) => {
+            number.node.push(node[0].clone());
+            let number_result = calculattions(asts::Types::Number(number), select_binary);
+            return number_result;
+        }
 
-    let bool_result = calculattions(asts::Types::Boolean(bool_ast), select_binary);
-    return bool_result;
-}
+        asts::Types::Boolean(mut bools) => {
+            bools.node.push(node[0].clone());
+            let bools_result = calculattions(asts::Types::Boolean(bools), select_binary);
+            return bools_result;
+        }
 
-fn calculation_comparison_continue_bool(
-    bools: asts::BooleanAST,
-    result: bool,
-    select_binary: i64,
-) -> asts::Types {
-    if bools.node.is_empty() {
-        let ast = asts::BooleanAST::new(result);
-        return asts::Types::Boolean(ast);
+        asts::Types::Strings(mut strings) => {
+            strings.node.push(node[0].clone());
+            let strings_result = calculattions(asts::Types::Strings(strings), select_binary);
+            return strings_result;
+        }
+
+        _ => {asts::Types::Error(asts::ErrorAST::new("Calculattions Error"))}
     }
-
-    let mut bool_ast = asts::BooleanAST::new(result);
-    let node_bool = bools.node[0].clone();
-    bool_ast.node.push(node_bool);
-
-    let bool_result = calculattions(asts::Types::Boolean(bool_ast), select_binary);
-    return bool_result;
-}
-
-fn calculation_continue_string(
-    string: asts::StringAST,
-    result: &str,
-    select_binary: i64,
-) -> asts::Types {
-    if string.node.is_empty() {
-        let ast = asts::StringAST::new(result);
-        return asts::Types::Strings(ast);
-    }
-    let mut string_ast = asts::StringAST::new(result);
-    let node_string = string.node[0].clone();
-    string_ast.node.push(node_string);
-    let string_result = calculattions(asts::Types::Strings(string_ast), select_binary);
-    return string_result;
-}
-
-fn calculation_continue_string_op(
-    string: asts::StringAST,
-    result: bool,
-    select_binary: i64,
-) -> asts::Types {
-    if string.node.is_empty() {
-        let ast = asts::BooleanAST::new(result);
-        return asts::Types::Boolean(ast);
-    }
-    let mut string_ast = asts::BooleanAST::new(result);
-    let node_string = string.node[0].clone();
-    string_ast.node.push(node_string);
-    let string_result = calculattions(asts::Types::Boolean(string_ast), select_binary);
-    return string_result;
 }
 
 fn match_type(node: asts::Types, next_node: asts::Types) -> (Vec<i64>, Vec<asts::Types>) {
