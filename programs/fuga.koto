@@ -1,7 +1,7 @@
 #comment
 let number = 1;
 
-let string = "hello, world";
+let string = "hello, world" + "hello";
 print(string);
 
 let vector = vec[1, 2, 3, 4, 5];

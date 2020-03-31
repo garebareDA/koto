@@ -8,14 +8,12 @@ pub fn common(bin: asts::BinaryAST) -> asts::Types {
 
     if bin.op == '-' || bin.op == '+' {
         match &next_node {
-            asts::Types::Binary(bin) => {
-                match comparison_operator(bin.op, &node)  {
-                    Some(num) => {
-                        return asts::Types::Number(asts::NumberAST::new(num));
-                    }
-                    None =>{}
+            asts::Types::Binary(bin) => match comparison_operator(bin.op, &node) {
+                Some(num) => {
+                    return asts::Types::Number(asts::NumberAST::new(num));
                 }
-            }
+                None => {}
+            },
 
             _ => {}
         }
@@ -73,14 +71,26 @@ pub fn common(bin: asts::BinaryAST) -> asts::Types {
 
     // + と比較演算子の文字列の対応
     if op == '+' {
-        let (numbers, types) = match_type(node.clone(), next_node.clone());
-        let result = plus(numbers[0], numbers[1]);
-        let mut ast = asts::NumberAST::new(result);
-        if !types.is_empty() {
-            ast.node.push(types[0].clone());
-            next_node = asts::Types::Number(ast);
-        } else {
-            next_node = asts::Types::Number(ast);
+        let (numbers, strings, types) = match_type_possible(node.clone(), next_node.clone());
+        if strings.len() == 0 {
+            let result = plus(numbers[0], numbers[1]);
+            let mut ast = asts::NumberAST::new(result);
+            if !types.is_empty() {
+                ast.node.push(types[0].clone());
+                next_node = asts::Types::Number(ast);
+            } else {
+                next_node = asts::Types::Number(ast);
+            }
+        }else{
+            let result = concatenation(&strings[0], &strings[1]);
+            println!("{}", result);
+            let mut ast = asts::StringAST::new(&result);
+            if !types.is_empty() {
+                ast.node.push(types[0].clone());
+                next_node = asts::Types::Strings(ast);
+            } else {
+                next_node = asts::Types::Strings(ast);
+            }
         }
     }
 
@@ -88,7 +98,7 @@ pub fn common(bin: asts::BinaryAST) -> asts::Types {
 
     if op == '<' {
         let (numbers, types) = match_type(node.clone(), next_node.clone());
-        let result:bool;
+        let result: bool;
 
         if bin.node.len() == 3 {
             result = greater_than_equal(numbers[0], numbers[1]);
@@ -107,7 +117,7 @@ pub fn common(bin: asts::BinaryAST) -> asts::Types {
 
     if op == '>' {
         let (numbers, types) = match_type(node.clone(), next_node.clone());
-        let result:bool;
+        let result: bool;
 
         if bin.node.len() == 3 {
             result = less_than_equal(numbers[0], numbers[1]);
@@ -204,6 +214,7 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
             bool_a = bools.boolean;
             node_first = bools.node[0].clone();
         }
+
         _ => {
             let err = error::Error::new(&numbers);
             err.exit("number error");
@@ -544,6 +555,66 @@ fn match_type(node: asts::Types, next_node: asts::Types) -> (Vec<i64>, Vec<asts:
     return (numbers, types);
 }
 
+fn match_type_possible(
+    node: asts::Types,
+    next_node: asts::Types,
+) -> (Vec<i64>, Vec<String>, Vec<asts::Types>) {
+    let mut numbers: Vec<i64> = Vec::new();
+    let mut strings: Vec<String> = Vec::new();
+    let mut types: Vec<asts::Types> = Vec::new();
+
+    match node {
+        asts::Types::Number(num) => {
+            numbers.push(num.val);
+        }
+
+        asts::Types::Strings(string) => {
+            let name = string.name;
+            strings.push(name);
+        }
+
+        _ => {
+            let err = error::Error::new(&node);
+            err.exit("not a number error");
+        }
+    }
+
+    match &next_node {
+        asts::Types::Number(num) => {
+            if strings.len() == 0 {
+                numbers.push(num.val);
+            }else{
+                strings.push(num.val.to_string());
+            }
+
+            if !num.node.is_empty() {
+                types.push(num.node[0].clone());
+            }
+        }
+
+        asts::Types::Strings(string) => {
+            if numbers.len() > 0 {
+                strings.push(numbers[0].to_string());
+                numbers.clear();
+            }
+            let name = &string.name;
+            strings.push(name.clone());
+            if !string.node.is_empty() {
+                types.push(string.node[0].clone());
+            }
+        }
+
+        _ => {
+            let err = error::Error::new(&next_node);
+            err.exit("number node error");
+        }
+    }
+
+
+
+    return (numbers, strings, types);
+}
+
 fn comparison_operator(op: char, number: &asts::Types) -> Option<i64> {
     match number {
         asts::Types::Number(num) => {
@@ -622,4 +693,8 @@ fn logical_and(a: bool, b: bool) -> bool {
 
 fn logical_or(a: bool, b: bool) -> bool {
     a || b
+}
+
+fn concatenation(a: &str, b: &str) -> String {
+    format!("{}{}", a, b)
 }

@@ -202,6 +202,14 @@ impl Variable {
                     }
                 }
 
+                asts::Types::Strings(mut string) => {
+                    if !string.node.is_empty() {
+                        let vec = self.variables_allocation(string.node.clone(), vec_function);
+                        string.node = vec;
+                    }
+                    ast_vec.push(asts::Types::Strings(string));
+                }
+
                 asts::Types::Call(call) => {
                     let result = vec_function.function_run(&call, self);
                     match result {
