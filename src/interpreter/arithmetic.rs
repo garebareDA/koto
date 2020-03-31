@@ -69,7 +69,6 @@ pub fn common(bin: asts::BinaryAST) -> asts::Types {
         }
     }
 
-    // + と比較演算子の文字列の対応
     if op == '+' {
         let (numbers, strings, types) = match_type_possible(node.clone(), next_node.clone());
         if strings.len() == 0 {
@@ -81,9 +80,8 @@ pub fn common(bin: asts::BinaryAST) -> asts::Types {
             } else {
                 next_node = asts::Types::Number(ast);
             }
-        }else{
+        } else {
             let result = concatenation(&strings[0], &strings[1]);
-            println!("{}", result);
             let mut ast = asts::StringAST::new(&result);
             if !types.is_empty() {
                 ast.node.push(types[0].clone());
@@ -185,6 +183,7 @@ pub fn common(bin: asts::BinaryAST) -> asts::Types {
 fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
     let mut number_a = 0;
     let mut bool_a = false;
+    let mut string_a = String::new();
     let mut bin = ' ';
 
     let mut node_first = asts::Types::Error(asts::ErrorAST::new("variable error"));
@@ -213,6 +212,14 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
             }
             bool_a = bools.boolean;
             node_first = bools.node[0].clone();
+        }
+
+        asts::Types::Strings(string) => {
+            if string.node.is_empty() {
+                return numbers;
+            }
+            string_a = string.name;
+            node_first = string.node[0].clone();
         }
 
         _ => {
@@ -263,6 +270,19 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
             }
 
             if bin == '+' && select_binary == priority_seccond {
+                if string_a.len() > 0 {
+                    let result = &concatenation(&string_a, &number_b.to_string());
+                    if num.node.is_empty() {
+                        let ast = asts::StringAST::new(result);
+                        return asts::Types::Strings(ast);
+                    }
+                    let mut string_ast = asts::StringAST::new(result);
+                    let node_string = num.node[0].clone();
+                    string_ast.node.push(node_string);
+                    let string_result =
+                        calculattions(asts::Types::Strings(string_ast), select_binary);
+                    return string_result;
+                }
                 let result = plus(number_a, number_b);
                 return calculattions_continue(num, result, select_binary);
             }
@@ -296,6 +316,14 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
             if bin == '=' && select_binary == priority_forth {
                 match comparison_node {
                     asts::Types::Binary(_) => {
+                        if string_a.len() > 0 {
+                            let result = equivalence_string(&string_a, &number_b.to_string());
+                            return calculation_comparison_continue(
+                                num.clone(),
+                                result,
+                                select_binary,
+                            );
+                        }
                         let result = equivalence(number_a, number_b);
                         return calculation_comparison_continue(num, result, select_binary);
                     }
@@ -310,6 +338,14 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
             if bin == '!' && select_binary == priority_forth {
                 match comparison_node {
                     asts::Types::Binary(_) => {
+                        if string_a.len() > 0 {
+                            let result = inequality_string(&string_a, &number_b.to_string());
+                            return calculation_comparison_continue(
+                                num.clone(),
+                                result,
+                                select_binary,
+                            );
+                        }
                         let result = inequality(number_a, number_b);
                         return calculation_comparison_continue(num, result, select_binary);
                     }
@@ -351,6 +387,13 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
                         ast_retruns = ast_return
                     }
 
+                    asts::Types::Strings(_) => {
+                        let mut strings = asts::StringAST::new(&string_a);
+                        strings.node.push(asts::Types::Binary(binarys));
+                        let ast_retrun = asts::Types::Strings(strings);
+                        ast_retruns = ast_retrun;
+                    }
+
                     _ => {
                         let err = error::Error::new(&numbers);
                         err.exit("number error");
@@ -367,6 +410,14 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
             if bin == '=' && select_binary == priority_forth {
                 match comparison_node {
                     asts::Types::Binary(_) => {
+                        if string_a.len() > 0 {
+                            let result = equivalence_string(&string_a, &bool_b.to_string());
+                            return calculation_comparison_continue_bool(
+                                bools,
+                                result,
+                                select_binary,
+                            );
+                        }
                         let result = equivalence_bool(bool_a, bool_b);
                         return calculation_comparison_continue_bool(bools, result, select_binary);
                     }
@@ -381,6 +432,14 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
             if bin == '!' && select_binary == priority_forth {
                 match comparison_node {
                     asts::Types::Binary(_) => {
+                        if string_a.len() > 0 {
+                            let result = inequality_string(&string_a, &bool_b.to_string());
+                            return calculation_comparison_continue_bool(
+                                bools,
+                                result,
+                                select_binary,
+                            );
+                        }
                         let result = inequality_bool(bool_a, bool_b);
                         return calculation_comparison_continue_bool(bools, result, select_binary);
                     }
@@ -454,6 +513,13 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
                         ast_retruns = ast_return
                     }
 
+                    asts::Types::Strings(_) => {
+                        let mut strings = asts::StringAST::new(&string_a);
+                        strings.node.push(asts::Types::Binary(binarys));
+                        let ast_retrun = asts::Types::Strings(strings);
+                        ast_retruns = ast_retrun;
+                    }
+
                     _ => {
                         let err = error::Error::new(&numbers);
                         err.exit("Comparison operator error")
@@ -464,6 +530,117 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
 
             return numbers;
         }
+
+        asts::Types::Strings(string) => {
+            let string_b = &string.name;
+            if bin == '+' && select_binary == priority_seccond {
+                match numbers.clone() {
+                    asts::Types::Strings(_) => {
+                        let result = &concatenation(&string_a, string_b);
+                        return calculation_continue_string(string, result, select_binary);
+                    }
+
+                    asts::Types::Number(_) => {
+                        let result = &concatenation(&number_a.to_string(), string_b);
+                        return calculation_continue_string(string, result, select_binary);
+                    }
+
+                    asts::Types::Boolean(_) => {
+                        let result = &concatenation(&bool_a.to_string(), string_b);
+                        return calculation_continue_string(string, result, select_binary);
+                    }
+
+                    _ => {}
+                }
+            }
+
+            if bin == '=' && select_binary == priority_forth {
+                match comparison_node {
+                    asts::Types::Binary(_) => match numbers.clone() {
+                        asts::Types::Strings(_) => {
+                            let result = equivalence_string(&string_a, string_b);
+                            return calculation_continue_string_op(string, result, select_binary);
+                        }
+
+                        asts::Types::Number(_) => {
+                            let result = equivalence_string(&number_a.to_string(), string_b);
+                            return calculation_continue_string_op(string, result, select_binary);
+                        }
+
+                        asts::Types::Boolean(_) => {
+                            let result = equivalence_string(&bool_a.to_string(), string_b);
+                            return calculation_continue_string_op(string, result, select_binary);
+                        }
+
+                        _ => {}
+                    },
+                    _ => {}
+                }
+            }
+
+            if bin == '!' && select_binary == priority_forth {
+                match comparison_node {
+                    asts::Types::Binary(_) => match numbers.clone() {
+                        asts::Types::Strings(_) => {
+                            let result = inequality_string(&string_a, string_b);
+                            return calculation_continue_string_op(string, result, select_binary);
+                        }
+
+                        asts::Types::Number(_) => {
+                            let result = inequality_string(&number_a.to_string(), string_b);
+                            return calculation_continue_string_op(string, result, select_binary);
+                        }
+
+                        asts::Types::Boolean(_) => {
+                            let result = inequality_string(&bool_a.to_string(), string_b);
+                            return calculation_continue_string_op(string, result, select_binary);
+                        }
+
+                        _ => {}
+                    },
+                    _ => {}
+                }
+                if !string.node.is_empty() {
+                    let result = calculattions(node_seccond.clone(), select_binary);
+                    let mut binarys = asts::BinaryAST::new(bin);
+                    match comparison_node {
+                        asts::Types::Binary(_) => {
+                            binarys.node.push(comparison_node);
+                        }
+                        _ => {}
+                    }
+                    binarys.node.push(result);
+                    let mut ast_retruns = asts::Types::Error(asts::ErrorAST::new("variable error"));
+                    match numbers.clone() {
+                        asts::Types::Number(_) => {
+                            let mut numbers = asts::NumberAST::new(number_a);
+                            numbers.node.push(asts::Types::Binary(binarys));
+                            let ast_return = asts::Types::Number(numbers);
+                            ast_retruns = ast_return
+                        }
+                        asts::Types::Boolean(_) => {
+                            let mut booleans = asts::BooleanAST::new(bool_a);
+                            booleans.node.push(asts::Types::Binary(binarys));
+                            let ast_return = asts::Types::Boolean(booleans);
+                            ast_retruns = ast_return
+                        }
+                        asts::Types::Strings(_) => {
+                            let mut strings = asts::StringAST::new(&string_a);
+                            strings.node.push(asts::Types::Binary(binarys));
+                            let ast_retrun = asts::Types::Strings(strings);
+                            ast_retruns = ast_retrun;
+                        }
+                        _ => {
+                            let err = error::Error::new(&numbers);
+                            err.exit("number error");
+                        }
+                    }
+                    return ast_retruns;
+                }
+                return numbers;
+            }
+        }
+
         _ => {
             let err = error::Error::new(&comparison_node);
             err.exit("operator or Number error")
@@ -473,6 +650,7 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
     return numbers;
 }
 
+//似た関数が多すぎるので何とかする
 fn calculattions_continue(num: asts::NumberAST, result: i64, select_binary: i64) -> asts::Types {
     if num.node.is_empty() {
         let ast = asts::NumberAST::new(result);
@@ -521,6 +699,38 @@ fn calculation_comparison_continue_bool(
 
     let bool_result = calculattions(asts::Types::Boolean(bool_ast), select_binary);
     return bool_result;
+}
+
+fn calculation_continue_string(
+    string: asts::StringAST,
+    result: &str,
+    select_binary: i64,
+) -> asts::Types {
+    if string.node.is_empty() {
+        let ast = asts::StringAST::new(result);
+        return asts::Types::Strings(ast);
+    }
+    let mut string_ast = asts::StringAST::new(result);
+    let node_string = string.node[0].clone();
+    string_ast.node.push(node_string);
+    let string_result = calculattions(asts::Types::Strings(string_ast), select_binary);
+    return string_result;
+}
+
+fn calculation_continue_string_op(
+    string: asts::StringAST,
+    result: bool,
+    select_binary: i64,
+) -> asts::Types {
+    if string.node.is_empty() {
+        let ast = asts::BooleanAST::new(result);
+        return asts::Types::Boolean(ast);
+    }
+    let mut string_ast = asts::BooleanAST::new(result);
+    let node_string = string.node[0].clone();
+    string_ast.node.push(node_string);
+    let string_result = calculattions(asts::Types::Boolean(string_ast), select_binary);
+    return string_result;
 }
 
 fn match_type(node: asts::Types, next_node: asts::Types) -> (Vec<i64>, Vec<asts::Types>) {
@@ -583,7 +793,7 @@ fn match_type_possible(
         asts::Types::Number(num) => {
             if strings.len() == 0 {
                 numbers.push(num.val);
-            }else{
+            } else {
                 strings.push(num.val.to_string());
             }
 
@@ -609,8 +819,6 @@ fn match_type_possible(
             err.exit("number node error");
         }
     }
-
-
 
     return (numbers, strings, types);
 }
@@ -697,4 +905,12 @@ fn logical_or(a: bool, b: bool) -> bool {
 
 fn concatenation(a: &str, b: &str) -> String {
     format!("{}{}", a, b)
+}
+
+fn equivalence_string(a: &str, b: &str) -> bool {
+    a == b
+}
+
+fn inequality_string(a: &str, b: &str) -> bool {
+    a != b
 }
