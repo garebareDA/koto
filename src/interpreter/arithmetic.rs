@@ -396,36 +396,8 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
                 }
 
                 binarys.node.push(result);
-                let mut ast_retruns = asts::Types::Error(asts::ErrorAST::new("variable error"));
-
-                match numbers.clone() {
-                    asts::Types::Number(_) => {
-                        let mut numbers = asts::NumberAST::new(number_a);
-                        numbers.node.push(asts::Types::Binary(binarys));
-                        let ast_return = asts::Types::Number(numbers);
-                        ast_retruns = ast_return
-                    }
-
-                    asts::Types::Boolean(_) => {
-                        let mut booleans = asts::BooleanAST::new(bool_a);
-                        booleans.node.push(asts::Types::Binary(binarys));
-                        let ast_return = asts::Types::Boolean(booleans);
-                        ast_retruns = ast_return
-                    }
-
-                    asts::Types::Strings(_) => {
-                        let mut strings = asts::StringAST::new(&string_a);
-                        strings.node.push(asts::Types::Binary(binarys));
-                        let ast_retrun = asts::Types::Strings(strings);
-                        ast_retruns = ast_retrun;
-                    }
-
-                    _ => {
-                        let err = error::Error::new(&numbers);
-                        err.exit("number error");
-                    }
-                }
-                return ast_retruns;
+                let inner = (number_a, bool_a, &string_a);
+                return ast_return(binarys, numbers, inner);
             }
 
             return numbers;
@@ -527,37 +499,8 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
                 }
 
                 binarys.node.push(result);
-
-                let mut ast_retruns = asts::Types::Error(asts::ErrorAST::new("variable error"));
-
-                match numbers.clone() {
-                    asts::Types::Number(_) => {
-                        let mut numbers = asts::NumberAST::new(number_a);
-                        numbers.node.push(asts::Types::Binary(binarys));
-                        let ast_return = asts::Types::Number(numbers);
-                        ast_retruns = ast_return
-                    }
-
-                    asts::Types::Boolean(_) => {
-                        let mut booleans = asts::BooleanAST::new(bool_a);
-                        booleans.node.push(asts::Types::Binary(binarys));
-                        let ast_return = asts::Types::Boolean(booleans);
-                        ast_retruns = ast_return
-                    }
-
-                    asts::Types::Strings(_) => {
-                        let mut strings = asts::StringAST::new(&string_a);
-                        strings.node.push(asts::Types::Binary(binarys));
-                        let ast_retrun = asts::Types::Strings(strings);
-                        ast_retruns = ast_retrun;
-                    }
-
-                    _ => {
-                        let err = error::Error::new(&numbers);
-                        err.exit("Comparison operator error")
-                    }
-                }
-                return ast_retruns;
+                let inner = (number_a, bool_a, &string_a);
+                return ast_return(binarys, numbers, inner);
             }
 
             return numbers;
@@ -644,6 +587,7 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
                 if !string.node.is_empty() {
                     let result = calculattions(node_seccond.clone(), select_binary);
                     let mut binarys = asts::BinaryAST::new(bin);
+
                     match comparison_node {
                         asts::Types::Binary(_) => {
                             binarys.node.push(comparison_node);
@@ -651,32 +595,8 @@ fn calculattions(numbers: asts::Types, select_binary: i64) -> asts::Types {
                         _ => {}
                     }
                     binarys.node.push(result);
-                    let mut ast_retruns = asts::Types::Error(asts::ErrorAST::new("variable error"));
-                    match numbers.clone() {
-                        asts::Types::Number(_) => {
-                            let mut numbers = asts::NumberAST::new(number_a);
-                            numbers.node.push(asts::Types::Binary(binarys));
-                            let ast_return = asts::Types::Number(numbers);
-                            ast_retruns = ast_return
-                        }
-                        asts::Types::Boolean(_) => {
-                            let mut booleans = asts::BooleanAST::new(bool_a);
-                            booleans.node.push(asts::Types::Binary(binarys));
-                            let ast_return = asts::Types::Boolean(booleans);
-                            ast_retruns = ast_return
-                        }
-                        asts::Types::Strings(_) => {
-                            let mut strings = asts::StringAST::new(&string_a);
-                            strings.node.push(asts::Types::Binary(binarys));
-                            let ast_retrun = asts::Types::Strings(strings);
-                            ast_retruns = ast_retrun;
-                        }
-                        _ => {
-                            let err = error::Error::new(&numbers);
-                            err.exit("number error");
-                        }
-                    }
-                    return ast_retruns;
+                    let inner = (number_a, bool_a, &string_a);
+                    return ast_return(binarys, numbers, inner);
                 }
                 return numbers;
             }
@@ -831,6 +751,37 @@ fn comparison_operator(op: char, number: &asts::Types) -> Option<i64> {
         }
     }
     return None;
+}
+
+fn ast_return(binarys:asts::BinaryAST, numbers:asts::Types, inner:(i64, bool, &String)) -> asts::Types {
+    let mut ast_retruns = asts::Types::Error(asts::ErrorAST::new("variable error"));
+    let (number_a, bool_a, string_a) = inner;
+
+    match numbers.clone() {
+        asts::Types::Number(_) => {
+            let mut numbers = asts::NumberAST::new(number_a);
+            numbers.node.push(asts::Types::Binary(binarys));
+            let ast_return = asts::Types::Number(numbers);
+            ast_retruns = ast_return
+        }
+        asts::Types::Boolean(_) => {
+            let mut booleans = asts::BooleanAST::new(bool_a);
+            booleans.node.push(asts::Types::Binary(binarys));
+            let ast_return = asts::Types::Boolean(booleans);
+            ast_retruns = ast_return
+        }
+        asts::Types::Strings(_) => {
+            let mut strings = asts::StringAST::new(string_a);
+            strings.node.push(asts::Types::Binary(binarys));
+            let ast_retrun = asts::Types::Strings(strings);
+            ast_retruns = ast_retrun;
+        }
+        _ => {
+            let err = error::Error::new(&numbers);
+            err.exit("number error");
+        }
+    }
+    return ast_retruns;
 }
 
 fn modulo(a: i64, b: i64) -> i64 {
