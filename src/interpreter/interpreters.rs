@@ -1,9 +1,17 @@
-use super::super::ast::asts;
 use super::arithmetic;
+use super::error;
 use super::fors;
 use super::function;
 use super::variable;
-use super::error;
+use super::super::ast::parsing;
+use super::super::ast::asts;
+use super::super::lexer::lexers;
+
+use std::fs::File;
+use std::io::prelude::*;
+use std::io::BufReader;
+use std::path::Path;
+use std::env;
 
 pub fn run(root: asts::ExprAST) {
     let mut index = 0;
@@ -91,11 +99,11 @@ pub fn run_judg(
                         }
                     }
 
-                    _ =>{}
+                    _ => {}
                 }
             }
 
-            if is_continue{
+            if is_continue {
                 match bin.node[0].clone() {
                     asts::Types::Variable(mut var) => {
                         var.node.push(result);
@@ -178,10 +186,43 @@ pub fn run_judg(
                 }
 
                 _ => {
-                    let err = error::Error::new(& ret.node[0]);
+                    let err = error::Error::new(&ret.node[0]);
                     err.exit("retrun error");
                 }
             }
+        }
+
+        asts::Types::Import(import) => {
+            let result = calculation(&import.path[0], vec_variable, vec_function);
+            let mut path = String::new();
+
+            match result {
+                asts::Types::Strings(string) => {
+                    path = string.name;
+                }
+                _ => {
+                    let err = error::Error::new(&result);
+                    err.exit("import error");
+                }
+            }
+
+            let relative_path = Path::new(&path);
+            let pwd = env::current_dir().unwrap();
+            let absolute_path = pwd.join(relative_path);
+            let file = File::open(absolute_path ).expect("file not found");
+            let mut file_buffer = BufReader::new(&file);
+            let mut content = String::new();
+            file_buffer
+                .read_to_string(&mut content)
+                .expect("file not found");
+
+            let mut lexer = lexers::Lexer::new(&content);
+            let tokens = lexer.start();
+
+            let mut pars = parsing::Parsing::new(&tokens);
+            let result = pars.parsing();
+            println!("{:?}", result);
+            vec_function.push(result.node.clone());
         }
 
         _ => {}

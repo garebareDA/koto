@@ -7,16 +7,22 @@ use koto::lexer::lexers;
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
+use std::path::Path;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
 
     if args.len() == 3 && &args[1] == "run" {
         let path = &args[2];
-        let file = File::open(path).expect("file not found");
+        let relative_path = Path::new(path);
+        let pwd = env::current_dir().unwrap();
+        let absolute_path = pwd.join(relative_path);
+        let file = File::open(absolute_path).expect("file not found");
         let mut file_buffer = BufReader::new(&file);
         let mut content = String::new();
-        file_buffer.read_to_string(&mut content).expect("file not found");
+        file_buffer
+            .read_to_string(&mut content)
+            .expect("file not found");
 
         let mut lexer = lexers::Lexer::new(&content);
         let tokens = lexer.start();

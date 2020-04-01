@@ -1,4 +1,6 @@
+#Due to the location of execution
 import "./programs/hoge.koto";
+
 #comment
 let number = 1;
 
@@ -20,13 +22,4 @@ print(result);
 for let i = 0; i > 5; i++;{
     let reslut = function(i);
     print(reslut);
-}
-
-fn function(n) {
-    if n < 3 {
-        return 1;
-    }
-
-    let b = function(n - 1) + function(n - 2);
-    return b;
 }
