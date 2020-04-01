@@ -1,3 +1,4 @@
+import "./programs/hoge.koto";
 #comment
 let number = 1;
 

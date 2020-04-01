@@ -137,6 +137,13 @@ impl Parsing {
             vector_ast.node = result;
             return asts::Types::Vector(vector_ast);
         }
+        if token == token_constant._import {
+            self.tokens.remove(0);
+            let result = self.calculation();
+            let mut import_ast = asts::ImportAST::new();
+            import_ast.path.push(result);
+            return asts::Types::Import(import_ast);
+        }
         if token == 40 || token == 41 {
             let parent = asts::ParenthesesAST::new(string.chars().nth(0).unwrap());
             let parent = asts::Types::Parent(parent);
@@ -361,7 +368,9 @@ impl Parsing {
                 return asts::Types::Binary(bin);
             }
 
-            _ =>{return asts::Types::Error(asts::ErrorAST::new("Reassignment operater error"));}
+            _ => {
+                return asts::Types::Error(asts::ErrorAST::new("Reassignment operater error"));
+            }
         }
     }
 
@@ -472,6 +481,9 @@ impl Parsing {
                 let result = self.syntax();
                 fors.node = result;
                 return Some(asts::Types::For(fors));
+            }
+            asts::Types::Import(_) => {
+                return Some(result);
             }
             asts::Types::Binary(_) => {
                 return Some(result);

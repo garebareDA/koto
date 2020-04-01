@@ -12,6 +12,7 @@ pub enum Types {
     For(ForAST),
     Retrun(RetrunAST),
     Scope(ScopeAST),
+    Import(ImportAST),
     Square(SquareAST),
     Comma(CommaAST),
     Parent(ParenthesesAST),
@@ -254,6 +255,19 @@ impl ScopeAST {
     pub fn new(scope: char) -> ScopeAST {
         ScopeAST{
             scope:scope
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ImportAST {
+    pub path: Vec<Types>
+}
+
+impl ImportAST {
+    pub fn new() -> ImportAST {
+        ImportAST{
+            path:Vec::new(),
         }
     }
 }
