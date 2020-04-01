@@ -1,0 +1,8 @@
+fn function(n) {
+    if n < 3 {
+        return 1;
+    }
+
+    let b = function(n - 1) + function(n - 2);
+    return b;
+}
