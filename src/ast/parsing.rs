@@ -1,5 +1,6 @@
 use super::super::lexer::token;
 use super::asts;
+//TODOパースのエラー処理
 
 pub struct Parsing {
     pub tokens: Vec<token::TokenValue>,
@@ -75,6 +76,22 @@ impl Parsing {
             return number;
         }
         if token == token_constant._identifier {
+
+            if self.tokens[1].token == 46 {
+                let mut acess = asts::BinaryAST::new('.');
+                self.tokens.remove(0);
+                self.tokens.remove(0);
+                let result = self.judge();
+                self.tokens.remove(0);
+                self.tokens.remove(0);
+                acess.node.push(result);
+                let acess = asts::Types::Binary(acess);
+                let mut variable = asts::VariableAST::new(&string);
+                variable.node.push(acess);
+                let variable = asts::Types::Variable(variable);
+                return variable;
+            }
+
             if self.tokens[1].token == 40 {
                 let call = asts::CallAST::new(&string);
                 let call = asts::Types::Call(call);
@@ -154,6 +171,7 @@ impl Parsing {
             let comma = asts::Types::Comma(comma);
             return comma;
         }
+
         if token == 43 || token == 45 || token == 47 || token == 37 || token == 42 {
             let bin = asts::BinaryAST::new(string.parse().unwrap());
             let binary = asts::Types::Binary(bin);

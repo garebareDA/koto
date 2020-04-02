@@ -130,7 +130,7 @@ impl Lexer {
             None => {}
         };
         //数字
-        let reg = Regex::new(r"[0-9.]+").expect("Faild");
+        let reg = Regex::new(r"[0-9]+").expect("Faild");
         match reg.captures(&last_str) {
             Some(_) => {
                 loop {

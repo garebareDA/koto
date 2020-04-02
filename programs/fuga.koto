@@ -3,7 +3,7 @@ import "./programs/hoge.koto";
 
 #comment
 let number = 1;
-
+hoge.function();
 let string = "hello, world" + 1 + 1 + 1 + "mozirel" + 123;
 print(string);
 

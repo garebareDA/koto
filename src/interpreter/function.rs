@@ -116,6 +116,9 @@ impl Function {
         for function_argument in function_arguments {
             match function_argument {
                 asts::Types::Variable(mut variable) => {
+                    if argument.is_empty() {
+                        break;
+                    }
                     let result = interpreters::calculation(&argument[index], vec_variable, self);
                     variable.node.push(result);
                     let variable = asts::Types::Variable(variable);
