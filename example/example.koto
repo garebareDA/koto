@@ -1,6 +1,5 @@
 #Due to the location of execution
 import "./example/hoge.koto";
-hoge.function();
 
 #comment
 let number = 1;

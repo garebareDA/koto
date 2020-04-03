@@ -76,15 +76,26 @@ impl Parsing {
             return number;
         }
         if token == token_constant._identifier {
-
+            
             if self.tokens[1].token == 46 {
                 let mut acess = asts::BinaryAST::new('.');
+                let before = self.tokens.clone();
                 self.tokens.remove(0);
                 self.tokens.remove(0);
-                let result = self.judge();
+                let mut result = self.judge();
+                match result.clone() {
+                    asts::Types::Call(mut function) => {
+                        function.argument = self.function_call();
+                        result = asts::Types::Call(function);
+                    }
+                    _ => { //TODOエラーメッセージ
+                    }
+                }
+
                 self.tokens.remove(0);
                 self.tokens.remove(0);
                 acess.node.push(result);
+                self.tokens = before;
                 let acess = asts::Types::Binary(acess);
                 let mut variable = asts::VariableAST::new(&string);
                 variable.node.push(acess);
@@ -234,6 +245,7 @@ impl Parsing {
         let mut binary_vector: Vec<asts::Types> = Vec::new();
         loop {
             let result = self.judge();
+
             match result {
                 asts::Types::Binary(_) => {
                     binary_vector.push(result);
@@ -245,18 +257,41 @@ impl Parsing {
                     number_vector.push(result);
                 }
 
-                asts::Types::Variable(var) => match var.index {
-                    Some(_) => {
-                        loop {
-                            self.tokens.remove(0);
-                            if self.tokens[0].token == 93 {
-                                break;
+                asts::Types::Variable(var) => {
+                    match var.index {
+                        Some(_) => {
+                            loop {
+                                self.tokens.remove(0);
+                                if self.tokens[0].token == 93 {
+                                    break;
+                                }
                             }
+                            number_vector.push(asts::Types::Variable(var.clone()));
+                            continue;
                         }
-                        number_vector.push(asts::Types::Variable(var))
+                        None => {},
                     }
-                    None => number_vector.push(asts::Types::Variable(var)),
-                },
+
+                    if var.node.is_empty() {
+                        number_vector.push(asts::Types::Variable(var.clone()));
+                        self.tokens.remove(0);
+                        continue;
+                    }
+
+                    match var.node[0]{
+                        asts::Types::Binary(_) => {
+                            loop {
+                                self.tokens.remove(0);
+                                if self.tokens[0].token == 41 {
+                                    break;
+                                }
+                            }
+                            number_vector.push(asts::Types::Variable(var))
+                        }
+
+                        _ => {number_vector.push(asts::Types::Variable(var))}
+                    }
+                }
                 asts::Types::Call(_) => match result {
                     asts::Types::Call(mut function) => {
                         function.argument = self.function_call();
