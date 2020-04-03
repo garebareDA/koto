@@ -70,6 +70,12 @@ impl Variable {
                 _ => {}
             }
         }
+
+        if bin_op =='.' {
+            //名前空間用の関数処理
+            println!("{:?}", bin_node);
+        }
+
         return interpreters::calculation(&var, self, vec_function);
     }
 

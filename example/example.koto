@@ -1,9 +1,9 @@
 #Due to the location of execution
-import "./programs/hoge.koto";
+import "./example/hoge.koto";
+hoge.function();
 
 #comment
 let number = 1;
-hoge.function();
 let string = "hello, world" + 1 + 1 + 1 + "mozirel" + 123;
 print(string);
 

@@ -206,23 +206,12 @@ pub fn run_judg(
                 }
             }
 
-            let relative_path = Path::new(&path);
-            let pwd = env::current_dir().unwrap();
-            let absolute_path = pwd.join(relative_path);
-            let file = File::open(absolute_path ).expect("file not found");
-            let mut file_buffer = BufReader::new(&file);
-            let mut content = String::new();
-            file_buffer
-                .read_to_string(&mut content)
-                .expect("file not found");
-
-            let mut lexer = lexers::Lexer::new(&content);
-            let tokens = lexer.start();
-
-            let mut pars = parsing::Parsing::new(&tokens);
-            let result = pars.parsing();
-            println!("{:?}", result);
-            vec_function.push(result.node.clone());
+            let result = read_file(&path);
+            let functions = vec_function.retrun_insert(result.node.clone());
+            let name:Vec<&str> = path.split('.').collect();
+            let mut var_ast = asts::VariableAST::new(name[name.len() - 2]);
+            var_ast.node = functions;
+            vec_variable.push(asts::Types::Variable(var_ast));
         }
 
         _ => {}
@@ -252,4 +241,23 @@ pub fn scope(
     }
 
     return (true, None);
+}
+
+fn read_file(path:&str) -> asts::ExprAST{
+    let relative_path = Path::new(path);
+    let pwd = env::current_dir().unwrap();
+    let absolute_path = pwd.join(relative_path);
+    let file = File::open(absolute_path ).expect("file not found");
+    let mut file_buffer = BufReader::new(&file);
+    let mut content = String::new();
+    file_buffer
+        .read_to_string(&mut content)
+        .expect("file not found");
+
+    let mut lexer = lexers::Lexer::new(&content);
+    let tokens = lexer.start();
+
+    let mut pars = parsing::Parsing::new(&tokens);
+    let result = pars.parsing();
+    return result;
 }

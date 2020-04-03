@@ -60,6 +60,29 @@ impl Function {
         }
     }
 
+    pub fn retrun_insert(&mut self, nodes: Vec<asts::Types>) -> Vec<asts::Types> {
+        let mut index = 0;
+        let mut inner:Vec<asts::Types> = Vec::new();
+        let len = nodes.len();
+        loop {
+            if index >= len {
+                break;
+            }
+
+            let node = nodes[index].clone();
+            match node {
+                asts::Types::Function(_) => {
+                    inner.push(node);
+                }
+                _ => {
+                }
+            }
+            index += 1;
+        }
+
+        return inner;
+    }
+
     pub fn function_run(&mut self, call_ast: &asts::CallAST, variable: &mut variable::Variable) ->Option<asts::Types> {
         let callee = call_ast.callee.clone();
         if callee == "print" {
