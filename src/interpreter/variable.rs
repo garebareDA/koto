@@ -52,29 +52,11 @@ impl Variable {
     ) -> asts::Types {
         let bin_op: char;
         let bin_node: Vec<asts::Types>;
-        let mut serch: Vec<asts::Types> = Vec::new();
-        println!("{:?}", var);
 
         match var.node[0].clone() {
             asts::Types::Binary(bin) => {
                 bin_op = bin.op;
                 bin_node = bin.node;
-            }
-
-            asts::Types::Variable(var) => {
-                if var.node.is_empty() {
-                    return asts::Types::Variable(var);
-                }
-
-                serch = self.serch_variable(&var, vec_function);
-                match var.node[0].clone() {
-                    asts::Types::Binary(bin) => {
-                        bin_op = bin.op;
-                        bin_node = bin.node;
-                    }
-
-                    _ => return var.node[0].clone(),
-                }
             }
 
             _ => return var.node[0].clone(),
@@ -91,6 +73,7 @@ impl Variable {
         }
 
         if bin_op == '.' {
+            let serch = self.serch_variable(&var, vec_function);
             vec_function.push(serch);
             match bin_node[0].clone() {
                 asts::Types::Call(fun) => {
@@ -190,9 +173,7 @@ impl Variable {
                         },
 
                         _ => {
-                            let mut vec = Vec::new();
-                            vec.push(in_var.node[0].clone());
-                            variable_retrun = vec;
+                            variable_retrun = in_var.node;
                         }
                     }
                 }

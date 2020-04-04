@@ -514,17 +514,18 @@ impl Parsing {
             }
             asts::Types::Variable(mut var) => {
                 let result_var = self.variable();
+
                 let continue_tokne = self.tokens[0].token;
                 if continue_tokne == 59 {
                     var.node.push(result_var);
                     result = asts::Types::Variable(var);
                     return Some(result);
                 }
-
+                let result_cal = self.calculation();
                 if var.node.is_empty() {
-                    let result_cal = self.calculation();
                     var.node.push(result_cal);
                 }
+
                 result = asts::Types::Variable(var);
                 return Some(result);
             }
