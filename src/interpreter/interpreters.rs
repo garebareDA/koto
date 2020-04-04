@@ -116,7 +116,7 @@ pub fn run_judg(
         }
 
         asts::Types::Variable(var) => {
-            let var_contents = vec_variable.variable(var.node[0].clone(), vec_function);
+            let var_contents = vec_variable.variable(var, vec_function);
             let mut var_ast = asts::VariableAST::new(&var.name);
             var_ast.node.push(var_contents);
             vec_variable.push(asts::Types::Variable(var_ast));
