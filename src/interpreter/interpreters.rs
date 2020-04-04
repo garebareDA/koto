@@ -177,7 +177,7 @@ pub fn run_judg(
 
                 asts::Types::Variable(var) => {
                     let result = vec_variable.serch_variable(&var, vec_function);
-                    return (false, Some(result));
+                    return (false, Some(result[0]));
                 }
 
                 asts::Types::Number(_) => {

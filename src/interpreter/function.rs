@@ -90,7 +90,7 @@ impl Function {
             match value {
                 asts::Types::Variable(var) => {
                     let var_result = variable.serch_variable(&var, self);
-                    self.print_var(&var_result);
+                    self.print_var(&var_result[0]);
                 }
 
                 asts::Types::Binary(_) => {

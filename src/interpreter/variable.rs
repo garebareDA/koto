@@ -1,7 +1,7 @@
 use super::super::ast::asts;
+use super::error;
 use super::function;
 use super::interpreters;
-use super::error;
 
 pub struct Variable {
     variables: Vec<Vec<asts::Types>>,
@@ -49,8 +49,8 @@ impl Variable {
         var: &asts::VariableAST,
         vec_function: &mut function::Function,
     ) -> asts::Types {
-        let bin_op:char;
-        let bin_node:Vec<asts::Types>;
+        let bin_op: char;
+        let bin_node: Vec<asts::Types>;
 
         match var.node[0].clone() {
             asts::Types::Binary(bin) => {
@@ -68,16 +68,16 @@ impl Variable {
                         bin_node = bin.node;
                     }
 
-                    _ => {return var.node[0].clone()}
+                    _ => return var.node[0].clone(),
                 }
             }
 
             _ => return var.node[0].clone(),
         }
 
-        if bin_op == '='{
+        if bin_op == '=' {
             match bin_node[0] {
-                asts::Types::Variable(_) =>{
+                asts::Types::Variable(_) => {
                     return bin_node[bin_node.len() - 1].clone();
                 }
 
@@ -85,7 +85,7 @@ impl Variable {
             }
         }
 
-        if bin_op =='.' {
+        if bin_op == '.' {
             //名前空間用の関数処理
             println!("{:?}", bin_node);
         }
@@ -97,8 +97,8 @@ impl Variable {
         &mut self,
         serch: &asts::VariableAST,
         vec_function: &mut function::Function,
-    ) -> asts::Types {
-        let mut variable_retrun = asts::Types::Error(asts::ErrorAST::new("Vairable Error"));
+    ) -> Vec<asts::Types> {
+        let mut variable_retrun = Vec::new();
         let var_vec = self.variables.clone();
         let serch = serch.clone();
         let serch_word = &serch.name;
@@ -128,7 +128,9 @@ impl Variable {
                                 interpreters::run_judg(&in_var.node[0], self, vec_function);
                             match result {
                                 Some(somes) => {
-                                    variable_retrun = somes;
+                                    let mut vec = Vec::new();
+                                    vec.push(somes);
+                                    variable_retrun = vec;
                                 }
 
                                 None => {
@@ -143,16 +145,21 @@ impl Variable {
                                 asts::Types::Number(num) => {
                                     let vector_num = num.val;
                                     let var = &vector.node[vector_num as usize];
-                                    variable_retrun = var.clone();
+                                    let mut vec = Vec::new();
+                                    vec.push(var.clone());
+                                    variable_retrun = vec;
                                 }
 
                                 asts::Types::Binary(_) => {
-                                    let result = interpreters::calculation(&index[0], self, vec_function);
+                                    let result =
+                                        interpreters::calculation(&index[0], self, vec_function);
                                     match result {
                                         asts::Types::Number(num) => {
                                             let vector_num = num.val;
                                             let var = &vector.node[vector_num as usize];
-                                            variable_retrun = var.clone();
+                                            let mut vec = Vec::new();
+                                            vec.push(var.clone());
+                                            variable_retrun = vec;
                                         }
                                         _ => {
                                             let err = error::Error::new(&result);
@@ -173,7 +180,9 @@ impl Variable {
                         },
 
                         _ => {
-                            variable_retrun = in_var.node[0].clone();
+                            let mut vec = Vec::new();
+                            vec.push(in_var.node[0].clone());
+                            variable_retrun = vec;
                         }
                     }
                 }
@@ -210,7 +219,7 @@ impl Variable {
                         vec = self.variables_allocation(var.node.clone(), vec_function);
                     }
                     let serch_result = self.serch_variable(&var, vec_function);
-                    match serch_result {
+                    match serch_result[0] {
                         asts::Types::Number(mut num) => {
                             num.node = vec;
                             ast_vec.push(asts::Types::Number(num));
