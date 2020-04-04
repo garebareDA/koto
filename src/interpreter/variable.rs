@@ -49,7 +49,7 @@ impl Variable {
         &mut self,
         var: &asts::VariableAST,
         vec_function: &mut function::Function,
-    ) -> asts::Types {
+    ) -> Option<asts::Types> {
         let bin_op: char;
         let bin_node: Vec<asts::Types>;
 
@@ -59,13 +59,13 @@ impl Variable {
                 bin_node = bin.node;
             }
 
-            _ => return var.node[0].clone(),
+            _ => return Some(var.node[0].clone()),
         }
 
         if bin_op == '=' {
             match bin_node[0] {
                 asts::Types::Variable(_) => {
-                    return bin_node[bin_node.len() - 1].clone();
+                    return Some(bin_node[bin_node.len() - 1].clone());
                 }
 
                 _ => {}
@@ -78,12 +78,14 @@ impl Variable {
             match bin_node[0].clone() {
                 asts::Types::Call(fun) => {
                     vec_function.function_run(&fun, self);
+                    return None;
                 }
                 _ => {}
             }
         }
 
-        return interpreters::calculation(&var.node[0].clone(), self, vec_function);
+        let calcu = interpreters::calculation(&var.node[0].clone(), self, vec_function);
+        return Some(calcu);
     }
 
     pub fn serch_variable(
