@@ -52,11 +52,31 @@ impl Variable {
     ) -> Option<asts::Types> {
         let bin_op: char;
         let bin_node: Vec<asts::Types>;
+        let mut is_variable: bool = false;
+        let mut serch:Vec<asts::Types> = Vec::new();
+
 
         match var.node[0].clone() {
             asts::Types::Binary(bin) => {
                 bin_op = bin.op;
                 bin_node = bin.node;
+            }
+
+            asts::Types::Variable(inner) => {
+                is_variable = true;
+                if inner.node.is_empty() {
+                    return Some(asts::Types::Variable(inner.clone()));
+                }
+
+                match inner.node[0].clone() {
+                    asts::Types::Binary(bin) => {
+                        serch = self.serch_variable(&inner, vec_function);
+                        vec_function.push(serch);
+                        bin_op = bin.op;
+                        bin_node = bin.node;
+                    }
+                    _ => {return None}
+                }
             }
 
             _ => return Some(var.node[0].clone()),
@@ -73,12 +93,16 @@ impl Variable {
         }
 
         if bin_op == '.' {
-            let serch = self.serch_variable(&var, vec_function);
-            vec_function.push(serch);
             match bin_node[0].clone() {
                 asts::Types::Call(fun) => {
-                    vec_function.function_run(&fun, self);
-                    return None;
+                    if is_variable {
+                        return vec_function.function_run(&fun, self);
+                    }else{
+                        let serch = self.serch_variable(&var, vec_function);
+                        vec_function.push(serch);
+                        vec_function.function_run(&fun, self);
+                        return None;
+                    }
                 }
                 _ => {}
             }
