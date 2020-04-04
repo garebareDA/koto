@@ -3,6 +3,7 @@ use super::error;
 use super::function;
 use super::interpreters;
 
+#[derive(Debug)]
 pub struct Variable {
     variables: Vec<Vec<asts::Types>>,
     inner: usize,
@@ -52,6 +53,7 @@ impl Variable {
         let bin_op: char;
         let bin_node: Vec<asts::Types>;
         let mut serch: Vec<asts::Types> = Vec::new();
+        println!("{:?}", var);
 
         match var.node[0].clone() {
             asts::Types::Binary(bin) => {
@@ -63,6 +65,7 @@ impl Variable {
                 if var.node.is_empty() {
                     return asts::Types::Variable(var);
                 }
+
                 serch = self.serch_variable(&var, vec_function);
                 match var.node[0].clone() {
                     asts::Types::Binary(bin) => {
@@ -89,6 +92,12 @@ impl Variable {
 
         if bin_op == '.' {
             vec_function.push(serch);
+            match bin_node[0].clone() {
+                asts::Types::Call(fun) => {
+                    vec_function.function_run(&fun, self);
+                }
+                _ => {}
+            }
         }
 
         return interpreters::calculation(&var.node[0].clone(), self, vec_function);

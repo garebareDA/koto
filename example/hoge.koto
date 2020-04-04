@@ -6,3 +6,7 @@ fn function(n) {
     let b = function(n - 1) + function(n - 2);
     return b;
 }
+
+fn a() {
+    print("hello");
+}

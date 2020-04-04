@@ -1,6 +1,6 @@
 #Due to the location of execution
 import "./example/hoge.koto";
-
+hoge.a();
 #comment
 let number = 1;
 let string = "hello, world" + 1 + 1 + 1 + "mozirel" + 123;

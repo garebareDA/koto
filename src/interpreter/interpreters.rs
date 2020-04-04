@@ -211,7 +211,8 @@ pub fn run_judg(
             let result = read_file(&path);
             let functions = vec_function.retrun_insert(result.node.clone());
             let name:Vec<&str> = path.split('.').collect();
-            let mut var_ast = asts::VariableAST::new(name[name.len() - 2]);
+            let name:Vec<&str> = name[name.len() - 2].split('/').collect();
+            let mut var_ast = asts::VariableAST::new(name[name.len() - 1]);
             var_ast.node = functions;
             vec_variable.push(asts::Types::Variable(var_ast));
         }

@@ -76,7 +76,6 @@ impl Parsing {
             return number;
         }
         if token == token_constant._identifier {
-            
             if self.tokens[1].token == 46 {
                 let mut acess = asts::BinaryAST::new('.');
                 let before = self.tokens.clone();
@@ -498,7 +497,7 @@ impl Parsing {
     }
 
     fn scope(&mut self) -> Option<asts::Types> {
-        let mut result = self.judge();
+        let mut result = self.calculation();
         match result {
             asts::Types::Call(mut function) => {
                 function.argument = self.function_call();

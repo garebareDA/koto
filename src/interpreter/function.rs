@@ -3,6 +3,7 @@ use super::interpreters;
 use super::variable;
 use super::error;
 
+#[derive(Debug)]
 pub struct Function {
     funcstions: Vec<Vec<asts::Types>>,
     inner: usize,
