@@ -291,6 +291,7 @@ impl Parsing {
                         _ => {number_vector.push(asts::Types::Variable(var))}
                     }
                 }
+
                 asts::Types::Call(_) => match result {
                     asts::Types::Call(mut function) => {
                         function.argument = self.function_call();
@@ -497,7 +498,7 @@ impl Parsing {
     }
 
     fn scope(&mut self) -> Option<asts::Types> {
-        let mut result = self.calculation();
+        let mut result = self.judge();
         match result {
             asts::Types::Call(mut function) => {
                 function.argument = self.function_call();
@@ -519,8 +520,11 @@ impl Parsing {
                     result = asts::Types::Variable(var);
                     return Some(result);
                 }
-                let result_cal = self.calculation();
-                var.node.push(result_cal);
+
+                if var.node.is_empty() {
+                    let result_cal = self.calculation();
+                    var.node.push(result_cal);
+                }
                 result = asts::Types::Variable(var);
                 return Some(result);
             }
