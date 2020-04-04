@@ -53,8 +53,6 @@ impl Variable {
         let bin_op: char;
         let bin_node: Vec<asts::Types>;
         let mut is_variable: bool = false;
-        let mut serch:Vec<asts::Types> = Vec::new();
-
 
         match var.node[0].clone() {
             asts::Types::Binary(bin) => {
@@ -70,7 +68,7 @@ impl Variable {
 
                 match inner.node[0].clone() {
                     asts::Types::Binary(bin) => {
-                        serch = self.serch_variable(&inner, vec_function);
+                        let serch = self.serch_variable(&inner, vec_function);
                         vec_function.push(serch);
                         bin_op = bin.op;
                         bin_node = bin.node;
