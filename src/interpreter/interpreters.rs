@@ -116,10 +116,12 @@ pub fn run_judg(
         }
 
         asts::Types::Variable(var) => {
+            vec_function.vec_push();
             let var_contents = vec_variable.variable(var, vec_function);
             let mut var_ast = asts::VariableAST::new(&var.name);
             var_ast.node.push(var_contents);
             vec_variable.push(asts::Types::Variable(var_ast));
+            vec_function.last_remove();
         }
 
         asts::Types::If(ifs) => {

@@ -51,6 +51,7 @@ impl Variable {
     ) -> asts::Types {
         let bin_op: char;
         let bin_node: Vec<asts::Types>;
+        let mut serch: Vec<asts::Types> = Vec::new();
 
         match var.node[0].clone() {
             asts::Types::Binary(bin) => {
@@ -62,6 +63,7 @@ impl Variable {
                 if var.node.is_empty() {
                     return asts::Types::Variable(var);
                 }
+                serch = self.serch_variable(&var, vec_function);
                 match var.node[0].clone() {
                     asts::Types::Binary(bin) => {
                         bin_op = bin.op;
@@ -86,8 +88,7 @@ impl Variable {
         }
 
         if bin_op == '.' {
-            //名前空間用の関数処理
-            println!("{:?}", bin_node);
+            vec_function.push(serch);
         }
 
         return interpreters::calculation(&var.node[0].clone(), self, vec_function);
