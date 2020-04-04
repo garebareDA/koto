@@ -18,6 +18,6 @@ result = cal;
 print(result);
 
 for let i = 0; i > 5; i++;{
-    let reslut = function(i);
+    let reslut = hoge.function(i);
     print(reslut);
 }
