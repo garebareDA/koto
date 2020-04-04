@@ -76,12 +76,19 @@ impl Parsing {
             return number;
         }
         if token == token_constant._identifier {
+
+            let is_token = self.tokens[1].token == self.tokens[2].token;
+            if self.tokens[2].token == 43  && is_token || self.tokens[2].token == 45 && is_token {
+                return self.reassignment();
+            }
+
             if self.tokens[1].token == 46 {
                 let mut acess = asts::BinaryAST::new('.');
                 let before = self.tokens.clone();
                 self.tokens.remove(0);
                 self.tokens.remove(0);
                 let mut result = self.judge();
+
                 match result.clone() {
                     asts::Types::Call(mut function) => {
                         function.argument = self.function_call();
@@ -117,10 +124,6 @@ impl Parsing {
                 let variable = asts::Types::Variable(variable);
                 self.tokens = before;
                 return variable;
-            }
-
-            if self.tokens[2].token == 43 || self.tokens[2].token == 45 {
-                return self.reassignment();
             }
 
             let variable = asts::VariableAST::new(&string);
@@ -230,7 +233,7 @@ impl Parsing {
                 self.tokens.remove(0);
                 continue;
             }
-            if token == 41 {
+            if token == 41 || token == 59{
                 break;
             }
             let result = self.calculation();
@@ -244,7 +247,6 @@ impl Parsing {
         let mut binary_vector: Vec<asts::Types> = Vec::new();
         loop {
             let result = self.judge();
-
             match result {
                 asts::Types::Binary(_) => {
                     binary_vector.push(result);
@@ -351,6 +353,7 @@ impl Parsing {
         }
         number_vector.reverse();
         binary_vector.reverse();
+
         let mut index = 0;
         let mut ast_temp = asts::Types::Error(asts::ErrorAST::new("ast_temp parsing error"));
         for binary in binary_vector {
@@ -406,7 +409,8 @@ impl Parsing {
         return result;
     }
 
-    fn reassignment(&mut self) -> asts::Types {
+    fn reassignment(&mut self) -> asts::Types { 
+        println!("{:?}", self.tokens);
         let var_val = asts::VariableAST::new(&self.tokens[0].val);
         self.tokens.remove(0);
         let first_bin = self.judge();
@@ -514,13 +518,13 @@ impl Parsing {
             }
             asts::Types::Variable(mut var) => {
                 let result_var = self.variable();
-
                 let continue_tokne = self.tokens[0].token;
                 if continue_tokne == 59 {
                     var.node.push(result_var);
                     result = asts::Types::Variable(var);
                     return Some(result);
                 }
+
                 let result_cal = self.calculation();
                 if var.node.is_empty() {
                     var.node.push(result_cal);
