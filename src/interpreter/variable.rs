@@ -219,7 +219,7 @@ impl Variable {
                         vec = self.variables_allocation(var.node.clone(), vec_function);
                     }
                     let serch_result = self.serch_variable(&var, vec_function);
-                    match serch_result[0] {
+                    match serch_result[0].clone() {
                         asts::Types::Number(mut num) => {
                             num.node = vec;
                             ast_vec.push(asts::Types::Number(num));
