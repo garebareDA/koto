@@ -72,8 +72,9 @@ impl Variable {
                         vec_function.push(serch);
                         bin_op = bin.op;
                         bin_node = bin.node;
+                        vec_function.last_remove();
                     }
-                    _ => {return None}
+                    _ => return None,
                 }
             }
 
@@ -95,11 +96,10 @@ impl Variable {
                 asts::Types::Call(fun) => {
                     if is_variable {
                         return vec_function.function_run(&fun, self);
-                    }else{
+                    } else {
                         let serch = self.serch_variable(&var, vec_function);
                         vec_function.push(serch);
-                        vec_function.function_run(&fun, self);
-                        return None;
+                        return vec_function.function_run(&fun, self);
                     }
                 }
                 _ => {}
@@ -228,16 +228,58 @@ impl Variable {
                     }
                     ast_vec.push(asts::Types::Number(num));
                 }
+                asts::Types::Boolean(mut bools) => {
+                    if !bools.node.is_empty() {
+                        let vec = self.variables_allocation(bools.node.clone(), vec_function);
+                        bools.node = vec;
+                    }
+                    ast_vec.push(asts::Types::Boolean(bools));
+                }
                 asts::Types::Variable(var) => {
                     let mut vec: Vec<asts::Types> = Vec::new();
+                    let mut serch_result: Vec<asts::Types> = Vec::new();
+                    let mut is_name_space_function = false;
                     if !var.node.is_empty() {
+                        let function_call = self.variable(&var, vec_function);
+                        match function_call {
+                            Some(call) => {
+                                serch_result.push(call);
+                                is_name_space_function = true;
+                                match var.node[0].clone() {
+                                    asts::Types::Binary(bin) => match bin.node[0].clone() {
+                                        asts::Types::Call(call) => {
+                                            vec = self.variables_allocation(
+                                                call.node.clone(),
+                                                vec_function,
+                                            );
+                                        }
+                                        _ => {}
+                                    },
+                                    _ => {}
+                                }
+                            }
+
+                            None => {}
+                        }
+                    }
+
+                    if !is_name_space_function {
+                        serch_result = self.serch_variable(&var, vec_function);
                         vec = self.variables_allocation(var.node.clone(), vec_function);
                     }
-                    let serch_result = self.serch_variable(&var, vec_function);
+
                     match serch_result[0].clone() {
                         asts::Types::Number(mut num) => {
                             num.node = vec;
                             ast_vec.push(asts::Types::Number(num));
+                        }
+                        asts::Types::Strings(mut strings) => {
+                            strings.node = vec;
+                            ast_vec.push(asts::Types::Strings(strings));
+                        }
+                        asts::Types::Boolean(mut bools) => {
+                            bools.node = vec;
+                            ast_vec.push(asts::Types::Boolean(bools));
                         }
                         _ => {
                             let err = error::Error::new(&node);

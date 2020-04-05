@@ -18,15 +18,7 @@ result = cal;
 print(result);
 
 for let i = 0; i > 5; i++;{
-    let reslut = hoge.function(i);
+    print(i);
+    let reslut = hoge.function(i + 1);
     print(reslut);
-}
-
-fn function(n) {
-    if n < 3 {
-        return 1;
-    }
-
-    let b = function(n - 1) + function(n - 2);
-    return b;
 }

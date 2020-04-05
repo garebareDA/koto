@@ -76,9 +76,8 @@ impl Parsing {
             return number;
         }
         if token == token_constant._identifier {
-
             let is_token = self.tokens[1].token == self.tokens[2].token;
-            if self.tokens[2].token == 43  && is_token || self.tokens[2].token == 45 && is_token {
+            if self.tokens[2].token == 43 && is_token || self.tokens[2].token == 45 && is_token {
                 return self.reassignment();
             }
 
@@ -233,7 +232,7 @@ impl Parsing {
                 self.tokens.remove(0);
                 continue;
             }
-            if token == 41 || token == 59{
+            if token == 41 || token == 59 {
                 break;
             }
             let result = self.calculation();
@@ -270,7 +269,7 @@ impl Parsing {
                             number_vector.push(asts::Types::Variable(var.clone()));
                             continue;
                         }
-                        None => {},
+                        None => {}
                     }
 
                     if var.node.is_empty() {
@@ -279,7 +278,7 @@ impl Parsing {
                         continue;
                     }
 
-                    match var.node[0]{
+                    match &var.node[0] {
                         asts::Types::Binary(_) => {
                             loop {
                                 self.tokens.remove(0);
@@ -290,7 +289,7 @@ impl Parsing {
                             number_vector.push(asts::Types::Variable(var))
                         }
 
-                        _ => {number_vector.push(asts::Types::Variable(var))}
+                        _ => number_vector.push(asts::Types::Variable(var)),
                     }
                 }
 
@@ -351,6 +350,7 @@ impl Parsing {
             let number = number_vector[0].clone();
             return number;
         }
+
         number_vector.reverse();
         binary_vector.reverse();
 
@@ -359,7 +359,7 @@ impl Parsing {
         for binary in binary_vector {
             let mut number = number_vector[index].clone();
             if index > 0 {
-                match number {
+                match number.clone() {
                     asts::Types::Number(mut numbers) => {
                         numbers.node.push(ast_temp.clone());
                         number = asts::Types::Number(numbers);
@@ -369,7 +369,42 @@ impl Parsing {
                         strings.node.push(ast_temp.clone());
                         number = asts::Types::Strings(strings);
                     }
-                    _ => {}
+
+                    asts::Types::Boolean(mut bools) => {
+                        bools.node.push(ast_temp.clone());
+                        number = asts::Types::Boolean(bools);
+                    }
+
+                    asts::Types::Variable(mut vars) => {
+                        if vars.node.is_empty() {
+                            vars.node.push(ast_temp.clone());
+                            number = asts::Types::Variable(vars);
+                        } else {
+                            match vars.node[0].clone() {
+                                asts::Types::Binary(mut bin) => match bin.node[0].clone() {
+                                    asts::Types::Call(mut call) => {
+                                        call.node.push(ast_temp.clone());
+                                        let call = asts::Types::Call(call);
+                                        bin.node.clear();
+                                        bin.node.push(call);
+                                        let bins = asts::Types::Binary(bin);
+                                        vars.node.clear();
+                                        vars.node.push(bins);
+                                        number = asts::Types::Variable(vars);
+                                    }
+                                    _ => {}
+                                },
+                                _ => {
+                                    vars.node.push(ast_temp.clone());
+                                    number = asts::Types::Variable(vars);
+                                }
+                            }
+                        }
+                    }
+
+                    _ => {
+                        //TODOエラー処理
+                    }
                 }
             }
 
@@ -409,8 +444,7 @@ impl Parsing {
         return result;
     }
 
-    fn reassignment(&mut self) -> asts::Types { 
-        println!("{:?}", self.tokens);
+    fn reassignment(&mut self) -> asts::Types {
         let var_val = asts::VariableAST::new(&self.tokens[0].val);
         self.tokens.remove(0);
         let first_bin = self.judge();
