@@ -108,8 +108,8 @@ impl Function {
         let serch_string = call_ast.callee.clone();
         let argument = call_ast.argument.clone();
         let mut functions = self.funcstions.clone();
-        functions.reverse();
 
+        functions.reverse();
         for funcs in functions {
             for fun in funcs {
                 match fun {
@@ -136,7 +136,6 @@ impl Function {
     ) -> Option<asts::Types> {
         vec_variable.vec_push();
         let mut index = 0;
-
         for function_argument in function_arguments {
             match function_argument {
                 asts::Types::Variable(mut variable) => {

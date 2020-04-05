@@ -72,7 +72,6 @@ impl Variable {
                         vec_function.push(serch);
                         bin_op = bin.op;
                         bin_node = bin.node;
-                        vec_function.last_remove();
                     }
                     _ => return None,
                 }
@@ -95,11 +94,17 @@ impl Variable {
             match bin_node[0].clone() {
                 asts::Types::Call(fun) => {
                     if is_variable {
-                        return vec_function.function_run(&fun, self);
+                        vec_function.vec_push();
+                        let result = vec_function.function_run(&fun, self);
+                        vec_function.last_remove();
+                        return result;
                     } else {
+                        vec_function.vec_push();
                         let serch = self.serch_variable(&var, vec_function);
                         vec_function.push(serch);
-                        return vec_function.function_run(&fun, self);
+                        let result = vec_function.function_run(&fun, self);
+                        vec_function.last_remove();
+                        return result;
                     }
                 }
                 _ => {}

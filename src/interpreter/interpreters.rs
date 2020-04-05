@@ -118,7 +118,6 @@ pub fn run_judg(
         asts::Types::Variable(var) => {
             let var_contents = vec_variable.variable(var, vec_function);
             let mut var_ast = asts::VariableAST::new(&var.name);
-
             match var_contents {
                 Some(content) => {
                     var_ast.node.push(content);
