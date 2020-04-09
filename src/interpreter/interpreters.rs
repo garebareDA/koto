@@ -3,6 +3,7 @@ use super::error;
 use super::fors;
 use super::function;
 use super::variable;
+use super::ifs;
 use super::super::ast::parsing;
 use super::super::ast::asts;
 use super::super::lexer::lexers;
@@ -29,26 +30,6 @@ pub fn run(root: asts::ExprAST) {
         run_judg(node, &mut variable, &mut function);
         index += 1;
     }
-}
-
-fn if_run(
-    result: &asts::Types,
-    ifs: &Vec<asts::Types>,
-    vec_variable: &mut variable::Variable,
-    vec_function: &mut function::Function,
-) -> Option<asts::Types> {
-    match result {
-        asts::Types::Boolean(boolean) => {
-            if boolean.boolean {
-                let (_, result) = scope(ifs, vec_variable, vec_function);
-
-                return result;
-            }
-        }
-        _ => {}
-    }
-
-    return None;
 }
 
 pub fn calculation(
@@ -136,7 +117,8 @@ pub fn run_judg(
             vec_function.vec_push();
             if !ifs.node.is_empty() {
                 vec_function.push(ifs.node.clone());
-                result_if = if_run(&result, &ifs.node, vec_variable, vec_function);
+                let ifs = ifs::If::new(&result, &ifs.node);
+                result_if = ifs.if_run(vec_variable, vec_function);
             }
             vec_variable.last_remove();
             vec_function.last_remove();
