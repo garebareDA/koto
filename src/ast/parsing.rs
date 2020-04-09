@@ -1,5 +1,6 @@
 use super::super::lexer::token;
 use super::asts;
+use super::error;
 //TODOパースのエラー処理
 
 pub struct Parsing {
@@ -51,7 +52,8 @@ impl Parsing {
                     return for_types;
                 }
                 None => {
-                    return asts::Types::Error(asts::ErrorAST::new("for parsing error"));
+                    let err = error::Error::new(&self.tokens[0]);
+                    err.exit("for parsing error");
                 }
             }
         }
@@ -93,7 +95,9 @@ impl Parsing {
                         function.argument = self.function_call();
                         result = asts::Types::Call(function);
                     }
-                    _ => { //TODOエラーメッセージ
+                    _ => {
+                        let err = error::Error::new(&self.tokens[0]);
+                        err.exit("variable error");
                     }
                 }
 
@@ -403,7 +407,8 @@ impl Parsing {
                     }
 
                     _ => {
-                        //TODOエラー処理
+                        let err = error::Error::new(&self.tokens[0]);
+                        err.exit("operater error");
                     }
                 }
             }
