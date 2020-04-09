@@ -234,7 +234,7 @@ pub fn scope(
     return (true, None);
 }
 
-fn read_file(path:&str) -> asts::ExprAST{
+pub fn read_file(path:&str) -> asts::ExprAST{
     let relative_path = Path::new(path);
     let pwd = env::current_dir().unwrap();
     let absolute_path = pwd.join(relative_path);
