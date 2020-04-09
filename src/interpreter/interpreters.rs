@@ -60,7 +60,8 @@ pub fn calculation(
         asts::Types::Binary(mut binary) => {
             let vec_binary = vec_variable.variables_allocation(binary.node, vec_function);
             binary.node = vec_binary;
-            return arithmetic::common(binary);
+            let arithmetic = arithmetic::Arithmetic::new(binary);
+            return arithmetic.common();
         }
 
         _ => {

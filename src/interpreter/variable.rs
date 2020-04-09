@@ -86,7 +86,10 @@ impl Variable {
                     return Some(bin_node[bin_node.len() - 1].clone());
                 }
 
-                _ => {}
+                _ => {
+                    let err = error::Error::new(&bin_node[0]);
+                    err.exit("variable error");
+                }
             }
         }
 
@@ -107,7 +110,10 @@ impl Variable {
                         return result;
                     }
                 }
-                _ => {}
+                _ => {
+                    let err = error::Error::new(&bin_node[0]);
+                    err.exit("variable or function error");
+                }
             }
         }
 
@@ -263,7 +269,6 @@ impl Variable {
                                     _ => {}
                                 }
                             }
-
                             None => {}
                         }
                     }
