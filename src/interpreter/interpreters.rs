@@ -156,7 +156,8 @@ pub fn run_judg(
             vec_variable.vec_push();
             vec_function.vec_push();
             vec_function.push(fors.node.clone());
-            let result = fors::for_run(&fors.init_var, &fors.node, vec_variable, vec_function);
+            let fors = fors::For::new(&fors.init_var, &fors.node);
+            let result = fors.for_run(vec_variable, vec_function);
             vec_variable.last_remove();
             vec_function.last_remove();
 
