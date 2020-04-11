@@ -2,6 +2,7 @@ use super::super::ast::asts;
 use super::interpreters;
 use super::variable;
 use super::error;
+use std;
 
 #[derive(Debug)]
 pub struct Function {
@@ -103,6 +104,14 @@ impl Function {
                     self.print_var(&value);
                 }
             }
+        }
+
+        if callee == "stdin" {
+            let mut console_in = String::new();
+            std::io::stdin().read_line(&mut console_in).unwrap();
+            console_in.trim_right().to_owned();
+            let ast = asts::StringAST::new(&console_in);
+            return Some(asts::Types::Strings(ast));
         }
 
         let serch_string = call_ast.callee.clone();

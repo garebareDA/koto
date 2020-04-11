@@ -1,7 +1,6 @@
 #Due to the location of execution
 import "./example/hoge.koto";
 #comment
-const cons = 1;
-cons = 1;
+const cons = stdin();
 print(cons);
 
