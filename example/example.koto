@@ -23,5 +23,5 @@ for let i = 0; i > 5; i++;{
 }
 
 const cons = stdin();
-const = 1;
 print(cons);
+cons = 1;
