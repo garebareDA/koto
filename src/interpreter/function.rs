@@ -86,6 +86,9 @@ impl Function {
     }
 
     pub fn function_run(&mut self, call_ast: &asts::CallAST, variable: &mut variable::Variable) ->Option<asts::Types> {
+        //引数に関数の一個上の部分まで
+        //中身で判定
+
         let callee = call_ast.callee.clone();
         if callee == "print" {
             let value = &call_ast.argument[0];
