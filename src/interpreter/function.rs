@@ -90,7 +90,7 @@ impl Function {
             let value = &call_ast.argument[0];
             match value {
                 asts::Types::Variable(var) => {
-                    let var_result = variable.serch_variable(&var, self);
+                    let (var_result, _) = variable.serch_variable(&var, self);
                     self.print_var(&var_result[0]);
                 }
 

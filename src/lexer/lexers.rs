@@ -104,6 +104,10 @@ impl Lexer {
                     let token_value = token::TokenValue::new(TOKEN._import, &identifier_str);
                     return (token_value, index);
                 }
+                if identifier_str == "const" {
+                    let token_value = token::TokenValue::new(TOKEN._const, &identifier_str);
+                    return (token_value, index);
+                }
                 let token_value = token::TokenValue::new(TOKEN._identifier, &identifier_str);
                 return (token_value, index);
             }

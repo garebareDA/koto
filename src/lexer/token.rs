@@ -14,6 +14,7 @@ pub struct Token {
     pub _return: i64,
     pub _vec: i64,
     pub _import: i64,
+    pub _const: i64,
 }
 
 impl Token {
@@ -34,6 +35,7 @@ impl Token {
             _return: -13,
             _vec: -14,
             _import: -15,
+            _const:-16
         }
     }
 }

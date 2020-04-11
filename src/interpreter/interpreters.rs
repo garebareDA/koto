@@ -100,6 +100,9 @@ pub fn run_judg(
         asts::Types::Variable(var) => {
             let var_contents = vec_variable.variable(var, vec_function);
             let mut var_ast = asts::VariableAST::new(&var.name);
+            if !var.muttable {
+                var_ast.muttable = false;
+            }
             match var_contents {
                 Some(content) => {
                     var_ast.node.push(content);
@@ -166,7 +169,7 @@ pub fn run_judg(
                 }
 
                 asts::Types::Variable(var) => {
-                    let result = vec_variable.serch_variable(&var, vec_function);
+                    let (result, _)= vec_variable.serch_variable(&var, vec_function);
                     return (false, Some(result[0].clone()));
                 }
 

@@ -77,7 +77,7 @@ impl Parsing {
             let number = asts::Types::Number(num);
             return number;
         }
-        if token == token_constant._identifier {
+        if token == token_constant._identifier{
             let is_token = self.tokens[1].token == self.tokens[2].token;
             if self.tokens[2].token == 43 && is_token || self.tokens[2].token == 45 && is_token {
                 return self.reassignment();
@@ -133,10 +133,13 @@ impl Parsing {
             let variable = asts::Types::Variable(variable);
             return variable;
         }
-        if token == token_constant._let {
+        if token == token_constant._let || token == token_constant._const{
             self.tokens.remove(0);
             let string = &self.tokens[0].val;
-            let variable = asts::VariableAST::new(string);
+            let mut variable = asts::VariableAST::new(string);
+            if token == token_constant._const {
+                variable.muttable = false;
+            }
             let variable = asts::Types::Variable(variable);
             self.tokens.remove(0);
             self.tokens.remove(0);

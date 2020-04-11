@@ -68,7 +68,7 @@ impl Variable {
 
                 match inner.node[0].clone() {
                     asts::Types::Binary(bin) => {
-                        let serch = self.serch_variable(&inner, vec_function);
+                        let (serch, _) = self.serch_variable(&inner, vec_function);
                         vec_function.push(serch);
                         bin_op = bin.op;
                         bin_node = bin.node;
@@ -83,6 +83,11 @@ impl Variable {
         if bin_op == '=' {
             match bin_node[0] {
                 asts::Types::Variable(_) => {
+                    let (_, mutable) = self.serch_variable(var, vec_function);
+                    if !mutable {
+                        let err = error::Error::new(&asts::Types::Variable(var.clone()));
+                        err.exit("variable is mutable");
+                    }
                     return Some(bin_node[bin_node.len() - 1].clone());
                 }
 
@@ -103,7 +108,7 @@ impl Variable {
                         return result;
                     } else {
                         vec_function.vec_push();
-                        let serch = self.serch_variable(&var, vec_function);
+                        let (serch, _) = self.serch_variable(&var, vec_function);
                         vec_function.push(serch);
                         let result = vec_function.function_run(&fun, self);
                         vec_function.last_remove();
@@ -125,8 +130,9 @@ impl Variable {
         &mut self,
         serch: &asts::VariableAST,
         vec_function: &mut function::Function,
-    ) -> Vec<asts::Types> {
+    ) -> (Vec<asts::Types>, bool) {
         let mut variable_retrun = Vec::new();
+        let mut is_mutable = true;
         let var_vec = self.variables.clone();
         let serch = serch.clone();
         let serch_word = &serch.name;
@@ -137,6 +143,7 @@ impl Variable {
                 match var {
                     asts::Types::Variable(in_vars) => {
                         in_var = in_vars;
+                        is_mutable = in_var.muttable;
                     }
 
                     _ => {
@@ -148,7 +155,8 @@ impl Variable {
                 if &in_var.name == serch_word {
                     match in_var.node[0].clone() {
                         asts::Types::Variable(var) => {
-                            variable_retrun = self.serch_variable(&var, vec_function);
+                            let (variable_retruns, _) = self.serch_variable(&var, vec_function);
+                            variable_retrun = variable_retruns;
                         }
 
                         asts::Types::Call(_) => {
@@ -214,7 +222,7 @@ impl Variable {
                 }
             }
         }
-        return variable_retrun;
+        return (variable_retrun, is_mutable);
     }
 
     pub fn variables_allocation(
@@ -274,7 +282,8 @@ impl Variable {
                     }
 
                     if !is_name_space_function {
-                        serch_result = self.serch_variable(&var, vec_function);
+                        let (serch_results, _) = self.serch_variable(&var, vec_function);
+                        serch_result = serch_results;
                         vec = self.variables_allocation(var.node.clone(), vec_function);
                     }
 

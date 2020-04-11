@@ -132,6 +132,7 @@ impl FunctionAST {
 pub struct VariableAST{
     pub name: String,
     pub index:Option<Vec<Types>>,
+    pub muttable: bool,
     pub node: Vec<Types>,
 }
 
@@ -141,6 +142,7 @@ impl VariableAST {
         VariableAST {
             name: string,
             index:None,
+            muttable:true,
             node: Vec::new(),
         }
     }
