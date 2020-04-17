@@ -77,11 +77,15 @@ impl Variable {
                 }
             }
 
+            asts::Types::Call(calle) => {
+                return vec_function.function_run(&calle, self);
+            }
+
             _ => return Some(var.node[0].clone()),
         }
 
         if bin_op == '=' {
-            match bin_node[0] {
+            match bin_node[0].clone() {
                 asts::Types::Variable(_) => {
                     let (_, mutable) = self.serch_variable(var, vec_function);
                     if !mutable {

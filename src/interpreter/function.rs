@@ -89,7 +89,7 @@ impl Function {
         //引数に関数の一個上の部分まで
         //中身で判定
 
-        let callee = call_ast.callee.clone();
+        let callee = &call_ast.callee;
         if callee == "print" {
             let value = &call_ast.argument[0];
             match value {
@@ -111,8 +111,7 @@ impl Function {
 
         if callee == "stdin" {
             let mut console_in = String::new();
-            std::io::stdin().read_line(&mut console_in).unwrap();
-            console_in.trim_right().to_owned();
+            std::io::stdin().read_line(&mut console_in).ok();
             let ast = asts::StringAST::new(&console_in);
             return Some(asts::Types::Strings(ast));
         }
