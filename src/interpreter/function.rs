@@ -147,12 +147,18 @@ impl Function {
     ) -> Option<asts::Types> {
         vec_variable.vec_push();
         let mut index = 0;
-        for function_argument in function_arguments {
-            match function_argument {
+        for function_argument in &function_arguments {
+            match function_argument.clone() {
                 asts::Types::Variable(mut variable) => {
                     if argument.is_empty() {
                         break;
                     }
+
+                    if argument.len() <= index {
+                        let err = error::Error::new(&function_argument.clone());
+                        err.exit("argument error");
+                    }
+
                     let result = interpreters::calculation(&argument[index], vec_variable, self);
                     variable.node.push(result);
                     let variable = asts::Types::Variable(variable);

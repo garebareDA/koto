@@ -1,7 +1,6 @@
 use super::super::lexer::token;
 use super::asts;
 use super::error;
-//TODOパースのエラー処理
 
 pub struct Parsing {
     pub tokens: Vec<token::TokenValue>,
@@ -474,6 +473,7 @@ impl Parsing {
     }
 
     fn function(&mut self) -> asts::Types {
+        //型解析の追加
         let string = &self.tokens[0].val;
         let token = self.tokens[1].token;
         let mut function_ast = asts::FunctionAST::new(string);
