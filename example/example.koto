@@ -1,7 +1,7 @@
 #Due to the location of execution
-import "./example/hoge.koto";
-fn a(string:string) {
-    print(string);
+fn a(a) {
+    print(a);
 }
 
-a("hello");
+let a:string = "hello";
+a(a);
