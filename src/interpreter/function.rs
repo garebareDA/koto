@@ -199,9 +199,9 @@ impl Function {
 
         match &result {
             Some(types_result) => {
-                let continu = self.type_inspection(&result_type, types_result);
+                let continu = self.type_inspection_retruns(&result_type, types_result);
                 if !continu {
-                    let err = error::Error::new(&function.argument.clone()[index]);
+                    let err = error::Error::new(&function.argument.clone()[index - 1]);
                     err.exit("argument type error");
                 }
             }
@@ -235,22 +235,75 @@ impl Function {
         types: &Option<asts::VariableTypes>,
         argument_type: &asts::Types,
     ) -> bool {
+        let mut argument_types: asts::VariableTypes = asts::VariableTypes::Bool;
+
+        match argument_type {
+            asts::Types::Variable(var) => match var.types.clone() {
+                Some(types_var) => {
+                    argument_types = types_var;
+                }
+                _ => {}
+            },
+
+            _ => {}
+        }
+
+        match types {
+            Some(t) => match t {
+                asts::VariableTypes::Bool => match argument_types {
+                    asts::VariableTypes::Bool => {
+                        return true;
+                    }
+                    _ => {}
+                },
+                asts::VariableTypes::Int => match argument_types {
+                    asts::VariableTypes::Int => {
+                        return true;
+                    }
+                    _ => {}
+                },
+                asts::VariableTypes::Strings => match argument_types {
+                    asts::VariableTypes::Strings => {
+                        return true;
+                    }
+                    _ => {}
+                },
+            },
+
+            _ => {}
+        }
+
+        false
+    }
+
+    fn type_inspection_retruns(
+        &self,
+        types: &Option<asts::VariableTypes>,
+        argument_type: &asts::Types,
+    ) -> bool {
         match types {
             Some(t) => match t {
                 asts::VariableTypes::Bool => match argument_type {
-                    asts::Types::Boolean(_) => true,
-                    _ => false,
+                    asts::Types::Boolean(_) => {
+                        return true;
+                    }
+                    _ => {}
                 },
                 asts::VariableTypes::Int => match argument_type {
-                    asts::Types::Number(_) => true,
-                    _ => false,
+                    asts::Types::Number(_) => {
+                        return true;
+                    }
+                    _ => {}
                 },
                 asts::VariableTypes::Strings => match argument_type {
-                    asts::Types::Strings(_) => true,
-                    _ => false,
+                    asts::Types::Strings(_) => {
+                        return true;
+                    }
+                    _ => {}
                 },
             },
-            None => false,
+            _ => {}
         }
+        false
     }
 }
