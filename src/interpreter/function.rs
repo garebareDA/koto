@@ -1,7 +1,7 @@
 use super::super::ast::asts;
+use super::error;
 use super::interpreters;
 use super::variable;
-use super::error;
 use std;
 
 #[derive(Debug)]
@@ -55,8 +55,7 @@ impl Function {
                 asts::Types::Function(_) => {
                     self.funcstions[self.inner].push(node);
                 }
-                _ => {
-                }
+                _ => {}
             }
             index += 1;
         }
@@ -64,7 +63,7 @@ impl Function {
 
     pub fn retrun_insert(&mut self, nodes: Vec<asts::Types>) -> Vec<asts::Types> {
         let mut index = 0;
-        let mut inner:Vec<asts::Types> = Vec::new();
+        let mut inner: Vec<asts::Types> = Vec::new();
         let len = nodes.len();
         loop {
             if index >= len {
@@ -76,8 +75,7 @@ impl Function {
                 asts::Types::Function(_) => {
                     inner.push(node);
                 }
-                _ => {
-                }
+                _ => {}
             }
             index += 1;
         }
@@ -85,7 +83,11 @@ impl Function {
         return inner;
     }
 
-    pub fn function_run(&mut self, call_ast: &asts::CallAST, variable: &mut variable::Variable) ->Option<asts::Types> {
+    pub fn function_run(
+        &mut self,
+        call_ast: &asts::CallAST,
+        variable: &mut variable::Variable,
+    ) -> Option<asts::Types> {
         //引数に関数の一個上の部分まで
         //中身で判定
 
@@ -126,7 +128,7 @@ impl Function {
                 match fun {
                     asts::Types::Function(fun) => {
                         if serch_string == fun.name {
-                            return self.function(fun.argument, &argument, fun.node, variable);
+                            return self.function(fun, &argument, variable);
                         }
                     }
 
@@ -140,14 +142,16 @@ impl Function {
 
     fn function(
         &mut self,
-        function_arguments: Vec<asts::Types>,
+        function: asts::FunctionAST,
         argument: &Vec<asts::Types>,
-        mut node: Vec<asts::Types>,
         vec_variable: &mut variable::Variable,
     ) -> Option<asts::Types> {
         vec_variable.vec_push();
         let mut index = 0;
-        for function_argument in &function_arguments {
+        let function_arguments = &function.argument;
+        let mut node = &function.node;
+
+        for function_argument in function_arguments {
             match function_argument.clone() {
                 asts::Types::Variable(mut variable) => {
                     if argument.is_empty() {
@@ -157,6 +161,22 @@ impl Function {
                     if argument.len() <= index {
                         let err = error::Error::new(&function_argument.clone());
                         err.exit("argument error");
+                    }
+
+                    match &function.argument.clone()[index] {
+                        asts::Types::Variable(var) => {
+                            let types = &var.types;
+                            let argument_type = &function.argument[index];
+                            let continu = self.type_inspection(types, argument_type);
+                            if !continu {
+                                let err = error::Error::new(&function.argument.clone()[index]);
+                                err.exit("argument type error");
+                            }
+                        }
+                        _ => {
+                            let err = error::Error::new(&function.argument.clone()[index]);
+                            err.exit("argument type error");
+                        }
                     }
 
                     let result = interpreters::calculation(&argument[index], vec_variable, self);
@@ -175,6 +195,19 @@ impl Function {
         }
 
         let (_, result) = interpreters::scope(&mut node, vec_variable, self);
+        let result_type = function.return_type;
+
+        match &result {
+            Some(types_result) => {
+                let continu = self.type_inspection(&result_type, types_result);
+                if !continu {
+                    let err = error::Error::new(&function.argument.clone()[index]);
+                    err.exit("argument type error");
+                }
+            }
+            None => {}
+        }
+
         vec_variable.last_remove();
         return result;
     }
@@ -194,6 +227,30 @@ impl Function {
                 let err = error::Error::new(&var_result);
                 err.exit("print error");
             }
+        }
+    }
+
+    fn type_inspection(
+        &self,
+        types: &Option<asts::VariableTypes>,
+        argument_type: &asts::Types,
+    ) -> bool {
+        match types {
+            Some(t) => match t {
+                asts::VariableTypes::Bool => match argument_type {
+                    asts::Types::Boolean(_) => true,
+                    _ => false,
+                },
+                asts::VariableTypes::Int => match argument_type {
+                    asts::Types::Number(_) => true,
+                    _ => false,
+                },
+                asts::VariableTypes::Strings => match argument_type {
+                    asts::Types::Strings(_) => true,
+                    _ => false,
+                },
+            },
+            None => false,
         }
     }
 }
