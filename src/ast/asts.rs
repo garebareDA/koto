@@ -124,6 +124,7 @@ impl CallAST {
 pub struct FunctionAST {
     pub name: String,
     pub argument: Vec<Types>,
+    pub return_type: Option<VariableTypes>,
     pub node: Vec<Types>,
 }
 
@@ -133,7 +134,21 @@ impl FunctionAST {
         FunctionAST{
             name:string,
             argument: Vec::new(),
+            return_type: None,
             node: Vec::new(),
+        }
+    }
+
+    pub fn set_type(&mut self, types:&str, tokens:&token::TokenValue) {
+        if types == "string" {
+            self.return_type = Some(VariableTypes::Strings);
+        }else if types == "int" {
+            self.return_type = Some(VariableTypes::Int);
+        }else if types == "bool" {
+            self.return_type = Some(VariableTypes::Bool);
+        }else {
+            let err = error::Error::new(tokens);
+            err.exit("Type is missing");
         }
     }
 }
@@ -168,8 +183,7 @@ impl VariableAST {
             self.types = Some(VariableTypes::Bool);
         }else {
             let err = error::Error::new(tokens);
-            err.exit("
-            Type is missing")
+            err.exit("Type is missing");
         }
     }
 }

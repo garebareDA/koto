@@ -1,6 +1,6 @@
 #Due to the location of execution
 
-fn a(string:string){
+fn a(string:string) -> int{
     print(string);
     return 1;
 }
