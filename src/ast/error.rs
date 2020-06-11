@@ -15,4 +15,3 @@ impl Error {
         exit(0);
     }
 }
-

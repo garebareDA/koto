@@ -1,7 +1,6 @@
 use super::super::lexer::token;
 use super::asts;
 use super::error;
-//TODOパースのエラー処理
 
 pub struct Parsing {
     pub tokens: Vec<token::TokenValue>,
@@ -77,7 +76,7 @@ impl Parsing {
             let number = asts::Types::Number(num);
             return number;
         }
-        if token == token_constant._identifier{
+        if token == token_constant._identifier {
             let is_token = self.tokens[1].token == self.tokens[2].token;
             if self.tokens[2].token == 43 && is_token || self.tokens[2].token == 45 && is_token {
                 return self.reassignment();
@@ -133,7 +132,7 @@ impl Parsing {
             let variable = asts::Types::Variable(variable);
             return variable;
         }
-        if token == token_constant._let || token == token_constant._const{
+        if token == token_constant._let || token == token_constant._const {
             self.tokens.remove(0);
             let string = &self.tokens[0].val;
             let mut variable = asts::VariableAST::new(string);
@@ -141,7 +140,12 @@ impl Parsing {
                 variable.muttable = false;
             }
             let variable = asts::Types::Variable(variable);
-            self.tokens.remove(0);
+
+            if self.tokens[1].token != 61 {
+                let error = error::Error::new(&self.tokens[0]);
+                error.exit("opcode error is not =");
+            }
+
             self.tokens.remove(0);
             return variable;
         }
@@ -483,12 +487,43 @@ impl Parsing {
             loop {
                 let token_judge = self.tokens[0].token;
                 if token_judge == -10 {
-                    let result = self.judge();
-                    function_ast.argument.push(result);
+                    let val = &self.tokens[0].val;
+                    let mut ast = asts::VariableAST::new(val);
+                    self.tokens.remove(0);
+                    let typetoken = self.tokens[0].token;
+
+                    if typetoken == 58 {
+                        self.tokens.remove(0);
+                        if self.tokens[0].token == -10 {
+                            ast.set_type(&self.tokens[0].val, &self.tokens[0]);
+                        } else {
+                            let err = error::Error::new(&self.tokens[0]);
+                            err.exit("Type not specified");
+                        }
+                    } else {
+                        let err = error::Error::new(&self.tokens[0]);
+                        err.exit("Type not specified");
+                    }
+
+                    let astvar = asts::Types::Variable(ast);
+                    function_ast.argument.push(astvar);
                 }
-                if token_judge == 41 {
+
+                if token_judge == 45 {
+                    self.tokens.remove(0);
+                    if self.tokens[0].token == 62 {
+                        self.tokens.remove(0);
+                        function_ast.set_type(&self.tokens[0].val, &self.tokens[0]);
+                    }else{
+                        let err = error::Error::new(&self.tokens[0]);
+                        err.exit("return ->");
+                    }
+                }
+
+                if token_judge == 123 {
                     break;
                 }
+
                 self.tokens.remove(0);
             }
         }

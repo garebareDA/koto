@@ -35,7 +35,7 @@ impl Token {
             _return: -13,
             _vec: -14,
             _import: -15,
-            _const:-16
+            _const:-16,
         }
     }
 }
