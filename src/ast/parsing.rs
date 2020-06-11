@@ -20,14 +20,6 @@ impl Parsing {
     }
 
     fn judge(&mut self) -> asts::Types {
-        //型解析の追加
-        /*
-        TODO関数の引数の型
-        変数の宣言内に型解析を追加
-        tokenが58以降の一つは型
-        型の列挙型も追加
-        変数に型のパラメータも追加
-        */
         let mut token = self.tokens[0].token;
         let mut string = self.tokens[0].val.clone();
         let token_constant = token::Token::new();
@@ -498,8 +490,26 @@ impl Parsing {
             loop {
                 let token_judge = self.tokens[0].token;
                 if token_judge == -10 {
-                    let result = self.judge();
-                    function_ast.argument.push(result);
+                    let val = &self.tokens[0].val;
+                    let mut ast = asts::VariableAST::new(val);
+                    self.tokens.remove(0);
+                    let typetoken = self.tokens[0].token;
+
+                    if typetoken == 58 {
+                        self.tokens.remove(0);
+                        if self.tokens[0].token == -10 {
+                            ast.set_type(&self.tokens[0].val, &self.tokens[0]);
+                        }else{
+                            let err = error::Error::new(&self.tokens[0]);
+                            err.exit("Type not specified");
+                        }
+                    }else{
+                        let err = error::Error::new(&self.tokens[0]);
+                        err.exit("Type not specified");
+                    }
+
+                    let astvar = asts::Types::Variable(ast);
+                    function_ast.argument.push(astvar);
                 }
                 if token_judge == 41 {
                     break;

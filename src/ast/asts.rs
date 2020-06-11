@@ -1,3 +1,6 @@
+use super::super::lexer::token;
+use super::error;
+
 #[derive(Debug, Clone)]
 pub enum Types {
     Boolean(BooleanAST),
@@ -18,6 +21,13 @@ pub enum Types {
     Parent(ParenthesesAST),
     End(EndAST),
     Error(ErrorAST)
+}
+
+#[derive(Debug, Clone)]
+pub enum VariableTypes {
+    Bool,
+    Int,
+    Strings,
 }
 
 #[derive(Debug)]
@@ -133,6 +143,7 @@ pub struct VariableAST{
     pub name: String,
     pub index:Option<Vec<Types>>,
     pub muttable: bool,
+    pub types: Option <VariableTypes>,
     pub node: Vec<Types>,
 }
 
@@ -143,7 +154,21 @@ impl VariableAST {
             name: string,
             index:None,
             muttable:true,
+            types:None,
             node: Vec::new(),
+        }
+    }
+
+    pub fn set_type(&mut self, types:&str, tokens:&token::TokenValue) {
+        if types == "string" {
+            self.types = Some(VariableTypes::Strings);
+        }else if types == "int" {
+            self.types = Some(VariableTypes::Int);
+        }else if types == "bool" {
+            self.types = Some(VariableTypes::Bool);
+        }else {
+            let err = error::Error::new(tokens);
+            err.exit("Type is missing");
         }
     }
 }
