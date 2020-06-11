@@ -168,7 +168,8 @@ impl VariableAST {
             self.types = Some(VariableTypes::Bool);
         }else {
             let err = error::Error::new(tokens);
-            err.exit("Type is missing");
+            err.exit("
+            Type is missing")
         }
     }
 }

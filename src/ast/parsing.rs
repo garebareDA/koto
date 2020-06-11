@@ -141,9 +141,7 @@ impl Parsing {
             }
             let variable = asts::Types::Variable(variable);
 
-            if self.tokens[0].token == 61 {
-                self.tokens.remove(0);
-            }else{
+            if self.tokens[1].token != 61 {
                 let error = error::Error::new(&self.tokens[0]);
                 error.exit("opcode error is not =");
             }
@@ -480,7 +478,6 @@ impl Parsing {
     }
 
     fn function(&mut self) -> asts::Types {
-        //型解析の追加
         let string = &self.tokens[0].val;
         let token = self.tokens[1].token;
         let mut function_ast = asts::FunctionAST::new(string);
@@ -511,9 +508,11 @@ impl Parsing {
                     let astvar = asts::Types::Variable(ast);
                     function_ast.argument.push(astvar);
                 }
-                if token_judge == 41 {
+
+                if token_judge == 123 {
                     break;
                 }
+
                 self.tokens.remove(0);
             }
         }

@@ -1,6 +1,9 @@
 #Due to the location of execution
-fn a(string:string) {
+
+fn a(string:string){
     print(string);
+    return 1;
 }
 
-a("hello");
+let b = a("hello");
+print(b);
