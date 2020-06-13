@@ -226,12 +226,6 @@ impl Variable {
                 }
             }
         }
-
-        if variable_retrun.is_empty() {
-            let err = error::Error::new(&asts::Types::Variable(serch.clone()));
-            err.exit("variable is empty");
-        }
-
         return (variable_retrun, is_mutable);
     }
 

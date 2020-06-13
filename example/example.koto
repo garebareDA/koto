@@ -1,9 +1,27 @@
 #Due to the location of execution
+import "./example/hoge.koto";
+#comment
+let number = 1;
+let string = "hello, world" + 1 + 1 + 1 + "mozirel" + 123;
+print(string);
 
-fn a(string:string) -> int{
-    print(string);
-    return;
+let vector = vec[1, 2, 3, 4, 5];
+let index = vector[1];
+print(index);
+
+let cal = number + 1 - 1 / 2 * 5;
+cal++;
+print(cal);
+
+let result = index;
+result = cal;
+print(result);
+
+for let i = 0; i > 5; i++;{
+    let reslut = hoge.function(i + 1);
+    print(reslut);
 }
 
-let b = a("hello");
-print(b);
+const cons = stdin();
+print(cons);
+cons = 1;
