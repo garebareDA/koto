@@ -2,7 +2,7 @@
 
 fn a(string:string) -> int{
     print(string);
-    return 1;
+    return;
 }
 
 let b = a("hello");
