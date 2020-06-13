@@ -147,6 +147,7 @@ impl Parsing {
             }
 
             self.tokens.remove(0);
+            self.tokens.remove(0);
             return variable;
         }
         if token == token_constant._bool {
@@ -257,6 +258,7 @@ impl Parsing {
         let mut binary_vector: Vec<asts::Types> = Vec::new();
         loop {
             let result = self.judge();
+            println!("{:?}", result);
             match result {
                 asts::Types::Binary(_) => {
                     binary_vector.push(result);
@@ -601,7 +603,6 @@ impl Parsing {
                     result = asts::Types::Variable(var);
                     return Some(result);
                 }
-
                 let result_cal = self.calculation();
                 if var.node.is_empty() {
                     var.node.push(result_cal);
