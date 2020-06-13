@@ -13,7 +13,7 @@ impl Compile {
     Compile { file: file }
   }
 
-  fn write(&mut self, string: &str) {
+  pub fn write(&mut self, string: &str) {
     self
       .file
       .write_all(string.as_bytes())
@@ -38,16 +38,17 @@ impl Compile {
     self.write("}");
   }
 
-  fn judge(&self, node: &asts::Types) {
+  fn judge(&mut self, node: &asts::Types) {
     match node {
       asts::Types::Variable(var) => {}
 
-      asts::Types::Function(fun) => {}
+      asts::Types::Call(fun) => {
+        self.function_write(&fun);
+      }
 
       _ => {
         return;
       }
     }
   }
-
 }
