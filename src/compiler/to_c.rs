@@ -9,7 +9,19 @@ pub fn compile(root: asts::ExprAST) {
     }
 
     let node = &root.node[index];
-    println!("{:?}", node);
+    judge(node);
     index += 1;
+  }
+}
+
+fn judge(node:&asts::Types) {
+  match node {
+    asts::Types::Boolean(bools) => {
+
+    }
+
+    _ => {
+      return;
+    }
   }
 }
