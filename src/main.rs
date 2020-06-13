@@ -14,7 +14,8 @@ fn main() {
         let path = &args[2];
         let result = interpreter::interpreters::read_file(path);
         println!("{:?}", result);
-        compiler::to_c::compile(result);
+        let mut compiler = compiler::to_c::Compile::new();
+        compiler.compile(result);
     } else {
         println!("file run");
         println!("./koto run [file name]");
