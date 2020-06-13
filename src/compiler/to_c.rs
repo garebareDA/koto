@@ -16,7 +16,11 @@ pub fn compile(root: asts::ExprAST) {
 
 fn judge(node:&asts::Types) {
   match node {
-    asts::Types::Boolean(bools) => {
+    asts::Types::Variable(var) => {
+
+    }
+
+    asts::Types::Function(fun) => {
 
     }
 

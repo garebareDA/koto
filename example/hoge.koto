@@ -1,4 +1,4 @@
-fn function(n) {
+fn function(n:int)-> int {
     if n < 3 {
         return 1;
     }
