@@ -28,10 +28,12 @@ impl Compile{
 
   fn printf_var(&mut self, var_result: &asts::Types) {
     match var_result {
-      asts::Types::Strings(value) => {
-        self.write("%s\\n\", \"");
-        self.write(&value.name);
-        self.write("\"");
+      asts::Types::Strings(strings) => {
+        let mut values = "".to_string();
+        values.push_str("%s\\n\", \"");
+        values.push_str(&strings.name);
+        values.push_str("\"");
+        self.write(&values);
       }
 
       _ => {
