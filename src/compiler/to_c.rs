@@ -31,6 +31,7 @@ impl Compile {
       }
 
       let node = &root.node[index];
+      println!("node {:?}", node);
       self.judge(node);
       index += 1;
     }
@@ -40,7 +41,9 @@ impl Compile {
 
   fn judge(&mut self, node: &asts::Types) {
     match node {
-      asts::Types::Variable(var) => {}
+      asts::Types::Variable(var) => {
+        self.variable_wirte(var);
+      }
 
       asts::Types::Call(fun) => {
         self.function_write(&fun);
