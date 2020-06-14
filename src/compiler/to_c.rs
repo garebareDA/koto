@@ -2,6 +2,8 @@ use super::super::ast::asts;
 use std::fs;
 use std::io::Write;
 
+//変数の関数の方を調べるために配列を用意する
+
 pub struct Compile {
   pub file: std::fs::File,
 }
@@ -31,7 +33,6 @@ impl Compile {
       }
 
       let node = &root.node[index];
-      println!("node {:?}", node);
       self.judge(node);
       index += 1;
     }

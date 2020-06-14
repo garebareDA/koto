@@ -25,6 +25,21 @@ impl Compile {
         num_var.push_str(";");
         self.write(&num_var);
       }
+
+      asts::Types::Call(call) => {
+        if call.callee == "stdin" {
+          let mut call_var = "".to_string();
+          call_var.push_str("char ");
+          call_var.push_str(var_name);
+          call_var.push_str("[1000];\n");
+          call_var.push_str("scanf(\"%s\",");
+          call_var.push_str(var_name);
+          call_var.push_str(");");
+          self.write(&call_var);
+        }else {
+          
+        }
+      }
       _ => {}
     }
 
