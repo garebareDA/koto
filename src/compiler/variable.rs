@@ -15,6 +15,16 @@ impl Compile {
         string_var.push_str("\";");
         self.write(&string_var);
       }
+
+      asts::Types::Number(num) => {
+        let mut num_var = "".to_string();
+        num_var.push_str("int ");
+        num_var.push_str(var_name);
+        num_var.push_str(" = ");
+        num_var.push_str(&num.val.to_string());
+        num_var.push_str(";");
+        self.write(&num_var);
+      }
       _ => {}
     }
 
