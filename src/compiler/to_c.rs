@@ -1,4 +1,5 @@
 use super::super::ast::asts;
+use super::variable;
 use std::fs;
 use std::io::Write;
 
@@ -6,13 +7,18 @@ use std::io::Write;
 
 pub struct Compile {
   pub file: std::fs::File,
+  pub variable: variable::Vriables
 }
 
 impl Compile {
   pub fn new() -> Compile {
     fs::create_dir_all("./build").expect("dir create failed");
     let file = fs::File::create("./build/build.c").expect("create failed");
-    Compile { file: file }
+    let vairables = variable::Vriables::new();
+    Compile {
+      file: file,
+      variable: vairables,
+    }
   }
 
   pub fn write(&mut self, string: &str) {
