@@ -65,6 +65,19 @@ impl Vriables {
     }
     self.inner -= 1;
   }
+
+  pub fn sertch_type(&self, name:&str) -> Option<asts::VariableTypes> {
+    let mut vars_vec = self.variables.clone();
+    vars_vec.reverse();
+    for vars in vars_vec {
+      for var in vars {
+        if var.name == name {
+          return Some(var.types);
+        }
+      }
+    }
+    return None;
+  }
 }
 
 impl Compile {
@@ -117,6 +130,9 @@ impl Compile {
 
       asts::Types::Call(call) => {
         if call.callee == "stdin" {
+          let types = Types::new(var_name, &asts::VariableTypes::Strings);
+          self.variable.push(&types);
+
           let mut call_var = "".to_string();
           call_var.push_str("char ");
           call_var.push_str(var_name);

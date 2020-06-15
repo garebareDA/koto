@@ -5,15 +5,35 @@ impl Compile {
   pub(crate) fn function_write(&mut self, call_ast: &asts::CallAST) {
     let callee = &call_ast.callee;
     if callee == "print" {
-      self.write("  printf(\"");
+      self.write("printf(\"");
 
       let value = &call_ast.argument[0];
       match value {
         asts::Types::Variable(var) => {
           let mut values = "".to_string();
-          //TODO 変数を保存して型を調べる
-          values.push_str("%s\\n\", ");
-          values.push_str(&var.name);
+          match self.variable.sertch_type(&var.name) {
+            Some(types) => match types {
+              asts::VariableTypes::Bool => {
+                values.push_str("%s\\n\", ");
+                values.push_str(&var.name);
+                values.push_str("? \"true\": \"false\"");
+              }
+
+              asts::VariableTypes::Int => {
+                values.push_str("%d\\n\", ");
+                values.push_str(&var.name);
+              }
+
+              asts::VariableTypes::Strings => {
+                values.push_str("%s\\n\", ");
+                values.push_str(&var.name);
+              }
+            },
+
+            None => {
+              //TODO error
+            }
+          }
           self.write(&values);
         }
 
