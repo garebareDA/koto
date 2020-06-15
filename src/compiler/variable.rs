@@ -103,10 +103,14 @@ impl Compile {
         self.variable.push(&types);
 
         let mut num_var = "".to_string();
-        num_var.push_str("bool ");
+        num_var.push_str("int ");
         num_var.push_str(var_name);
         num_var.push_str(" = ");
-        num_var.push_str(&bools.boolean.to_string());
+        if bools.boolean {
+          num_var.push_str("1");
+        } else {
+          num_var.push_str("0");
+        }
         num_var.push_str(";");
         self.write(&num_var);
       }
