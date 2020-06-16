@@ -1,12 +1,18 @@
 use super::super::ast::asts;
 use super::to_c::Compile;
 
+pub enum Format {
+  Formats(String),
+  Strings(String),
+}
+
 impl Compile {
-  pub(crate) fn calcuration(&mut self, bin: &asts::BinaryAST) {
+  pub(crate) fn calcuration(&mut self, bin: &asts::BinaryAST, var_name:&str) {
+    self.write(&format!("char {}[1000] = \"\\0\";\n", var_name));
     let op = &bin.op.to_string();
     let node = &bin.node[0];
     let in_node = &bin.node[1];
-    let mut num_str = "".to_string();
+    let mut num_str = format!("snprintf({}, 1000, ", var_name);
 
     match node {
       asts::Types::Number(num) => {
@@ -21,29 +27,43 @@ impl Compile {
     self.calcuration_write(in_node);
   }
 
-  fn calcuration_write(&mut self, node: &asts::Types) {
+  fn calcuration_write(&mut self, node: &asts::Types) -> Option<asts::VariableTypes> {
     match node {
+      asts::Types::Strings(strings) => {
+        self.write(&format!(" \"{}\"", strings.name));
+        if strings.node.is_empty() {
+          return Some(asts::VariableTypes::Strings);
+        }
+
+        self.calcuration_write(&strings.node[0]);
+        return Some(asts::VariableTypes::Strings);
+      }
+
       asts::Types::Number(num) => {
         self.write(&format!(" {}", num.val));
 
         if num.node.is_empty() {
-          return;
+          return Some(asts::VariableTypes::Int);
         }
 
         self.calcuration_write(&num.node[0]);
+        return Some(asts::VariableTypes::Int);
       }
 
       asts::Types::Binary(bin) => {
         self.write(&format!(" {}", bin.op));
 
         if bin.node.is_empty() {
-          return;
+          return Some(asts::VariableTypes::Binary);
         }
 
         self.calcuration_write(&bin.node[0]);
+        return Some(asts::VariableTypes::Binary);
       }
 
-      _ => {}
+      _ => {
+        None
+      }
     }
   }
 }

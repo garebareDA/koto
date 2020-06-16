@@ -268,6 +268,11 @@ impl Function {
                     }
                     _ => {}
                 },
+
+                _ => {
+                    let err = error::Error::new(argument_type);
+                    err.exit("argument_type");
+                }
             },
 
             _ => {}
@@ -301,6 +306,11 @@ impl Function {
                     }
                     _ => {}
                 },
+
+                _ => {
+                    let err = error::Error::new(argument_type);
+                    err.exit("argument_type");
+                }
             },
             _ => {}
         }

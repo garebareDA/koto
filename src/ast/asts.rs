@@ -28,6 +28,7 @@ pub enum VariableTypes {
     Bool,
     Int,
     Strings,
+    Binary,
 }
 
 #[derive(Debug)]

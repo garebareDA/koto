@@ -28,6 +28,10 @@ impl Compile {
                 values.push_str("%s\\n\", ");
                 values.push_str(&var.name);
               }
+
+              _ => {
+                //TODO err
+              }
             },
 
             None => {
@@ -38,7 +42,7 @@ impl Compile {
         }
 
         asts::Types::Binary(bin) => {
-          //TODO
+          self.calcuration(bin, "");
         }
 
         asts::Types::Strings(strings) => {

@@ -88,12 +88,7 @@ impl Compile {
         let types = Types::new(var_name, &asts::VariableTypes::Int);
         self.variable.push(&types);
 
-        let mut num_var = "".to_string();
-        num_var.push_str("int ");
-        num_var.push_str(var_name);
-        num_var.push_str(" = ");
-        self.write(&num_var);
-        self.calcuration(&bin);
+        self.calcuration(&bin, var_name);
         self.write(";");
       }
 
