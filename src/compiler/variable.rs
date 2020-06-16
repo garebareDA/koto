@@ -66,7 +66,7 @@ impl Vriables {
     self.inner -= 1;
   }
 
-  pub fn sertch_type(&self, name:&str) -> Option<asts::VariableTypes> {
+  pub fn sertch_type(&self, name: &str) -> Option<asts::VariableTypes> {
     let mut vars_vec = self.variables.clone();
     vars_vec.reverse();
     for vars in vars_vec {
@@ -84,6 +84,19 @@ impl Compile {
   pub(crate) fn variable_wirte(&mut self, var: &asts::VariableAST) {
     let var_name = &var.name;
     match var.node[0].clone() {
+      asts::Types::Binary(bin) => {
+        let types = Types::new(var_name, &asts::VariableTypes::Int);
+        self.variable.push(&types);
+
+        let mut num_var = "".to_string();
+        num_var.push_str("int ");
+        num_var.push_str(var_name);
+        num_var.push_str(" = ");
+        self.write(&num_var);
+        self.calcuration(&bin);
+        self.write(";");
+      }
+
       asts::Types::Strings(strings) => {
         let types = Types::new(var_name, &asts::VariableTypes::Strings);
         self.variable.push(&types);
