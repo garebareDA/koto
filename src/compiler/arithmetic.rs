@@ -1,14 +1,24 @@
 use super::super::ast::asts;
 use super::to_c::Compile;
 
-pub enum Format {
-  Formats(String),
-  Strings(String),
+struct Format{
+  formats:String,
+  strings:String,
+}
+
+impl Format {
+  pub fn new() -> Format {
+    Format{
+      formats:String::new(),
+      strings:String::new(),
+    }
+  }
 }
 
 impl Compile {
   pub(crate) fn calcuration(&mut self, bin: &asts::BinaryAST, var_name:&str) {
     self.write(&format!("char {}[1000] = \"\\0\";\n", var_name));
+    let mut formats = Format::new();
     let op = &bin.op.to_string();
     let node = &bin.node[0];
     let in_node = &bin.node[1];
@@ -16,13 +26,14 @@ impl Compile {
 
     match node {
       asts::Types::Number(num) => {
-        num_str.push_str(&num.val.to_string());
+        formats.formats.push_str("%d");
+        formats.strings.push_str(&num.val.to_string());
       }
 
       _ => {}
     }
 
-    num_str.push_str(&format!(" {}", op));
+    formats.strings.push_str(&format!(" {}", op));
     self.write(&num_str);
     self.calcuration_write(in_node);
   }
