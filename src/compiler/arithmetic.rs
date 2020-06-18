@@ -55,9 +55,19 @@ impl Compile {
             match t {
               asts::VariableTypes::Strings => {
                 formats.formats.push_str("%s");
+                formats.strings.push_str(&format!("{}", vars.name));
+                if op == "+" {
+                  formats.strings.push_str(",");
+                } else {
+                  //error
+                }
+                self.calcuration_write(in_node, &mut formats, &asts::VariableTypes::Strings);
               }
               asts::VariableTypes::Int => {
                 formats.formats.push_str("%d");
+                formats.strings.push_str(&format!("{}", vars.name));
+                formats.strings.push_str(&op);
+                self.calcuration_write(in_node, &mut formats, &asts::VariableTypes::Int);
               }
 
               _ => {
