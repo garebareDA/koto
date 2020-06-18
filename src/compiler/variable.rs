@@ -85,11 +85,11 @@ impl Compile {
     let var_name = &var.name;
     match var.node[0].clone() {
       asts::Types::Binary(bin) => {
-        let types = Types::new(var_name, &asts::VariableTypes::Int);
-        self.variable.push(&types);
-
-        self.calcuration(&bin, var_name);
+        let types = self.calcuration(&bin, var_name);
         self.write(";");
+
+        let types = Types::new(var_name, &types);
+        self.variable.push(&types);
       }
 
       asts::Types::Strings(strings) => {

@@ -1,3 +1,5 @@
+use regex::Regex;
+
 use super::super::ast::asts;
 use super::to_c::Compile;
 
@@ -17,7 +19,11 @@ impl Format {
 }
 
 impl Compile {
-  pub(crate) fn calcuration(&mut self, bin: &asts::BinaryAST, var_name: &str) {
+  pub(crate) fn calcuration(
+    &mut self,
+    bin: &asts::BinaryAST,
+    var_name: &str,
+  ) -> asts::VariableTypes {
     let mut formats = Format::new();
     let op = &bin.op.to_string();
     let node = &bin.node[0];
@@ -36,16 +42,38 @@ impl Compile {
         formats.strings.push_str(&format!("\"{}\"", &strings.name));
         if op == "+" {
           formats.strings.push_str(",");
-        }else{
+        } else {
           //error
         }
 
         self.calcuration_write(in_node, &mut formats, &asts::VariableTypes::Strings);
       }
 
+      asts::Types::Variable(vars) => {
+        match self.variable.sertch_type(&vars.name) {
+          Some(t) => {
+            match t {
+              asts::VariableTypes::Strings => {
+                formats.formats.push_str("%s");
+              }
+              asts::VariableTypes::Int => {
+                formats.formats.push_str("%d");
+              }
+
+              _ => {
+                //error
+              }
+            }
+          }
+          None => {
+            //error
+          }
+        }
+      }
+
       _ => {}
     }
-    formats.strings.remove(formats.strings.len() - 1);
+
     let formats_len = formats.strings.len();
     self.write(&format!("char {}[{}] = \"\\0\";\n", var_name, formats_len));
     self.write(&format!("snprintf({}, {}, ", var_name, formats_len));
@@ -53,6 +81,17 @@ impl Compile {
     self.write(&formats.strings);
     self.write(")");
     println!("{:?}", formats);
+
+    let reg = Regex::new(r"[a-zA-Z]+").expect("Faild");
+    match reg.captures(&formats.strings) {
+      Some(_) => {
+        return asts::VariableTypes::Strings;
+      }
+
+      _ => {
+        return asts::VariableTypes::Int;
+      }
+    }
   }
 
   fn calcuration_write(
@@ -98,13 +137,13 @@ impl Compile {
           asts::VariableTypes::Strings => {
             if bin.op == '+' {
               foramts.strings.push_str(",");
-            }else {
+            } else {
               //error
             }
-          },
+          }
           asts::VariableTypes::Int => {
             foramts.strings.push_str(&bin.op.to_string());
-          },
+          }
           _ => {
             //error
           }
@@ -118,15 +157,25 @@ impl Compile {
       }
 
       asts::Types::Variable(vars) => {
-        match self.variable.sertch_type(&vars.name){
+        match self.variable.sertch_type(&vars.name) {
           Some(t) => {
             match t {
               asts::VariableTypes::Strings => {
                 foramts.formats.push_str("%s");
-              },
+                foramts.strings.remove(foramts.strings.len() - 1);
+                foramts.strings.push_str(&format!(",{}", vars.name));
+                if vars.node.is_empty() {
+                  return;
+                }
+                self.calcuration_write(&vars.node[0], foramts, &asts::VariableTypes::Strings);
+              }
               asts::VariableTypes::Int => {
-                foramts.formats.push_str("%d");
-              },
+                foramts.strings.push_str(&format!("{}", vars.name));
+                if vars.node.is_empty() {
+                  return;
+                }
+                self.calcuration_write(&vars.node[0], foramts, &asts::VariableTypes::Int);
+              }
 
               _ => {
                 //error
@@ -137,19 +186,10 @@ impl Compile {
             //error
           }
         }
-
-        foramts.strings.remove(foramts.strings.len() - 1);
-        foramts.strings.push_str(&format!(",{},", vars.name));
-
-        if vars.node.is_empty() {
-          return;
-        }
-
-        self.calcuration_write(&vars.node[0], foramts, types);
         return;
       }
 
-      _ => {},
+      _ => {}
     }
   }
 }
