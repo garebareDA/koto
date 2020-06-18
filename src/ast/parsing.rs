@@ -258,8 +258,11 @@ impl Parsing {
         let mut binary_vector: Vec<asts::Types> = Vec::new();
         loop {
             let result = self.judge();
-            println!("{:?}", result);
             match result {
+                asts::Types::Boolean(_) => {
+                    number_vector.push(result);
+                }
+
                 asts::Types::Binary(_) => {
                     binary_vector.push(result);
                 }
