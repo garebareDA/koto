@@ -218,7 +218,7 @@ impl Function {
                 println!("{}", value.name);
             }
             asts::Types::Number(number) => {
-                println!("{}", number.val);
+                println!("atoi{}", number.val);
             }
             asts::Types::Boolean(bools) => {
                 println!("{}", bools.boolean);

@@ -15,13 +15,13 @@ impl Compile {
             Some(types) => match types {
               asts::VariableTypes::Bool => {
                 values.push_str("%s\\n\", ");
-                values.push_str(&var.name);
+                values.push_str(&format!("atoi({})",&var.name));
                 values.push_str("? \"true\": \"false\"");
               }
 
               asts::VariableTypes::Int => {
                 values.push_str("%d\\n\", ");
-                values.push_str(&var.name);
+                values.push_str(&format!("atoi({})",&var.name));
               }
 
               asts::VariableTypes::Strings => {

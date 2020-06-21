@@ -47,6 +47,20 @@ impl Compile {
     self.write("}");
   }
 
+  pub(crate) fn scope(&mut self, ast: &Vec<asts::Types>,) {
+    let mut index = 0;
+    let len = ast.len();
+    loop {
+      if index >= len {
+        break;
+      }
+
+      let node = &ast[index];
+      self.judge(node);
+      index += 1;
+    }
+  }
+
   fn judge(&mut self, node: &asts::Types) {
     match node {
       asts::Types::Variable(var) => {
@@ -54,7 +68,11 @@ impl Compile {
       }
 
       asts::Types::Call(fun) => {
-        self.function_write(&fun);
+        self.function_write(fun);
+      }
+
+      asts::Types::If(ifs) => {
+        self.ifs_write(ifs);
       }
 
       _ => {
