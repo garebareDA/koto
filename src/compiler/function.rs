@@ -2,7 +2,7 @@ use super::super::ast::asts;
 use super::to_c::Compile;
 
 impl Compile {
-  pub(crate) fn function_write(&mut self, call_ast: &asts::CallAST) {
+  pub(crate) fn call_write(&mut self, call_ast: &asts::CallAST) {
     let callee = &call_ast.callee;
     if callee == "print" {
       self.write("printf(\"");

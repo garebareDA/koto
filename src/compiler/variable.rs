@@ -159,7 +159,5 @@ impl Compile {
       }
       _ => {}
     }
-
-    self.write("\n");
   }
 }

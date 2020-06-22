@@ -65,10 +65,11 @@ impl Compile {
     match node {
       asts::Types::Variable(var) => {
         self.variable_wirte(var);
+        self.write("\n");
       }
 
       asts::Types::Call(fun) => {
-        self.function_write(fun);
+        self.call_write(fun);
       }
 
       asts::Types::If(ifs) => {

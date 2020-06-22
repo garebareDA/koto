@@ -11,8 +11,7 @@ snprintf(tmp, 15, "%d",number<atoi(aa));
 if(atoi(tmp)){
 printf("%s\n", "if!");
 }
-for(int a = 1;
-a<5;a++)
+for(int a = 1;a<5;a++)
 {
 }
 printf("%s\n", "hello world");
