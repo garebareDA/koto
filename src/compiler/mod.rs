@@ -3,3 +3,4 @@ pub mod function;
 pub mod variable;
 pub mod arithmetic;
 pub mod ifs;
+pub mod fors;

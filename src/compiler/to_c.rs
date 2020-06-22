@@ -75,6 +75,10 @@ impl Compile {
         self.ifs_write(ifs);
       }
 
+      asts::Types::For(fors) => {
+        self.fors_write(&fors);
+      }
+
       _ => {
         return;
       }
