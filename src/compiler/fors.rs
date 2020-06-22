@@ -61,7 +61,11 @@ impl Compile {
       }
 
       asts::Types::Boolean(bools) => {
-        
+        if bools.boolean {
+          self.write("1");
+        }else{
+          self.write("0");
+        }
       }
 
       asts::Types::Variable(vars) => {
