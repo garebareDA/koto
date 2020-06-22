@@ -84,7 +84,9 @@ impl Compile {
         self.write(&o.to_string());
       }
 
-      None => {}
+      None => {
+        return;
+      }
     }
 
     if node.len() == 2 {
