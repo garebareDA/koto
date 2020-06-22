@@ -32,6 +32,7 @@ impl Compile {
         //error
       }
     }
+
     self.write("{\n");
     self.scope(&judg.node);
     self.write("}\n");
