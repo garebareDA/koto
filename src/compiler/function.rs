@@ -59,4 +59,8 @@ impl Compile {
       self.write(");\n");
     }
   }
+
+  pub(crate) fn function_write() {
+    
+  }
 }
