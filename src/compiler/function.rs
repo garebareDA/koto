@@ -131,7 +131,7 @@ impl Compile {
                   self.write("char *");
                 }
 
-                asts::VariableTypes::Bool =>  {
+                asts::VariableTypes::Bool => {
                   let types = Types::new(&vars.name, &asts::VariableTypes::Int);
                   self.variable.push(&types);
                   self.write("int ");
@@ -167,6 +167,146 @@ impl Compile {
 
       self.variable.last_remove();
       self.function.last_remove();
+    }
+  }
+
+  pub(crate) fn return_write(&mut self, rets: asts::RetrunAST, function_name: &str) {
+    self.write("\nreturn");
+    if rets.node.is_empty() {
+      self.write(";");
+      return;
+    }
+    let types = self.function.sertch_type(function_name);
+    match &rets.node[0] {
+      asts::Types::Binary(bin) => {
+        self.calcuration(&bin, "tmp");
+        match &types {
+          Some(t) => match t {
+            asts::VariableTypes::Strings => {
+              self.write("tmp");
+            }
+
+            asts::VariableTypes::Bool => {
+              self.write("atoi(tmp)");
+            }
+
+            asts::VariableTypes::Int => {
+              self.write("atoi(tmp)");
+            }
+
+            _ => {
+              //error
+            }
+          },
+
+          None => {
+            //error
+          }
+        }
+      }
+
+      asts::Types::Boolean(bools) => match &types {
+        Some(t) => match t {
+          asts::VariableTypes::Bool => {
+            if bools.boolean == true {
+              self.write("1");
+            } else {
+              self.write("0");
+            }
+          }
+          _ => {
+            //error
+          }
+        },
+        None => {
+          //error
+        }
+      },
+
+      asts::Types::Strings(strings) => match &types {
+        Some(t) => match t {
+          asts::VariableTypes::Strings => {
+            self.write(&strings.name);
+          }
+          _ => {
+            //error
+          }
+        },
+        None => {
+          //error
+        }
+      },
+
+      asts::Types::Variable(vars) => {
+        let serch_types = self.variable.sertch_type(&vars.name);
+        match &types {
+          Some(t) => {
+            match t {
+              asts::VariableTypes::Bool => {
+                match serch_types.unwrap() {
+                  asts::VariableTypes::Bool => {
+                    self.write(&vars.name);
+                  }
+
+                  _ => {
+                    //error
+                  }
+                }
+              }
+
+              asts::VariableTypes::Int => {
+                match serch_types.unwrap() {
+                  asts::VariableTypes::Int => {
+                    self.write(&vars.name);
+                  }
+
+                  _ => {
+                    //error
+                  }
+                }
+              }
+
+              asts::VariableTypes::Strings => {
+                match serch_types.unwrap() {
+                  asts::VariableTypes::Strings => {
+                    self.write(&vars.name);
+                  }
+
+                  _ => {
+                    //error
+                  }
+                }
+              }
+
+              _ => {
+                //error
+              }
+            }
+          }
+
+          None => {
+            //error
+          }
+        }
+      }
+
+      asts::Types::Number(num) => match &types {
+        Some(t) => match t {
+          asts::VariableTypes::Int => {
+            self.write(&num.val.to_string());
+          }
+          _ => {
+            //error
+          }
+        },
+        None => {
+          //error
+        }
+      },
+
+      _ => {
+        //error
+      }
     }
   }
 }
