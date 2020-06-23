@@ -47,6 +47,7 @@ impl Compile {
     self.write("{\n");
     self.scope(&fors.node);
     self.write("}\n");
+
     self.variable.last_remove();
     self.function.last_remove();
   }

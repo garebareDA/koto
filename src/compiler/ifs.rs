@@ -38,6 +38,6 @@ impl Compile {
     self.scope(&judg.node);
     self.write("}\n");
     self.variable.last_remove();
-    self.variable.last_remove();
+    self.function.last_remove();
   }
 }

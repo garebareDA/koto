@@ -9,6 +9,7 @@ pub struct Compile {
   pub file: std::fs::File,
   pub variable: variable::Vriables,
   pub function: variable::Vriables,
+  pub inner_name: Option<String>
 }
 
 impl Compile {
@@ -21,6 +22,7 @@ impl Compile {
       file: file,
       variable: vairables,
       function: function,
+      inner_name: None,
     }
   }
 
@@ -38,6 +40,7 @@ impl Compile {
     self.write("int main() {\n");
     let mut index = 0;
     let len = root.node.len();
+
     loop {
       if index >= len {
         break;
@@ -51,14 +54,13 @@ impl Compile {
     self.write("}");
   }
 
-  pub(crate) fn scope(&mut self, ast: &Vec<asts::Types>,) {
+  pub(crate) fn scope(&mut self, ast: &Vec<asts::Types>) {
     let mut index = 0;
     let len = ast.len();
     loop {
       if index >= len {
         break;
       }
-
       let node = &ast[index];
       self.judge(node);
       index += 1;
@@ -83,6 +85,16 @@ impl Compile {
       asts::Types::For(fors) => {
         self.fors_write(&fors);
       }
+
+      asts::Types::Retrun(rets) => match self.inner_name.clone() {
+        Some(n) => {
+          self.return_write(rets, &n);
+        },
+
+        None => {
+          self.write("return 0;");
+        }
+      },
 
       _ => {
         return;

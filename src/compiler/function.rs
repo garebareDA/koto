@@ -73,15 +73,23 @@ impl Compile {
       match node {
         asts::Types::Function(funs) => match &funs.return_type {
           Some(f) => {
+            self.variable.vec_push();
+
             let types = Types::new(&funs.name, &f);
             self.function.push(&types);
             self.functions(&f, &funs);
+
+            self.variable.last_remove();
           }
 
           None => {
+            self.variable.vec_push();
+
             let types = Types::new(&funs.name, &asts::VariableTypes::Void);
             self.function.push(&types);
             self.functions(&asts::VariableTypes::Void, &funs);
+
+            self.variable.last_remove();
           }
         },
         _ => {}
@@ -91,9 +99,6 @@ impl Compile {
   }
 
   fn functions(&mut self, types: &asts::VariableTypes, fun: &asts::FunctionAST) {
-    self.variable.vec_push();
-    self.function.vec_push();
-
     match types {
       asts::VariableTypes::Bool => {
         self.write("int ");
@@ -160,22 +165,23 @@ impl Compile {
           //error
         }
       }
+
       self.write(")\n");
       self.write("{\n");
+      self.inner_name = Some(fun.name.clone());
       self.scope(&fun.node);
       self.write("}\n");
-
-      self.variable.last_remove();
-      self.function.last_remove();
     }
   }
 
-  pub(crate) fn return_write(&mut self, rets: asts::RetrunAST, function_name: &str) {
-    self.write("\nreturn");
+  pub(crate) fn return_write(&mut self, rets: &asts::RetrunAST, function_name: &str) {
+    self.write("return ");
+
     if rets.node.is_empty() {
       self.write(";");
       return;
     }
+
     let types = self.function.sertch_type(function_name);
     match &rets.node[0] {
       asts::Types::Binary(bin) => {
@@ -308,5 +314,7 @@ impl Compile {
         //error
       }
     }
+
+    self.write(";\n");
   }
 }
