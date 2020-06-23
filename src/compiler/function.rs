@@ -1,6 +1,6 @@
 use super::super::ast::asts;
-use super::variable::Types;
 use super::to_c::Compile;
+use super::variable::Types;
 
 impl Compile {
   pub(crate) fn call_write(&mut self, call_ast: &asts::CallAST) {
@@ -71,26 +71,29 @@ impl Compile {
 
       let node = nodes[index].clone();
       match node {
-        asts::Types::Function(funs) => {
-          match funs.return_type {
-            Some(f) => {
-              let types = Types::new(&funs.name, &f);
-              self.function.push(&types);
-            }
-
-            None => {
-              let types = Types::new(&funs.name, &asts::VariableTypes::Void);
-              self.function.push(&types);
-            }
+        asts::Types::Function(funs) => match &funs.return_type {
+          Some(f) => {
+            let types = Types::new(&funs.name, &f);
+            self.function.push(&types);
+            self.functions(&f, &funs);
           }
-        }
+
+          None => {
+            let types = Types::new(&funs.name, &asts::VariableTypes::Void);
+            self.function.push(&types);
+            self.functions(&asts::VariableTypes::Void, &funs);
+          }
+        },
         _ => {}
       }
       index += 1;
     }
   }
 
-  fn functions(&mut self, types:&asts::VariableTypes, fun:asts::FunctionAST) {
+  fn functions(&mut self, types: &asts::VariableTypes, fun: &asts::FunctionAST) {
+    self.variable.vec_push();
+    self.function.vec_push();
+
     match types {
       asts::VariableTypes::Bool => {
         self.write("int ");
@@ -101,7 +104,7 @@ impl Compile {
       }
 
       asts::VariableTypes::Strings => {
-        self.write("char* ");
+        self.write("char *");
       }
 
       asts::VariableTypes::Void => {
@@ -118,14 +121,52 @@ impl Compile {
 
     for arg in &fun.argument {
       match arg {
-        asts::Types::Number(num) => {
-          
-        }
+        asts::Types::Variable(vars) => {
+          match &vars.types {
+            Some(t) => {
+              match t {
+                asts::VariableTypes::Strings => {
+                  let types = Types::new(&vars.name, &asts::VariableTypes::Strings);
+                  self.variable.push(&types);
+                  self.write("char *");
+                }
 
+                asts::VariableTypes::Bool =>  {
+                  let types = Types::new(&vars.name, &asts::VariableTypes::Int);
+                  self.variable.push(&types);
+                  self.write("int ");
+                }
+
+                asts::VariableTypes::Int => {
+                  let types = Types::new(&vars.name, &asts::VariableTypes::Int);
+                  self.variable.push(&types);
+                  self.write("int ");
+                }
+
+                _ => {
+                  //error
+                }
+              }
+            }
+
+            None => {
+              //error
+            }
+          }
+
+          self.write(&vars.name);
+        }
         _ => {
           //error
         }
       }
+      self.write(")\n");
+      self.write("{\n");
+      self.scope(&fun.node);
+      self.write("}\n");
+
+      self.variable.last_remove();
+      self.function.last_remove();
     }
   }
 }

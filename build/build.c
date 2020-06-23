@@ -1,14 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
-int main() {
-char string[] = "a";
-int number = 1;
-int bools = 0;
-char aa[14] = "\0";
-snprintf(aa, 14, "%d",number+1+1<1*1);
-char tmp[15] = "\0";
-snprintf(tmp, 15, "%d",number<atoi(aa));
+int function(int n)
+{
+char tmp[3] = "\0";
+snprintf(tmp, 3, "%d",n<3);
 if(atoi(tmp)){
-printf("%s\n", "if!");
 }
-for(
+}
+int main() {
+  return 0;
+}
