@@ -4,6 +4,7 @@ use super::to_c::Compile;
 impl Compile {
   pub(crate) fn ifs_write(&mut self, judg: &asts::IfAST) {
     self.variable.vec_push();
+    self.function.vec_push();
 
     match &judg.judge[0] {
       asts::Types::Binary(bin) => {
@@ -36,6 +37,7 @@ impl Compile {
     self.write("{\n");
     self.scope(&judg.node);
     self.write("}\n");
+    self.variable.last_remove();
     self.variable.last_remove();
   }
 }

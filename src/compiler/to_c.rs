@@ -7,7 +7,8 @@ use std::io::Write;
 
 pub struct Compile {
   pub file: std::fs::File,
-  pub variable: variable::Vriables
+  pub variable: variable::Vriables,
+  pub function: variable::Vriables,
 }
 
 impl Compile {
@@ -15,9 +16,11 @@ impl Compile {
     fs::create_dir_all("./build").expect("dir create failed");
     let file = fs::File::create("./build/build.c").expect("create failed");
     let vairables = variable::Vriables::new();
+    let function = variable::Vriables::new();
     Compile {
       file: file,
       variable: vairables,
+      function: function,
     }
   }
 
@@ -31,6 +34,7 @@ impl Compile {
   pub fn compile(&mut self, root: asts::ExprAST) {
     self.write("#include <stdio.h>\n");
     self.write("#include <stdlib.h>\n");
+    self.function_write(&root.node);
     self.write("int main() {\n");
     let mut index = 0;
     let len = root.node.len();

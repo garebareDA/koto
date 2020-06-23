@@ -4,6 +4,7 @@ use super::super::ast::asts;
 impl Compile {
   pub(crate) fn fors_write(&mut self, fors: &asts::ForAST){
     self.variable.vec_push();
+    self.function.vec_push();
 
     let variant = &fors.init_var[0];
     let judge = &fors.init_var[1];
@@ -47,6 +48,7 @@ impl Compile {
     self.scope(&fors.node);
     self.write("}\n");
     self.variable.last_remove();
+    self.function.last_remove();
   }
 
   fn fors_juge(&mut self, node:&Vec<asts::Types>, op:Option<char>) {

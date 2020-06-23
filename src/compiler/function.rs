@@ -1,4 +1,5 @@
 use super::super::ast::asts;
+use super::variable::Types;
 use super::to_c::Compile;
 
 impl Compile {
@@ -15,13 +16,13 @@ impl Compile {
             Some(types) => match types {
               asts::VariableTypes::Bool => {
                 values.push_str("%s\\n\", ");
-                values.push_str(&format!("atoi({})",&var.name));
+                values.push_str(&format!("atoi({})", &var.name));
                 values.push_str("? \"true\": \"false\"");
               }
 
               asts::VariableTypes::Int => {
                 values.push_str("%d\\n\", ");
-                values.push_str(&format!("atoi({})",&var.name));
+                values.push_str(&format!("atoi({})", &var.name));
               }
 
               asts::VariableTypes::Strings => {
@@ -60,7 +61,71 @@ impl Compile {
     }
   }
 
-  pub(crate) fn function_write() {
-    
+  pub(crate) fn function_write(&mut self, nodes: &Vec<asts::Types>) {
+    let mut index = 0;
+    let len = nodes.len();
+    loop {
+      if index >= len {
+        break;
+      }
+
+      let node = nodes[index].clone();
+      match node {
+        asts::Types::Function(funs) => {
+          match funs.return_type {
+            Some(f) => {
+              let types = Types::new(&funs.name, &f);
+              self.function.push(&types);
+            }
+
+            None => {
+              let types = Types::new(&funs.name, &asts::VariableTypes::Void);
+              self.function.push(&types);
+            }
+          }
+        }
+        _ => {}
+      }
+      index += 1;
+    }
+  }
+
+  fn functions(&mut self, types:&asts::VariableTypes, fun:asts::FunctionAST) {
+    match types {
+      asts::VariableTypes::Bool => {
+        self.write("int ");
+      }
+
+      asts::VariableTypes::Int => {
+        self.write("int ");
+      }
+
+      asts::VariableTypes::Strings => {
+        self.write("char* ");
+      }
+
+      asts::VariableTypes::Void => {
+        self.write("void ");
+      }
+
+      _ => {
+        //error
+      }
+    }
+
+    self.write(&fun.name);
+    self.write("(");
+
+    for arg in &fun.argument {
+      match arg {
+        asts::Types::Number(num) => {
+          
+        }
+
+        _ => {
+          //error
+        }
+      }
+    }
   }
 }
