@@ -124,7 +124,7 @@ impl Compile {
     self.write(&fun.name);
     self.write("(");
 
-    for arg in &fun.argument {
+    for (i, arg) in fun.argument.iter().enumerate() {
       match arg {
         asts::Types::Variable(vars) => {
           match &vars.types {
@@ -158,7 +158,6 @@ impl Compile {
               //error
             }
           }
-
           self.write(&vars.name);
         }
         _ => {
@@ -166,12 +165,15 @@ impl Compile {
         }
       }
 
-      self.write(")\n");
-      self.write("{\n");
-      self.inner_name = Some(fun.name.clone());
-      self.scope(&fun.node);
-      self.write("}\n");
+      if i != fun.argument.len() - 1 {
+        self.write(",");
+      }
     }
+    self.write(")\n");
+    self.write("{\n");
+    self.inner_name = Some(fun.name.clone());
+    self.scope(&fun.node);
+    self.write("}\n");
   }
 
   pub(crate) fn return_write(&mut self, rets: &asts::RetrunAST, function_name: &str) {

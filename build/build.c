@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-int function(int n)
+int function(int n,int a)
 {
 char tmp[3] = "\0";
 snprintf(tmp, 3, "%d",n<3);
@@ -28,5 +28,7 @@ printf("%s\n", "for!");
 
 printf("%s\n", "hello world");
 printf("%s\n", atoi(aa)? "true": "false");
+int c=function(number,1);
+printf("%d\n", atoi(c));
   return 0;
 }

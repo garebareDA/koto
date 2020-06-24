@@ -150,28 +150,32 @@ impl Compile {
           call_var.push_str(");");
           self.write(&call_var);
         } else {
-          /*
-          TODO function
-          関数の返り値の型を調べる
-          それをvariablesにpush
-          */
           match self.function.sertch_type(&call.callee) {
             Some(t) => {
               let mut call_var = "".to_string();
               match t {
                 asts::VariableTypes::Strings => {
+                  let types = Types::new(var_name,  &asts::VariableTypes::Strings);
+                  self.variable.push(&types);
+
                   call_var.push_str("char ");
                   call_var.push_str(var_name);
                   call_var.push_str("[] =");
                 }
 
                 asts::VariableTypes::Bool => {
+                  let types = Types::new(var_name,  &asts::VariableTypes::Int);
+                  self.variable.push(&types);
+
                   call_var.push_str("int ");
                   call_var.push_str(var_name);
                   call_var.push_str("=");
                 }
 
                 asts::VariableTypes::Int => {
+                  let types = Types::new(var_name,  &asts::VariableTypes::Int);
+                  self.variable.push(&types);
+
                   call_var.push_str("int ");
                   call_var.push_str(var_name);
                   call_var.push_str("=");
@@ -183,7 +187,8 @@ impl Compile {
               call_var.push_str(&call.callee);
               call_var.push_str("(");
               self.write(&call_var);
-              call_var.push_str(")");
+              self.argment_write(call.argument);
+              self.write(");");
             }
 
             None => {
@@ -199,7 +204,7 @@ impl Compile {
   }
 
   fn argment_write(&mut self, argment:Vec<asts::Types>) {
-    for arg in argment {
+    for (i,arg) in argment.iter().enumerate(){
       match arg {
         asts::Types::Variable(var) => {
           self.write(&var.name);
@@ -222,12 +227,18 @@ impl Compile {
         }
 
         asts::Types::Call(call) => {
-          
+          self.call_write(&call);
+          self.write(";\n");
         }
+
         _ => {
           //error
         }
       }
+      if i != argment.len() - 1{
+        self.write(",");
+      }
+
     }
   }
 }
