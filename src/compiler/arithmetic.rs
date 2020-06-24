@@ -90,7 +90,14 @@ impl Compile {
     self.write(&format!("\"{}\",", &formats.formats));
     self.write(&formats.strings);
     self.write(")");
-    println!("{:?}", formats);
+
+    let reg = Regex::new(r"[><]").expect("Faild");
+    match reg.captures(&formats.strings) {
+      Some(_) => {
+        return asts::VariableTypes::Bool;
+      }
+      _ => {}
+    }
 
     let reg = Regex::new(r"[a-zA-Z]+").expect("Faild");
     match reg.captures(&formats.strings) {
@@ -143,6 +150,8 @@ impl Compile {
       }
 
       asts::Types::Binary(bin) => {
+        let bin_len = bin.node.len();
+        let bin_more = 2;
         match types {
           asts::VariableTypes::Strings => {
             if bin.op == '+' {
@@ -153,6 +162,17 @@ impl Compile {
           }
           asts::VariableTypes::Int => {
             foramts.strings.push_str(&bin.op.to_string());
+            if bin_len == bin_more {
+              match bin.node[1].clone() {
+                asts::Types::Binary(bin) => {
+                  foramts.strings.push_str(&bin.op.to_string());
+                }
+
+                _ => {
+                  //error
+                }
+              }
+            }
           }
           _ => {
             //error
@@ -162,7 +182,11 @@ impl Compile {
           return;
         }
 
-        self.calcuration_write(&bin.node[0], foramts, types);
+        if bin_len == bin_more {
+          self.calcuration_write(&bin.node[1], foramts, types);
+        }else{
+          self.calcuration_write(&bin.node[0], foramts, types);
+        }
         return;
       }
 
@@ -180,11 +204,26 @@ impl Compile {
                 self.calcuration_write(&vars.node[0], foramts, &asts::VariableTypes::Strings);
               }
               asts::VariableTypes::Int => {
-                foramts.strings.push_str(&format!("{}", vars.name));
+                foramts.strings.push_str(&vars.name);
                 if vars.node.is_empty() {
                   return;
                 }
                 self.calcuration_write(&vars.node[0], foramts, &asts::VariableTypes::Int);
+              }
+              asts::VariableTypes::Bool => {
+                let is_stings = foramts.strings.chars().nth(foramts.strings.len() - 1).unwrap();
+                if is_stings  == '+'{
+                  foramts.formats.push_str("%s");
+                  foramts.strings.remove(foramts.strings.len() - 1);
+                  foramts.strings.push_str(&format!(",atoi({})? \"true\": \"false\"", vars.name));
+                }else{
+                  foramts.strings.push_str(&format!("atoi({})", &vars.name));
+                }
+
+                if vars.node.is_empty() {
+                  return;
+                }
+                self.calcuration_write(&vars.node[0], foramts, &asts::VariableTypes::Bool);
               }
 
               _ => {
