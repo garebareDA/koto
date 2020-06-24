@@ -3,6 +3,7 @@ use koto::interpreter;
 use std::env;
 
 use std::process::{Command, Stdio};
+//関数の書き込みをなんとかする
 
 fn main() {
     let args: Vec<String> = env::args().collect();

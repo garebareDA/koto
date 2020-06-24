@@ -76,6 +76,7 @@ impl Compile {
 
       asts::Types::Call(fun) => {
         self.call_write(fun);
+        self.write(";\n");
       }
 
       asts::Types::If(ifs) => {

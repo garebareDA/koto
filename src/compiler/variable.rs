@@ -155,10 +155,78 @@ impl Compile {
           関数の返り値の型を調べる
           それをvariablesにpush
           */
+          match self.function.sertch_type(&call.callee) {
+            Some(t) => {
+              let mut call_var = "".to_string();
+              match t {
+                asts::VariableTypes::Strings => {
+                  call_var.push_str("char ");
+                  call_var.push_str(var_name);
+                  call_var.push_str("[] =");
+                }
+
+                asts::VariableTypes::Bool => {
+                  call_var.push_str("int ");
+                  call_var.push_str(var_name);
+                  call_var.push_str("=");
+                }
+
+                asts::VariableTypes::Int => {
+                  call_var.push_str("int ");
+                  call_var.push_str(var_name);
+                  call_var.push_str("=");
+                }
+                _ => {
+                  //error
+                }
+              }
+              call_var.push_str(&call.callee);
+              call_var.push_str("(");
+              self.write(&call_var);
+              call_var.push_str(")");
+            }
+
+            None => {
+              //error
+            }
+          }
         }
       }
       _ => {
         //error
+      }
+    }
+  }
+
+  fn argment_write(&mut self, argment:Vec<asts::Types>) {
+    for arg in argment {
+      match arg {
+        asts::Types::Variable(var) => {
+          self.write(&var.name);
+        }
+
+        asts::Types::Strings(strings) => {
+          self.write(&format!("\"{}\"", strings.name));
+        }
+
+        asts::Types::Number(num) => {
+          self.write(&num.val.to_string());
+        }
+
+        asts::Types::Boolean(bools) => {
+          if bools.boolean{
+            self.write("1");
+          }else{
+            self.write("0");
+          }
+        }
+
+        asts::Types::Call(call) => {
+          
+        }
+        _ => {
+          //error
+        }
       }
     }
   }
