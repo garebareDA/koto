@@ -175,10 +175,7 @@ impl Compile {
                   foramts.strings.push_str(&bin.op.to_string());
                 }
 
-                _ => {
-                  let err = error::Error::new(node);
-                  err.exit("caliculation binay error");
-                }
+                _ => {}
               }
             }
           }

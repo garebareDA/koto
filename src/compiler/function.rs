@@ -345,4 +345,67 @@ impl Compile {
 
     self.write(";\n");
   }
+
+  pub(crate) fn argment_write(&mut self, argment: &Vec<asts::Types>, callee: &str) {
+    if argment.len() == 0 {
+      return;
+    }
+
+    let call_types = self.function.sertch_type(callee);
+    let type_array = call_types.1;
+
+    for (i, arg) in argment.iter().enumerate() {
+      let _param_types = &type_array[i];
+      match arg {
+        asts::Types::Variable(var) => {
+          match self.variable.sertch_type(&var.name).0 {
+            Some(t) => match t {
+              _param_types => {}
+
+              _ => {
+                let err = error::Error::new(arg);
+                err.exit("argment type error");
+              }
+            },
+
+            None => {
+              let err = error::Error::new(arg);
+              err.exit("argment type error");
+            }
+          }
+          self.write(&var.name);
+        }
+
+        asts::Types::Strings(strings) => {
+          self.write(&format!("\"{}\"", strings.name));
+        }
+
+        asts::Types::Number(num) => {
+          self.write(&num.val.to_string());
+        }
+
+        asts::Types::Boolean(bools) => {
+          if bools.boolean {
+            self.write("1");
+          } else {
+            self.write("0");
+          }
+        }
+
+        asts::Types::Call(call) => {
+          self.call_write(&call);
+          self.write(";\n");
+        }
+
+        _ => {
+          let err = error::Error::new(arg);
+          err.exit("argment error");
+        }
+      }
+
+      if i != argment.len() - 1 {
+        self.write(",");
+      }
+    }
+  }
 }

@@ -15,9 +15,9 @@ char string[] = "a";
 int number = 1;
 int bools = 0;
 char aa[14] = "\0";
-snprintf(aa, 14, "%d",number+1+1<1*1);
-char tpm1[15] = "\0";
-snprintf(tpm1, 15, "%d",number<atoi(aa));
+snprintf(aa, 14, "%d",number+1+1+1*1);
+char tpm1[9] = "\0";
+snprintf(tpm1, 9, "%d%s",number,aa);
 if(atoi(tpm1)){
 printf("%s\n", "if!");
 }
@@ -29,10 +29,8 @@ char tpm2[5] = "\0";
 snprintf(tpm2, 5, "%d",1<0+6);
 if(atoi(tpm2)){
 }
-
 printf("%s\n", "hello world");
-printf("%s\n", atoi(aa)? "true": "false");
+printf("%s\n", aa);
 int c = function(number,1);
 printf("%d\n", c);
-  return 0;
-}
+int vector[5] = {1,2,3,4,5,});

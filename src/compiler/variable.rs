@@ -6,7 +6,7 @@ use super::to_c::Compile;
 pub struct Types {
   name: String,
   types: asts::VariableTypes,
-  change:bool,
+  change: bool,
   array: Vec<asts::VariableTypes>,
 }
 
@@ -15,7 +15,7 @@ impl Types {
     Types {
       name: name.to_string(),
       types: types.clone(),
-      change:false,
+      change: false,
       array: Vec::new(),
     }
   }
@@ -35,7 +35,7 @@ impl Types {
   pub fn change(&mut self) {
     if self.change {
       self.change = false;
-    }else{
+    } else {
       self.change = true;
     }
   }
@@ -68,13 +68,13 @@ impl Vriables {
     self.in_var();
   }
 
-  pub fn push(&mut self, var: &Types) -> usize{
+  pub fn push(&mut self, var: &Types) -> usize {
     self.variables[self.inner].push(var.clone());
     let address = self.variables.len() - 1;
     return address;
   }
 
-  pub fn appo_push(&mut self,vec:usize,var: &Types) {
+  pub fn appo_push(&mut self, vec: usize, var: &Types) {
     self.variables[self.inner][vec] = var.clone();
   }
 
@@ -93,7 +93,10 @@ impl Vriables {
     self.variables.len() - 1
   }
 
-  pub fn sertch_type(&self, name: &str) -> (Option<asts::VariableTypes>, Vec<asts::VariableTypes>, bool) {
+  pub fn sertch_type(
+    &self,
+    name: &str,
+  ) -> (Option<asts::VariableTypes>, Vec<asts::VariableTypes>, bool) {
     let mut vars_vec = self.variables.clone();
     vars_vec.reverse();
     for vars in vars_vec {
@@ -110,7 +113,8 @@ impl Vriables {
 impl Compile {
   pub(crate) fn variable_wirte(&mut self, var: &asts::VariableAST) {
     let var_name = &var.name;
-    match var.node[0].clone() {
+
+    match &var.node[0] {
       asts::Types::Binary(bin) => {
         let types = self.calcuration(&bin, var_name);
         self.write(";");
@@ -217,10 +221,9 @@ impl Compile {
               call_var.push_str(&call.callee);
               call_var.push_str("(");
               self.write(&call_var);
-              self.argment_write(call.argument, &call.callee);
+              self.argment_write(&call.argument, &call.callee);
               self.write(");");
             }
-
             None => {
               let err = error::Error::new(&var.node[0].clone());
               err.exit("error variable");
@@ -228,6 +231,40 @@ impl Compile {
           }
         }
       }
+
+      asts::Types::Vector(vecs) => {
+        match &vecs.node[0] {
+          asts::Types::Strings(_) => {
+            self.write(&format!("char {}[][{}] = ", var_name, vecs.node.len()));
+            let types = Types::new(var_name, &asts::VariableTypes::Strings);
+            self.variable.push(&types);
+            self.array_write(&vecs.node, &asts::VariableTypes::Strings);
+            self.write(");");
+          }
+
+          asts::Types::Number(_) => {
+            self.write(&format!("int {}[{}] = ", var_name, vecs.node.len()));
+            let types = Types::new(var_name, &asts::VariableTypes::Strings);
+            self.variable.push(&types);
+            self.array_write(&vecs.node, &asts::VariableTypes::Int);
+            self.write(");");
+          }
+
+          asts::Types::Boolean(_) => {
+            self.write(&format!("int {}[{}] = ", var_name, vecs.node.len()));
+            let types = Types::new(var_name, &asts::VariableTypes::Strings);
+            self.variable.push(&types);
+            self.array_write(&vecs.node, &asts::VariableTypes::Bool);
+            self.write(");");
+          }
+
+          _ => {
+            let err = error::Error::new(&vecs.node[0]);
+            err.exit("Vecter error");
+          }
+        }
+      }
+
       _ => {
         let err = error::Error::new(&var.node[0].clone());
         err.exit("error variable");
@@ -235,66 +272,56 @@ impl Compile {
     }
   }
 
-  fn argment_write(&mut self, argment: Vec<asts::Types>, callee: &str) {
-    if argment.len() == 0 {
-      return;
-    }
+  fn array_write(&mut self, arry: &Vec<asts::Types>, types: &asts::VariableTypes) {
+    self.write("{");
+    for (i, arr) in arry.iter().enumerate() {
+      match arr {
+        asts::Types::Strings(strings) => match types {
+          asts::VariableTypes::Strings => {
+            self.write(&format!("\"{}\"", strings.name));
+          }
 
-    let call_types = self.function.sertch_type(callee);
-    let type_array = call_types.1;
+          _ => {
+            let err = error::Error::new(arr);
+            err.exit("type error");
+          }
+        },
 
-    for (i, arg) in argment.iter().enumerate() {
-      let _param_types = &type_array[i];
-      match arg {
-        asts::Types::Variable(var) => {
-          match self.variable.sertch_type(&var.name).0 {
-            Some(t) => match t {
-              _param_types => {}
+        asts::Types::Number(num) => match types {
+          asts::VariableTypes::Int => {
+            self.write(&num.val.to_string());
+          }
 
-              _ => {
-                let err = error::Error::new(arg);
-                err.exit("argment type error");
-              }
-            },
+          _ => {
+            let err = error::Error::new(arr);
+            err.exit("type error");
+          }
+        },
 
-            None => {
-              let err = error::Error::new(arg);
-              err.exit("argment type error");
+        asts::Types::Boolean(bools) => match types {
+          asts::VariableTypes::Int => {
+            if bools.boolean {
+              self.write("1");
+            } else {
+              self.write("0");
             }
           }
-          self.write(&var.name);
-        }
 
-        asts::Types::Strings(strings) => {
-          self.write(&format!("\"{}\"", strings.name));
-        }
-
-        asts::Types::Number(num) => {
-          self.write(&num.val.to_string());
-        }
-
-        asts::Types::Boolean(bools) => {
-          if bools.boolean {
-            self.write("1");
-          } else {
-            self.write("0");
+          _ => {
+            let err = error::Error::new(arr);
+            err.exit("type error");
           }
-        }
-
-        asts::Types::Call(call) => {
-          self.call_write(&call);
-          self.write(";\n");
-        }
-
+        },
         _ => {
-          let err = error::Error::new(arg);
-          err.exit("argment error");
+          let err = error::Error::new(arr);
+          err.exit("arry error");
         }
       }
 
-      if i != argment.len() - 1 {
+      if i != arry.len() {
         self.write(",");
       }
     }
+    self.write("}");
   }
 }
