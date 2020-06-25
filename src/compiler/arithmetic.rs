@@ -2,6 +2,7 @@ use regex::Regex;
 
 use super::super::ast::asts;
 use super::to_c::Compile;
+use super::super::interpreter::error;
 
 #[derive(Debug, Clone)]
 struct Format {
@@ -43,7 +44,8 @@ impl Compile {
         if op == "+" {
           formats.strings.push_str(",");
         } else {
-          //error
+          let err = error::Error::new(node);
+          err.exit("caliculation error");
         }
 
         self.calcuration_write(in_node, &mut formats, &asts::VariableTypes::Strings);
@@ -60,7 +62,8 @@ impl Compile {
                 if op == "+" {
                   formats.strings.push_str(",");
                 } else {
-                  //error
+                  let err = error::Error::new(node);
+                  err.exit("string binary error");
                 }
                 self.calcuration_write(in_node, &mut formats, &asts::VariableTypes::Strings);
               }
@@ -72,12 +75,14 @@ impl Compile {
               }
 
               _ => {
-                //error
+                let err = error::Error::new(node);
+                err.exit("caliculation error");
               }
             }
           }
           None => {
-            //error
+            let err = error::Error::new(node);
+            err.exit("caliculation error");
           }
         }
       }
@@ -158,7 +163,8 @@ impl Compile {
             if bin.op == '+' {
               foramts.strings.push_str(",");
             } else {
-              //error
+              let err = error::Error::new(node);
+              err.exit("caliculation binary error");
             }
           }
           asts::VariableTypes::Int => {
@@ -170,13 +176,15 @@ impl Compile {
                 }
 
                 _ => {
-                  //error
+                  let err = error::Error::new(node);
+                  err.exit("caliculation binay error");
                 }
               }
             }
           }
           _ => {
-            //error
+            let err = error::Error::new(node);
+            err.exit("caliculation error");
           }
         }
         if bin.node.is_empty() {
@@ -229,12 +237,14 @@ impl Compile {
               }
 
               _ => {
-                //error
+                let err = error::Error::new(node);
+                err.exit("variable calucuration error");
               }
             }
           }
           None => {
-            //error
+            let err = error::Error::new(node);
+            err.exit("calucuration error");
           }
         }
         return;
