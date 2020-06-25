@@ -115,6 +115,37 @@ impl Compile {
     let var_name = &var.name;
 
     match &var.node[0] {
+      asts::Types::Variable(var) => match &var.index {
+        Some(i) => {
+          let sertch_type = self.variable.sertch_type(&var.name).0;
+          match sertch_type {
+            Some(t) => {
+              let mut var_tmp = self.type_write(&t, &var_name, &asts::Types::Variable(var.clone()));
+              var_tmp.push_str(&var.name);
+              var_tmp.push_str("[");
+              match &i[0] {
+                asts::Types::Number(num) => {
+                  var_tmp.push_str(&num.val.to_string());
+                }
+
+                _ => {
+                  let err = error::Error::new(&var.node[0]);
+                  err.exit("variable error");
+                }
+              }
+              self.write(&var_tmp);
+              self.write("];");
+            }
+
+            None => {
+              let err = error::Error::new(&var.node[0]);
+              err.exit("variable error");
+            }
+          }
+        }
+
+        None => {}
+      },
       asts::Types::Binary(bin) => {
         let types = self.calcuration(&bin, var_name);
         self.write(";");
@@ -185,39 +216,7 @@ impl Compile {
           let types = self.function.sertch_type(&call.callee).0;
           match types {
             Some(t) => {
-              let mut call_var = "".to_string();
-              match t {
-                asts::VariableTypes::Strings => {
-                  let types = Types::new(var_name, &asts::VariableTypes::Strings);
-                  self.variable.push(&types);
-
-                  call_var.push_str("char ");
-                  call_var.push_str(var_name);
-                  call_var.push_str("[] =");
-                }
-
-                asts::VariableTypes::Bool => {
-                  let types = Types::new(var_name, &asts::VariableTypes::Bool);
-                  self.variable.push(&types);
-
-                  call_var.push_str("int ");
-                  call_var.push_str(var_name);
-                  call_var.push_str("=");
-                }
-
-                asts::VariableTypes::Int => {
-                  let types = Types::new(var_name, &asts::VariableTypes::Int);
-                  self.variable.push(&types);
-
-                  call_var.push_str("int ");
-                  call_var.push_str(var_name);
-                  call_var.push_str(" = ");
-                }
-                _ => {
-                  let err = error::Error::new(&var.node[0].clone());
-                  err.exit("error variable");
-                }
-              }
+              let mut call_var = self.type_write(&t, &var_name, &asts::Types::Call(call.clone()));
               call_var.push_str(&call.callee);
               call_var.push_str("(");
               self.write(&call_var);
@@ -232,38 +231,36 @@ impl Compile {
         }
       }
 
-      asts::Types::Vector(vecs) => {
-        match &vecs.node[0] {
-          asts::Types::Strings(_) => {
-            self.write(&format!("char {}[][{}] = ", var_name, vecs.node.len()));
-            let types = Types::new(var_name, &asts::VariableTypes::Strings);
-            self.variable.push(&types);
-            self.array_write(&vecs.node, &asts::VariableTypes::Strings);
-            self.write(");");
-          }
-
-          asts::Types::Number(_) => {
-            self.write(&format!("int {}[{}] = ", var_name, vecs.node.len()));
-            let types = Types::new(var_name, &asts::VariableTypes::Strings);
-            self.variable.push(&types);
-            self.array_write(&vecs.node, &asts::VariableTypes::Int);
-            self.write(");");
-          }
-
-          asts::Types::Boolean(_) => {
-            self.write(&format!("int {}[{}] = ", var_name, vecs.node.len()));
-            let types = Types::new(var_name, &asts::VariableTypes::Strings);
-            self.variable.push(&types);
-            self.array_write(&vecs.node, &asts::VariableTypes::Bool);
-            self.write(");");
-          }
-
-          _ => {
-            let err = error::Error::new(&vecs.node[0]);
-            err.exit("Vecter error");
-          }
+      asts::Types::Vector(vecs) => match &vecs.node[0] {
+        asts::Types::Strings(_) => {
+          self.write(&format!("char {}[][{}] = ", var_name, vecs.node.len()));
+          let types = Types::new(var_name, &asts::VariableTypes::Strings);
+          self.variable.push(&types);
+          self.array_write(&vecs.node, &asts::VariableTypes::Strings);
+          self.write(";");
         }
-      }
+
+        asts::Types::Number(_) => {
+          self.write(&format!("int {}[{}] = ", var_name, vecs.node.len()));
+          let types = Types::new(var_name, &asts::VariableTypes::Int);
+          self.variable.push(&types);
+          self.array_write(&vecs.node, &asts::VariableTypes::Int);
+          self.write(";");
+        }
+
+        asts::Types::Boolean(_) => {
+          self.write(&format!("int {}[{}] = ", var_name, vecs.node.len()));
+          let types = Types::new(var_name, &asts::VariableTypes::Bool);
+          self.variable.push(&types);
+          self.array_write(&vecs.node, &asts::VariableTypes::Bool);
+          self.write(";");
+        }
+
+        _ => {
+          let err = error::Error::new(&vecs.node[0]);
+          err.exit("Vecter error");
+        }
+      },
 
       _ => {
         let err = error::Error::new(&var.node[0].clone());
@@ -323,5 +320,43 @@ impl Compile {
       }
     }
     self.write("}");
+  }
+
+  fn type_write(&mut self, t: &asts::VariableTypes, var_name: &str, node: &asts::Types) -> String {
+    let mut types_str = "".to_string();
+    match t {
+      asts::VariableTypes::Strings => {
+        let types = Types::new(var_name, &asts::VariableTypes::Strings);
+        self.variable.push(&types);
+
+        types_str.push_str("char ");
+        types_str.push_str(var_name);
+        types_str.push_str("[] =");
+      }
+
+      asts::VariableTypes::Bool => {
+        let types = Types::new(var_name, &asts::VariableTypes::Bool);
+        self.variable.push(&types);
+
+        types_str.push_str("int ");
+        types_str.push_str(var_name);
+        types_str.push_str("=");
+      }
+
+      asts::VariableTypes::Int => {
+        let types = Types::new(var_name, &asts::VariableTypes::Int);
+        self.variable.push(&types);
+
+        types_str.push_str("int ");
+        types_str.push_str(var_name);
+        types_str.push_str(" = ");
+      }
+      _ => {
+        let err = error::Error::new(&node);
+        err.exit("error variable");
+      }
+    }
+
+    return types_str;
   }
 }
