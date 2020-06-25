@@ -229,7 +229,8 @@ impl Compile {
         }
       }
       _ => {
-        //error
+        let err = error::Error::new(&var.node[0].clone());
+        err.exit("error variable");
       }
     }
   }
