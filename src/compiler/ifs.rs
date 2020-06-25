@@ -8,12 +8,14 @@ impl Compile {
 
     match &judg.judge[0] {
       asts::Types::Binary(bin) => {
-        self.calcuration(&bin, "tmp");
-        self.write(";\nif(atoi(tmp))");
+        let tmp = &format!("tpm{}", self.tmp);
+        self.calcuration(&bin, tmp);
+        self.write(&format!(";\nif(atoi({}))", tmp));
+        self.tmp += 1;
       }
 
       asts::Types::Variable(vars) => {
-        let (sertch_types,_) = self.variable.sertch_type(&vars.name);
+        let (sertch_types, _, change) = self.variable.sertch_type(&vars.name);
         match sertch_types {
           Some(t) => match t {
             asts::VariableTypes::Strings => {
@@ -21,7 +23,11 @@ impl Compile {
             }
 
             _ => {
-              self.write(&format!("\nif(itoa({})", vars.name));
+              if change {
+                self.write(&format!("\nif(itoa({})", vars.name));
+              }else {
+                self.write(&format!("\nif({})", vars.name));
+              }
             }
           },
           _ => {

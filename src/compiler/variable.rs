@@ -6,6 +6,7 @@ use super::to_c::Compile;
 pub struct Types {
   name: String,
   types: asts::VariableTypes,
+  change:bool,
   array: Vec<asts::VariableTypes>,
 }
 
@@ -14,6 +15,7 @@ impl Types {
     Types {
       name: name.to_string(),
       types: types.clone(),
+      change:false,
       array: Vec::new(),
     }
   }
@@ -28,6 +30,14 @@ impl Types {
 
   pub fn array_push(&mut self, param: &asts::VariableTypes) {
     self.array.push(param.clone());
+  }
+
+  pub fn change(&mut self) {
+    if self.change {
+      self.change = false;
+    }else{
+      self.change = true;
+    }
   }
 }
 
@@ -58,8 +68,14 @@ impl Vriables {
     self.in_var();
   }
 
-  pub fn push(&mut self, var: &Types) {
+  pub fn push(&mut self, var: &Types) -> usize{
     self.variables[self.inner].push(var.clone());
+    let address = self.variables.len() - 1;
+    return address;
+  }
+
+  pub fn appo_push(&mut self,vec:usize,var: &Types) {
+    self.variables[self.inner][vec] = var.clone();
   }
 
   fn in_var(&mut self) {
@@ -73,17 +89,21 @@ impl Vriables {
     self.inner -= 1;
   }
 
-  pub fn sertch_type(&self, name: &str) -> (Option<asts::VariableTypes>, Vec<asts::VariableTypes>) {
+  pub fn get_len(&self) -> usize {
+    self.variables.len() - 1
+  }
+
+  pub fn sertch_type(&self, name: &str) -> (Option<asts::VariableTypes>, Vec<asts::VariableTypes>, bool) {
     let mut vars_vec = self.variables.clone();
     vars_vec.reverse();
     for vars in vars_vec {
       for var in vars {
         if var.name == name {
-          return (Some(var.types), var.array);
+          return (Some(var.types), var.array, var.change);
         }
       }
     }
-    return (None, Vec::new());
+    return (None, Vec::new(), false);
   }
 }
 
@@ -95,7 +115,8 @@ impl Compile {
         let types = self.calcuration(&bin, var_name);
         self.write(";");
 
-        let types = Types::new(var_name, &types);
+        let mut types = Types::new(var_name, &types);
+        types.change();
         self.variable.push(&types);
       }
 
@@ -157,7 +178,7 @@ impl Compile {
           call_var.push_str(");");
           self.write(&call_var);
         } else {
-          let (types, _) = self.function.sertch_type(&call.callee);
+          let types = self.function.sertch_type(&call.callee).0;
           match types {
             Some(t) => {
               let mut call_var = "".to_string();

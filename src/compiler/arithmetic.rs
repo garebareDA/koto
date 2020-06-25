@@ -50,7 +50,7 @@ impl Compile {
       }
 
       asts::Types::Variable(vars) => {
-        let (sertch_type, _) = self.variable.sertch_type(&vars.name);
+        let sertch_type= self.variable.sertch_type(&vars.name).0;
         match sertch_type {
           Some(t) => {
             match t {
@@ -192,7 +192,7 @@ impl Compile {
       }
 
       asts::Types::Variable(vars) => {
-        let (sertch_type, _) = self.variable.sertch_type(&vars.name);
+        let sertch_type = self.variable.sertch_type(&vars.name).0;
         match sertch_type {
           Some(t) => {
             match t {

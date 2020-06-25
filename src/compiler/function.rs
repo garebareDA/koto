@@ -13,18 +13,27 @@ impl Compile {
       match value {
         asts::Types::Variable(var) => {
           let mut values = "".to_string();
-          let (sertch_type, _) = self.variable.sertch_type(&var.name);
+          let (sertch_type, _, change) = self.variable.sertch_type(&var.name);
           match sertch_type{
             Some(types) => match types {
               asts::VariableTypes::Bool => {
                 values.push_str("%s\\n\", ");
-                values.push_str(&format!("atoi({})", &var.name));
+                if change {
+                  values.push_str(&format!("atoi({})", &var.name));
+                }else{
+                  values.push_str(&format!("{}", &var.name));
+                }
+
                 values.push_str("? \"true\": \"false\"");
               }
 
               asts::VariableTypes::Int => {
                 values.push_str("%d\\n\", ");
-                values.push_str(&format!("atoi({})", &var.name));
+                if change {
+                  values.push_str(&format!("atoi({})", &var.name));
+                }else{
+                  values.push_str(&format!("{}", &var.name));
+                }
               }
 
               asts::VariableTypes::Strings => {
@@ -80,8 +89,9 @@ impl Compile {
             self.variable.vec_push();
 
             let mut types = Types::new(&funs.name, &f);
+            let addr = self.function.push(&types);
             self.functions(&f, &funs, &mut types);
-            self.function.push(&types);
+            self.function.appo_push(addr, &types);
 
             self.variable.last_remove();
           }
@@ -90,8 +100,9 @@ impl Compile {
             self.variable.vec_push();
 
             let mut types = Types::new(&funs.name, &asts::VariableTypes::Void);
+            let addr = self.function.push(&types);
             self.functions(&asts::VariableTypes::Void, &funs, &mut types);
-            self.function.push(&types);
+            self.function.appo_push(addr, &types);
 
             self.variable.last_remove();
           }
@@ -193,7 +204,7 @@ impl Compile {
       return;
     }
 
-    let (types, _) = self.function.sertch_type(function_name);
+    let types = self.function.sertch_type(function_name).0;
     match &rets.node[0] {
       asts::Types::Binary(bin) => {
         self.calcuration(&bin, "tmp");
@@ -261,10 +272,10 @@ impl Compile {
       },
 
       asts::Types::Variable(vars) => {
-        let serch_types = self.variable.sertch_type(&vars.name);
+        let serch_types = self.variable.sertch_type(&vars.name).0;
         match &types {
           Some(t) => match t {
-            asts::VariableTypes::Bool => match serch_types.0.unwrap() {
+            asts::VariableTypes::Bool => match serch_types.unwrap() {
               asts::VariableTypes::Bool => {
                 self.write(&vars.name);
               }
@@ -275,7 +286,7 @@ impl Compile {
               }
             },
 
-            asts::VariableTypes::Int => match serch_types.0.unwrap() {
+            asts::VariableTypes::Int => match serch_types.unwrap() {
               asts::VariableTypes::Int => {
                 self.write(&vars.name);
               }
@@ -286,7 +297,7 @@ impl Compile {
               }
             },
 
-            asts::VariableTypes::Strings => match serch_types.0.unwrap() {
+            asts::VariableTypes::Strings => match serch_types.unwrap() {
               asts::VariableTypes::Strings => {
                 self.write(&vars.name);
               }

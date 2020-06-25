@@ -9,6 +9,7 @@ pub struct Compile {
   pub file: std::fs::File,
   pub variable: variable::Vriables,
   pub function: variable::Vriables,
+  pub tmp:usize,
   pub inner_name: Option<String>
 }
 
@@ -22,6 +23,7 @@ impl Compile {
       file: file,
       variable: vairables,
       function: function,
+      tmp:0,
       inner_name: None,
     }
   }
