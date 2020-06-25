@@ -1,4 +1,5 @@
 use super::super::ast::asts;
+use super::super::interpreter::error;
 use super::to_c::Compile;
 
 impl Compile {
@@ -25,19 +26,21 @@ impl Compile {
             _ => {
               if change {
                 self.write(&format!("\nif(itoa({})", vars.name));
-              }else {
+              } else {
                 self.write(&format!("\nif({})", vars.name));
               }
             }
           },
           _ => {
-            //error
+            let err = error::Error::new(&judg.judge[0]);
+            err.exit("if error");
           }
         }
       }
 
       _ => {
-        //error
+        let err = error::Error::new(&judg.judge[0]);
+        err.exit("if error");
       }
     }
 
