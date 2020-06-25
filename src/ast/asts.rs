@@ -150,7 +150,7 @@ impl FunctionAST {
             self.return_type = Some(VariableTypes::Bool);
         }else {
             let err = error::Error::new(tokens);
-            err.exit("Type is missing");
+            err.exit(&format!("Type is missing: {}", types));
         }
     }
 }
@@ -185,7 +185,7 @@ impl VariableAST {
             self.types = Some(VariableTypes::Bool);
         }else {
             let err = error::Error::new(tokens);
-            err.exit("Type is missing");
+            err.exit(&format!("Type is missing: {}", types));
         }
     }
 }

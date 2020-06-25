@@ -13,7 +13,8 @@ impl Compile {
       }
 
       asts::Types::Variable(vars) => {
-        match self.variable.sertch_type(&vars.name) {
+        let (sertch_types,_) = self.variable.sertch_type(&vars.name);
+        match sertch_types {
           Some(t) => match t {
             asts::VariableTypes::Strings => {
               self.write(&vars.name);

@@ -1,4 +1,5 @@
 use super::super::ast::asts;
+use super::super::interpreter::error;
 use super::to_c::Compile;
 use super::variable::Types;
 
@@ -12,7 +13,8 @@ impl Compile {
       match value {
         asts::Types::Variable(var) => {
           let mut values = "".to_string();
-          match self.variable.sertch_type(&var.name) {
+          let (sertch_type, _) = self.variable.sertch_type(&var.name);
+          match sertch_type{
             Some(types) => match types {
               asts::VariableTypes::Bool => {
                 values.push_str("%s\\n\", ");
@@ -31,12 +33,14 @@ impl Compile {
               }
 
               _ => {
-                //TODO err
+                let err = error::Error::new(value);
+                err.exit("argment error");
               }
             },
 
             None => {
-              //TODO error
+              let err = error::Error::new(value);
+              err.exit("argment error");
             }
           }
           self.write(&values);
@@ -75,9 +79,9 @@ impl Compile {
           Some(f) => {
             self.variable.vec_push();
 
-            let types = Types::new(&funs.name, &f);
+            let mut types = Types::new(&funs.name, &f);
+            self.functions(&f, &funs, &mut types);
             self.function.push(&types);
-            self.functions(&f, &funs);
 
             self.variable.last_remove();
           }
@@ -85,9 +89,9 @@ impl Compile {
           None => {
             self.variable.vec_push();
 
-            let types = Types::new(&funs.name, &asts::VariableTypes::Void);
+            let mut types = Types::new(&funs.name, &asts::VariableTypes::Void);
+            self.functions(&asts::VariableTypes::Void, &funs, &mut types);
             self.function.push(&types);
-            self.functions(&asts::VariableTypes::Void, &funs);
 
             self.variable.last_remove();
           }
@@ -98,7 +102,7 @@ impl Compile {
     }
   }
 
-  fn functions(&mut self, types: &asts::VariableTypes, fun: &asts::FunctionAST) {
+  fn functions(&mut self, types: &asts::VariableTypes, fun: &asts::FunctionAST, param: &mut Types) {
     match types {
       asts::VariableTypes::Bool => {
         self.write("int ");
@@ -117,7 +121,8 @@ impl Compile {
       }
 
       _ => {
-        //error
+        let err = error::Error::new(&asts::Types::Function(fun.clone()));
+        err.exit("function error");
       }
     }
 
@@ -128,40 +133,44 @@ impl Compile {
       match arg {
         asts::Types::Variable(vars) => {
           match &vars.types {
-            Some(t) => {
-              match t {
-                asts::VariableTypes::Strings => {
-                  let types = Types::new(&vars.name, &asts::VariableTypes::Strings);
-                  self.variable.push(&types);
-                  self.write("char *");
-                }
-
-                asts::VariableTypes::Bool => {
-                  let types = Types::new(&vars.name, &asts::VariableTypes::Int);
-                  self.variable.push(&types);
-                  self.write("int ");
-                }
-
-                asts::VariableTypes::Int => {
-                  let types = Types::new(&vars.name, &asts::VariableTypes::Int);
-                  self.variable.push(&types);
-                  self.write("int ");
-                }
-
-                _ => {
-                  //error
-                }
+            Some(t) => match t {
+              asts::VariableTypes::Strings => {
+                let types = Types::new(&vars.name, &asts::VariableTypes::Strings);
+                self.variable.push(&types);
+                self.write("char *");
+                param.array_push(&asts::VariableTypes::Strings);
               }
-            }
+
+              asts::VariableTypes::Bool => {
+                let types = Types::new(&vars.name, &asts::VariableTypes::Bool);
+                self.variable.push(&types);
+                self.write("int ");
+                param.array_push(&asts::VariableTypes::Bool);
+              }
+
+              asts::VariableTypes::Int => {
+                let types = Types::new(&vars.name, &asts::VariableTypes::Int);
+                self.variable.push(&types);
+                self.write("int ");
+                param.array_push(&asts::VariableTypes::Int);
+              }
+
+              _ => {
+                let err = error::Error::new(arg);
+                err.exit("param error");
+              }
+            },
 
             None => {
-              //error
+              let err = error::Error::new(arg);
+              err.exit("param error");
             }
           }
           self.write(&vars.name);
         }
         _ => {
-          //error
+          let err = error::Error::new(arg);
+          err.exit("param error");
         }
       }
 
@@ -184,7 +193,7 @@ impl Compile {
       return;
     }
 
-    let types = self.function.sertch_type(function_name);
+    let (types, _) = self.function.sertch_type(function_name);
     match &rets.node[0] {
       asts::Types::Binary(bin) => {
         self.calcuration(&bin, "tmp");
@@ -203,12 +212,14 @@ impl Compile {
             }
 
             _ => {
-              //error
+              let err = error::Error::new(&rets.node[0]);
+              err.exit("return binary error");
             }
           },
 
           None => {
-            //error
+            let err = error::Error::new(&rets.node[0]);
+            err.exit("return binary error");
           }
         }
       }
@@ -223,11 +234,13 @@ impl Compile {
             }
           }
           _ => {
-            //error
+            let err = error::Error::new(&rets.node[0]);
+            err.exit("return bool error");
           }
         },
         None => {
-          //error
+          let err = error::Error::new(&rets.node[0]);
+          err.exit("return bool error");
         }
       },
 
@@ -237,63 +250,62 @@ impl Compile {
             self.write(&strings.name);
           }
           _ => {
-            //error
+            let err = error::Error::new(&rets.node[0]);
+            err.exit("return string error");
           }
         },
         None => {
-          //error
+          let err = error::Error::new(&rets.node[0]);
+          err.exit("return string error");
         }
       },
 
       asts::Types::Variable(vars) => {
         let serch_types = self.variable.sertch_type(&vars.name);
         match &types {
-          Some(t) => {
-            match t {
+          Some(t) => match t {
+            asts::VariableTypes::Bool => match serch_types.0.unwrap() {
               asts::VariableTypes::Bool => {
-                match serch_types.unwrap() {
-                  asts::VariableTypes::Bool => {
-                    self.write(&vars.name);
-                  }
-
-                  _ => {
-                    //error
-                  }
-                }
-              }
-
-              asts::VariableTypes::Int => {
-                match serch_types.unwrap() {
-                  asts::VariableTypes::Int => {
-                    self.write(&vars.name);
-                  }
-
-                  _ => {
-                    //error
-                  }
-                }
-              }
-
-              asts::VariableTypes::Strings => {
-                match serch_types.unwrap() {
-                  asts::VariableTypes::Strings => {
-                    self.write(&vars.name);
-                  }
-
-                  _ => {
-                    //error
-                  }
-                }
+                self.write(&vars.name);
               }
 
               _ => {
-                //error
+                let err = error::Error::new(&rets.node[0]);
+                err.exit("return variable error");
               }
+            },
+
+            asts::VariableTypes::Int => match serch_types.0.unwrap() {
+              asts::VariableTypes::Int => {
+                self.write(&vars.name);
+              }
+
+              _ => {
+                let err = error::Error::new(&rets.node[0]);
+                err.exit("return variable error");
+              }
+            },
+
+            asts::VariableTypes::Strings => match serch_types.0.unwrap() {
+              asts::VariableTypes::Strings => {
+                self.write(&vars.name);
+              }
+
+              _ => {
+                let err = error::Error::new(&rets.node[0]);
+                err.exit("return variable error");
+              }
+            },
+
+            _ => {
+              let err = error::Error::new(&rets.node[0]);
+              err.exit("return variable error");
             }
-          }
+          },
 
           None => {
-            //error
+            let err = error::Error::new(&rets.node[0]);
+            err.exit("return variable error");
           }
         }
       }
@@ -304,16 +316,19 @@ impl Compile {
             self.write(&num.val.to_string());
           }
           _ => {
-            //error
+            let err = error::Error::new(&rets.node[0]);
+            err.exit("return number error");
           }
         },
         None => {
-          //error
+          let err = error::Error::new(&rets.node[0]);
+          err.exit("return number error");
         }
       },
 
       _ => {
-        //error
+        let err = error::Error::new(&rets.node[0]);
+        err.exit("return number error");
       }
     }
 

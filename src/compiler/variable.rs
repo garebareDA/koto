@@ -1,10 +1,12 @@
 use super::super::ast::asts;
+use super::super::interpreter::error;
 use super::to_c::Compile;
 
 #[derive(Debug, Clone)]
 pub struct Types {
   name: String,
   types: asts::VariableTypes,
+  array: Vec<asts::VariableTypes>,
 }
 
 impl Types {
@@ -12,6 +14,7 @@ impl Types {
     Types {
       name: name.to_string(),
       types: types.clone(),
+      array: Vec::new(),
     }
   }
 
@@ -21,6 +24,10 @@ impl Types {
 
   pub fn get_type(&self) -> &asts::VariableTypes {
     &self.types
+  }
+
+  pub fn array_push(&mut self, param: &asts::VariableTypes) {
+    self.array.push(param.clone());
   }
 }
 
@@ -66,17 +73,17 @@ impl Vriables {
     self.inner -= 1;
   }
 
-  pub fn sertch_type(&self, name: &str) -> Option<asts::VariableTypes> {
+  pub fn sertch_type(&self, name: &str) -> (Option<asts::VariableTypes>, Vec<asts::VariableTypes>) {
     let mut vars_vec = self.variables.clone();
     vars_vec.reverse();
     for vars in vars_vec {
       for var in vars {
         if var.name == name {
-          return Some(var.types);
+          return (Some(var.types), var.array);
         }
       }
     }
-    return None;
+    return (None, Vec::new());
   }
 }
 
@@ -150,12 +157,13 @@ impl Compile {
           call_var.push_str(");");
           self.write(&call_var);
         } else {
-          match self.function.sertch_type(&call.callee) {
+          let (types, _) = self.function.sertch_type(&call.callee);
+          match types {
             Some(t) => {
               let mut call_var = "".to_string();
               match t {
                 asts::VariableTypes::Strings => {
-                  let types = Types::new(var_name,  &asts::VariableTypes::Strings);
+                  let types = Types::new(var_name, &asts::VariableTypes::Strings);
                   self.variable.push(&types);
 
                   call_var.push_str("char ");
@@ -164,7 +172,7 @@ impl Compile {
                 }
 
                 asts::VariableTypes::Bool => {
-                  let types = Types::new(var_name,  &asts::VariableTypes::Int);
+                  let types = Types::new(var_name, &asts::VariableTypes::Bool);
                   self.variable.push(&types);
 
                   call_var.push_str("int ");
@@ -173,26 +181,28 @@ impl Compile {
                 }
 
                 asts::VariableTypes::Int => {
-                  let types = Types::new(var_name,  &asts::VariableTypes::Int);
+                  let types = Types::new(var_name, &asts::VariableTypes::Int);
                   self.variable.push(&types);
 
                   call_var.push_str("int ");
                   call_var.push_str(var_name);
-                  call_var.push_str("=");
+                  call_var.push_str(" = ");
                 }
                 _ => {
-                  //error
+                  let err = error::Error::new(&var.node[0].clone());
+                  err.exit("error variable");
                 }
               }
               call_var.push_str(&call.callee);
               call_var.push_str("(");
               self.write(&call_var);
-              self.argment_write(call.argument);
+              self.argment_write(call.argument, &call.callee);
               self.write(");");
             }
 
             None => {
-              //error
+              let err = error::Error::new(&var.node[0].clone());
+              err.exit("error variable");
             }
           }
         }
@@ -203,10 +213,33 @@ impl Compile {
     }
   }
 
-  fn argment_write(&mut self, argment:Vec<asts::Types>) {
-    for (i,arg) in argment.iter().enumerate(){
+  fn argment_write(&mut self, argment: Vec<asts::Types>, callee: &str) {
+    if argment.len() == 0 {
+      return;
+    }
+
+    let call_types = self.function.sertch_type(callee);
+    let type_array = call_types.1;
+
+    for (i, arg) in argment.iter().enumerate() {
+      let _param_types = &type_array[i];
       match arg {
         asts::Types::Variable(var) => {
+          match self.variable.sertch_type(&var.name).0 {
+            Some(t) => match t {
+              _param_types => {}
+
+              _ => {
+                let err = error::Error::new(arg);
+                err.exit("argment type error");
+              }
+            },
+
+            None => {
+              let err = error::Error::new(arg);
+              err.exit("argment type error");
+            }
+          }
           self.write(&var.name);
         }
 
@@ -219,9 +252,9 @@ impl Compile {
         }
 
         asts::Types::Boolean(bools) => {
-          if bools.boolean{
+          if bools.boolean {
             self.write("1");
-          }else{
+          } else {
             self.write("0");
           }
         }
@@ -232,13 +265,14 @@ impl Compile {
         }
 
         _ => {
-          //error
+          let err = error::Error::new(arg);
+          err.exit("argment error");
         }
       }
-      if i != argment.len() - 1{
+
+      if i != argment.len() - 1 {
         self.write(",");
       }
-
     }
   }
 }
