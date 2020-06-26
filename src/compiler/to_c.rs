@@ -40,7 +40,7 @@ impl Compile {
   pub fn compile(&mut self, root: asts::ExprAST) {
     self.write("#include <stdio.h>\n");
     self.write("#include <stdlib.h>\n");
-    self.function_write(&root.node);
+    self.function_write(&root.node, "");
     self.write("int main() {\n");
     let mut index = 0;
     let len = root.node.len();

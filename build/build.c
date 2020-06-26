@@ -1,5 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
+int import_hoge_function(int n)
+{
+int tpm0 = n<3;;
+if(atoi(tpm0)){
+return 1;
+}
+int b = ;;
+return b;
+}
+void import_hoge_a()
+{
+printf("%s\n", "hello");
+}
 int main() {
 int number = 1;
 char string[34] = "\0";
@@ -16,5 +29,3 @@ result = cal;
 printf("%d\n", result);
 for(int i = 0;i>5;i++)
 {
-
-printf("

@@ -1,4 +1,5 @@
 use super::super::ast::asts;
+use super::super::interpreter;
 use super::super::interpreter::error;
 use super::to_c::Compile;
 use super::variable::Types;
@@ -14,13 +15,13 @@ impl Compile {
         asts::Types::Variable(var) => {
           let mut values = "".to_string();
           let (sertch_type, _, change) = self.variable.sertch_type(&var.name);
-          match sertch_type{
+          match sertch_type {
             Some(types) => match types {
               asts::VariableTypes::Bool => {
                 values.push_str("%s\\n\", ");
                 if change {
                   values.push_str(&format!("atoi({})", &var.name));
-                }else{
+                } else {
                   values.push_str(&format!("{}", &var.name));
                 }
 
@@ -31,7 +32,7 @@ impl Compile {
                 values.push_str("%d\\n\", ");
                 if change {
                   values.push_str(&format!("atoi({})", &var.name));
-                }else{
+                } else {
                   values.push_str(&format!("{}", &var.name));
                 }
               }
@@ -74,7 +75,7 @@ impl Compile {
     }
   }
 
-  pub(crate) fn function_write(&mut self, nodes: &Vec<asts::Types>) {
+  pub(crate) fn function_write(&mut self, nodes: &Vec<asts::Types>, is_import: &str) {
     let mut index = 0;
     let len = nodes.len();
     loop {
@@ -84,26 +85,50 @@ impl Compile {
 
       let node = nodes[index].clone();
       match node {
+        asts::Types::Import(imports) => match &imports.path[0] {
+          asts::Types::Strings(strings) => {
+            self.variable.vec_push();
+            let result = interpreter::interpreters::read_file(&strings.name);
+            let name: Vec<&str> = strings.name.split('.').collect();
+            let name: Vec<&str> = name[name.len() - 2].split('/').collect();
+            self.function_write(&result.node, &name[name.len() - 1]);
+            self.variable.last_remove();
+          }
+          _ => {}
+        },
+
         asts::Types::Function(funs) => match &funs.return_type {
           Some(f) => {
             self.variable.vec_push();
-
-            let mut types = Types::new(&funs.name, &f);
-            let addr = self.function.push(&types);
-            self.functions(&f, &funs, &mut types);
-            self.function.appo_push(addr, &types);
-
+            if is_import == "" {
+              let mut types = Types::new(&funs.name, &f);
+              let addr = self.function.push(&types);
+              self.functions(&f, &funs, &mut types, &funs.name);
+              self.function.appo_push(addr, &types);
+            } else {
+              let funs_name = &format!("import_{}_{}", is_import, funs.name);
+              let mut types = Types::new(funs_name, &f);
+              let addr = self.function.push(&types);
+              self.functions(&f, &funs, &mut types, funs_name);
+              self.function.appo_push(addr, &types);
+            }
             self.variable.last_remove();
           }
 
           None => {
             self.variable.vec_push();
-
-            let mut types = Types::new(&funs.name, &asts::VariableTypes::Void);
-            let addr = self.function.push(&types);
-            self.functions(&asts::VariableTypes::Void, &funs, &mut types);
-            self.function.appo_push(addr, &types);
-
+            if is_import == "" {
+              let mut types = Types::new(&funs.name, &asts::VariableTypes::Void);
+              let addr = self.function.push(&types);
+              self.functions(&asts::VariableTypes::Void, &funs, &mut types, &funs.name);
+              self.function.appo_push(addr, &types);
+            } else {
+              let funs_name = &format!("import_{}_{}", is_import, funs.name);
+              let mut types = Types::new(funs_name, &asts::VariableTypes::Void);
+              let addr = self.function.push(&types);
+              self.functions(&asts::VariableTypes::Void, &funs, &mut types, funs_name);
+              self.function.appo_push(addr, &types);
+            }
             self.variable.last_remove();
           }
         },
@@ -113,7 +138,13 @@ impl Compile {
     }
   }
 
-  fn functions(&mut self, types: &asts::VariableTypes, fun: &asts::FunctionAST, param: &mut Types) {
+  fn functions(
+    &mut self,
+    types: &asts::VariableTypes,
+    fun: &asts::FunctionAST,
+    param: &mut Types,
+    fun_name: &str,
+  ) {
     match types {
       asts::VariableTypes::Bool => {
         self.write("int ");
@@ -137,7 +168,7 @@ impl Compile {
       }
     }
 
-    self.write(&fun.name);
+    self.write(fun_name);
     self.write("(");
 
     for (i, arg) in fun.argument.iter().enumerate() {
@@ -191,7 +222,7 @@ impl Compile {
     }
     self.write(")\n");
     self.write("{\n");
-    self.inner_name = Some(fun.name.clone());
+    self.inner_name = Some(fun_name.to_string());
     self.scope(&fun.node);
     self.write("}\n");
   }
@@ -339,7 +370,7 @@ impl Compile {
 
       _ => {
         let err = error::Error::new(&rets.node[0]);
-        err.exit("return number error");
+        err.exit("return error");
       }
     }
 
@@ -405,6 +436,30 @@ impl Compile {
 
       if i != argment.len() - 1 {
         self.write(",");
+      }
+    }
+  }
+
+  pub(crate) fn var_call_write(
+    &mut self,
+    call: &asts::CallAST,
+    var_name: &str,
+    call_name: &str,
+    var: &asts::VariableAST,
+  ) {
+    let types = self.function.sertch_type(call_name).0;
+    match types {
+      Some(t) => {
+        let mut call_var = self.type_write(&t, &var_name, &asts::Types::Call(call.clone()));
+        call_var.push_str(call_name);
+        call_var.push_str("(");
+        self.write(&call_var);
+        self.argment_write(&call.argument, call_name);
+        self.write(");");
+      }
+      None => {
+        let err = error::Error::new(&var.node[0].clone());
+        err.exit("error function or variable");
       }
     }
   }

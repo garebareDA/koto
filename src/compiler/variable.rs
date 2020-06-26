@@ -131,6 +131,28 @@ impl Compile {
               err.exit("variable error");
             }
           }
+        } else {
+          match &var.node[0] {
+            asts::Types::Binary(bin) => {
+              if bin.op == '.' {
+                match &bin.node[0] {
+                  asts::Types::Call(call) => {
+                    let call_name = &format!("impot_{}_{}", var.name, call.callee);
+                    println!("{}", call_name);
+                    self.var_call_write(call, var_name, call_name, var);
+                  }
+
+                  _ => {}
+                }
+              } else {
+                let err = error::Error::new(&var.node[0]);
+                err.exit("variable error");
+              }
+            }
+
+            _ => {}
+          }
+          return;
         }
 
         match &var.index {
@@ -169,6 +191,7 @@ impl Compile {
         }
       }
       asts::Types::Binary(bin) => {
+        //変数の再代入
         if bin.op == '=' {
           self.resubstitution(var_name, &bin, var);
           return;
@@ -245,21 +268,8 @@ impl Compile {
           call_var.push_str(");");
           self.write(&call_var);
         } else {
-          let types = self.function.sertch_type(&call.callee).0;
-          match types {
-            Some(t) => {
-              let mut call_var = self.type_write(&t, &var_name, &asts::Types::Call(call.clone()));
-              call_var.push_str(&call.callee);
-              call_var.push_str("(");
-              self.write(&call_var);
-              self.argment_write(&call.argument, &call.callee);
-              self.write(");");
-            }
-            None => {
-              let err = error::Error::new(&var.node[0].clone());
-              err.exit("error variable");
-            }
-          }
+          //callの書き込み
+          self.var_call_write(call, var_name, &call.callee, var);
         }
       }
 
@@ -354,7 +364,12 @@ impl Compile {
     self.write("}");
   }
 
-  fn type_write(&mut self, t: &asts::VariableTypes, var_name: &str, node: &asts::Types) -> String {
+  pub(crate) fn type_write(
+    &mut self,
+    t: &asts::VariableTypes,
+    var_name: &str,
+    node: &asts::Types,
+  ) -> String {
     let mut types_str = "".to_string();
     match t {
       asts::VariableTypes::Strings => {
@@ -424,4 +439,6 @@ impl Compile {
       }
     };
   }
+
+  fn import_function_write(&mut self) {}
 }
