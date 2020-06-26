@@ -116,6 +116,7 @@ impl Compile {
 
     match &var.node[0] {
       asts::Types::Variable(var) => {
+        println!("{:?}", var);
         if var.node.is_empty() {
           let serch_types = self.variable.sertch_type(&var.name).0;
           match serch_types {
