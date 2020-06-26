@@ -3,7 +3,7 @@
 int function(int n,int a)
 {
 int tpm0 = n<3;;
-if(atoi(tpm0)){
+if(tpm0){
 return 1;
 }
 int b = 1;
@@ -15,7 +15,7 @@ int number = 1;
 int bools = 0;
 int aa = number+1+1+1*1;;
 int tpm1 = number<aa;;
-if(atoi(tpm1)){
+if(tpm1){
 printf("%s\n", "if!");
 }
 for(int a = 1;a<5;a++)
@@ -23,7 +23,7 @@ for(int a = 1;a<5;a++)
 printf("%s\n", "for!");
 }
 int tpm2 = 1<0+6;;
-if(atoi(tpm2)){
+if(tpm2){
 }
 printf("%s\n", "hello world");
 printf("%d\n", aa);

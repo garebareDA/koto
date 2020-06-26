@@ -10,8 +10,14 @@ impl Compile {
     match &judg.judge[0] {
       asts::Types::Binary(bin) => {
         let tmp = &format!("tpm{}", self.tmp);
-        self.calcuration(&bin, tmp);
-        self.write(&format!(";\nif(atoi({}))", tmp));
+        match self.calcuration(&bin, tmp){
+          asts::VariableTypes::Strings => {
+            self.write(&format!(";\nif(atoi({}))", tmp));
+          }
+          _ => {
+            self.write(&format!(";\nif({})", tmp));
+          }
+        }
         self.tmp += 1;
       }
 

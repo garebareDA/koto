@@ -118,6 +118,40 @@ impl Compile {
     let var_name = &var.name;
     match &var.node[0] {
       asts::Types::Variable(var) => {
+        match &var.index {
+          Some(i) => {
+            let sertch_type = self.variable.sertch_type(&var.name).0;
+            match sertch_type {
+              Some(t) => {
+                let mut var_tmp =
+                  self.type_write(&t, &var_name, &asts::Types::Variable(var.clone()));
+                var_tmp.push_str(&var.name);
+                var_tmp.push_str("[");
+                match &i[0] {
+                  asts::Types::Number(num) => {
+                    var_tmp.push_str(&num.val.to_string());
+                  }
+
+                  _ => {
+                    let err = error::Error::new(&var.node[0]);
+                    err.exit("variable error");
+                  }
+                }
+                self.write(&var_tmp);
+                self.write("];");
+                return;
+              }
+
+              None => {
+                let err = error::Error::new(&var.node[0]);
+                err.exit("variable error");
+              }
+            }
+            return;
+          }
+
+          None => {}
+        }
         if var.node.is_empty() {
           let serch_types = self.variable.sertch_type(&var.name).0;
           match serch_types {
@@ -154,40 +188,6 @@ impl Compile {
             _ => {}
           }
           return;
-        }
-
-        match &var.index {
-          Some(i) => {
-            let sertch_type = self.variable.sertch_type(&var.name).0;
-            match sertch_type {
-              Some(t) => {
-                let mut var_tmp =
-                  self.type_write(&t, &var_name, &asts::Types::Variable(var.clone()));
-                var_tmp.push_str(&var.name);
-                var_tmp.push_str("[");
-                match &i[0] {
-                  asts::Types::Number(num) => {
-                    var_tmp.push_str(&num.val.to_string());
-                  }
-
-                  _ => {
-                    let err = error::Error::new(&var.node[0]);
-                    err.exit("variable error");
-                  }
-                }
-                self.write(&var_tmp);
-                self.write("];");
-              }
-
-              None => {
-                let err = error::Error::new(&var.node[0]);
-                err.exit("variable error");
-              }
-            }
-            return;
-          }
-
-          None => {}
         }
       }
       asts::Types::Binary(bin) => {
