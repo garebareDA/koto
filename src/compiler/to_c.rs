@@ -12,7 +12,8 @@ pub struct Compile {
   pub variable: variable::Vriables,
   pub function: variable::Vriables,
   pub tmp:usize,
-  pub inner_name: Option<String>
+  pub inner_name: Option<String>,
+  pub import: String,
 }
 
 impl Compile {
@@ -27,7 +28,12 @@ impl Compile {
       function: function,
       tmp:0,
       inner_name: None,
+      import: "".to_string(),
     }
+  }
+
+  pub fn to_import(&mut self, import:&str) {
+    self.import = import.to_string();
   }
 
   pub fn write(&mut self, string: &str) {
@@ -40,7 +46,7 @@ impl Compile {
   pub fn compile(&mut self, root: asts::ExprAST) {
     self.write("#include <stdio.h>\n");
     self.write("#include <stdlib.h>\n");
-    self.function_write(&root.node, "");
+    self.function_write(&root.node);
     self.write("int main() {\n");
     let mut index = 0;
     let len = root.node.len();

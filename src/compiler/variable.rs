@@ -116,7 +116,6 @@ impl Vriables {
 impl Compile {
   pub(crate) fn variable_wirte(&mut self, var: &asts::VariableAST) {
     let var_name = &var.name;
-
     match &var.node[0] {
       asts::Types::Variable(var) => {
         if var.node.is_empty() {
@@ -185,7 +184,6 @@ impl Compile {
                 err.exit("variable error");
               }
             }
-
             return;
           }
 

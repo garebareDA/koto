@@ -75,7 +75,7 @@ impl Compile {
     }
   }
 
-  pub(crate) fn function_write(&mut self, nodes: &Vec<asts::Types>, is_import: &str) {
+  pub(crate) fn function_write(&mut self, nodes: &Vec<asts::Types>) {
     let mut index = 0;
     let len = nodes.len();
     loop {
@@ -90,8 +90,10 @@ impl Compile {
             let result = interpreter::interpreters::read_file(&strings.name);
             let name: Vec<&str> = strings.name.split('.').collect();
             let name: Vec<&str> = name[name.len() - 2].split('/').collect();
-            self.function_write(&result.node, &name[name.len() - 1]);
+            self.to_import(&name[2]);
+            self.function_write(&result.node);
             self.variable.last_remove();
+            self.to_import("");
           }
           _ => {}
         },
@@ -99,13 +101,13 @@ impl Compile {
         asts::Types::Function(funs) => match &funs.return_type {
           Some(f) => {
             self.variable.vec_push();
-            if is_import == "" {
+            if self.import == "" {
               let mut types = Types::new(&funs.name, &f);
               let addr = self.function.push(&types);
               self.functions(&f, &funs, &mut types, &funs.name);
               self.function.appo_push(addr, &types);
             } else {
-              let funs_name = &format!("import_{}_{}", is_import, funs.name);
+              let funs_name = &format!("import_{}_{}",  self.import, funs.name);
               let mut types = Types::new(funs_name, &f);
               let addr = self.function.push(&types);
               self.functions(&f, &funs, &mut types, funs_name);
@@ -117,13 +119,13 @@ impl Compile {
 
           None => {
             self.variable.vec_push();
-            if is_import == "" {
+            if  self.import == "" {
               let mut types = Types::new(&funs.name, &asts::VariableTypes::Void);
               let addr = self.function.push(&types);
               self.functions(&asts::VariableTypes::Void, &funs, &mut types, &funs.name);
               self.function.appo_push(addr, &types);
             } else {
-              let funs_name = &format!("import_{}_{}", is_import, funs.name);
+              let funs_name = &format!("import_{}_{}",  self.import, funs.name);
               let mut types = Types::new(funs_name, &asts::VariableTypes::Void);
               let addr = self.function.push(&types);
               self.functions(&asts::VariableTypes::Void, &funs, &mut types, funs_name);
@@ -447,7 +449,13 @@ impl Compile {
     call_name: &str,
     var: &asts::VariableAST,
   ) {
-    let types = self.function.sertch_type(call_name).0;
+    let mut types:Option<asts::VariableTypes> = None;
+    if self.import != ""{
+      let call_name = &format!("import_{}_{}", self.import, call_name);
+      types = self.function.sertch_type(call_name).0;
+    }else {
+      types = self.function.sertch_type(call_name).0;
+    }
     match types {
       Some(t) => {
         let mut call_var = self.type_write(&t, &var_name, &asts::Types::Call(call.clone()));
