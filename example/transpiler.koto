@@ -1,0 +1,36 @@
+#As much as the Transpiler supports
+let string = "a";
+let number = 1;
+let bools = false;
+let aa = number + 1 + 1 + 1 * 1 ;
+
+if number < aa {
+  print("if!")
+}
+
+for let a = 1; a < 5; a++; {
+  print("for!");
+}
+
+if 1 < 0 + 6 {
+
+}
+
+print("hello world");
+print(aa);
+
+let c = function(number, 1);
+print(c);
+
+let vector = vec[1, 2, 3, 4, 5];
+let v = vector[2];
+print(v);
+
+fn function(n:int, a:int)-> int {
+    if n < 3 {
+        return 1;
+    }
+
+    let b = 1;
+    return b;
+}
