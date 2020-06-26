@@ -75,6 +75,10 @@ impl Compile {
         self.calcuration_write(in_node, &mut formats, &asts::VariableTypes::Strings);
       }
 
+      asts::Types::Function(funs) => {
+        //時間があれば
+      }
+
       asts::Types::Variable(vars) => {
         let sertch_type= self.variable.sertch_type(&vars.name).0;
         match sertch_type {

@@ -439,6 +439,4 @@ impl Compile {
       }
     };
   }
-
-  fn import_function_write(&mut self) {}
 }
