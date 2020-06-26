@@ -1,5 +1,6 @@
 use super::to_c::Compile;
 use super::super::ast::asts;
+use super::super::interpreter::error;
 
 impl Compile {
   pub(crate) fn fors_write(&mut self, fors: &asts::ForAST){
@@ -18,7 +19,8 @@ impl Compile {
       }
 
       _ => {
-        //error
+        let err = error::Error::new(variant);
+        err.exit("for init error");
       }
     }
 
@@ -29,7 +31,8 @@ impl Compile {
       }
 
       _ => {
-        //error
+        let err = error::Error::new(variant);
+        err.exit("for init error");
       }
     }
 
@@ -39,7 +42,8 @@ impl Compile {
       }
 
       _ => {
-        //error
+        let err = error::Error::new(loop_for);
+        err.exit("loop error");
       }
     }
 
@@ -82,7 +86,8 @@ impl Compile {
       }
 
       _ => {
-        //error
+        let err = error::Error::new( &node[0]);
+        err.exit("judge error");
       }
     }
 
@@ -109,7 +114,8 @@ impl Compile {
         }
 
         _ => {
-          //error
+          let err = error::Error::new( &node[1]);
+          err.exit("judge error");
         }
       }
     }

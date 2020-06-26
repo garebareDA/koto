@@ -1,7 +1,9 @@
 use super::super::ast::asts;
+use super::super::interpreter::error;
 use super::variable;
 use std::fs;
 use std::io::Write;
+
 
 //変数の関数の方を調べるために配列を用意する
 
@@ -9,7 +11,9 @@ pub struct Compile {
   pub file: std::fs::File,
   pub variable: variable::Vriables,
   pub function: variable::Vriables,
-  pub inner_name: Option<String>
+  pub tmp:usize,
+  pub inner_name: Option<String>,
+  pub import: String,
 }
 
 impl Compile {
@@ -22,8 +26,14 @@ impl Compile {
       file: file,
       variable: vairables,
       function: function,
+      tmp:0,
       inner_name: None,
+      import: "".to_string(),
     }
+  }
+
+  pub fn to_import(&mut self, import:&str) {
+    self.import = import.to_string();
   }
 
   pub fn write(&mut self, string: &str) {
@@ -72,6 +82,19 @@ impl Compile {
       asts::Types::Variable(var) => {
         self.variable_wirte(var);
         self.write("\n");
+      }
+
+      asts::Types::Binary(bin) => {
+        match &bin.node[0] {
+          asts::Types::Variable(vars) => {
+            self.calcuration(bin, &vars.name);
+            self.write("\n");
+          }
+          _ => {
+            let err = error::Error::new(node);
+            err.exit("type error");
+          }
+        }
       }
 
       asts::Types::Call(fun) => {

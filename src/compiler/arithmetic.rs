@@ -2,11 +2,13 @@ use regex::Regex;
 
 use super::super::ast::asts;
 use super::to_c::Compile;
+use super::super::interpreter::error;
 
 #[derive(Debug, Clone)]
 struct Format {
   formats: String,
   strings: String,
+  types:asts::VariableTypes,
 }
 
 impl Format {
@@ -14,7 +16,12 @@ impl Format {
     Format {
       formats: String::new(),
       strings: String::new(),
+      types: asts::VariableTypes::Int,
     }
+  }
+
+  pub fn into_string(&mut self) {
+    self.types = asts::VariableTypes::Strings;
   }
 }
 
@@ -28,6 +35,24 @@ impl Compile {
     let op = &bin.op.to_string();
     let node = &bin.node[0];
     let in_node = &bin.node[1];
+
+    match in_node {
+      asts::Types::Binary(bin) => {
+        if &bin.op.to_string() == op {
+          if op == "+" {
+            self.write(&format!("{}++;", var_name));
+          }else if op == "-"{
+            self.write(&format!("{}--;", var_name));
+          }else{
+            let err = error::Error::new(node);
+            err.exit("type error");
+          }
+
+          return asts::VariableTypes::Int;
+        }
+      }
+      _  => {}
+    }
 
     match node {
       asts::Types::Number(num) => {
@@ -43,14 +68,20 @@ impl Compile {
         if op == "+" {
           formats.strings.push_str(",");
         } else {
-          //error
+          let err = error::Error::new(node);
+          err.exit("caliculation error");
         }
 
         self.calcuration_write(in_node, &mut formats, &asts::VariableTypes::Strings);
       }
 
+      asts::Types::Function(funs) => {
+        //時間があれば
+      }
+
       asts::Types::Variable(vars) => {
-        match self.variable.sertch_type(&vars.name) {
+        let sertch_type= self.variable.sertch_type(&vars.name).0;
+        match sertch_type {
           Some(t) => {
             match t {
               asts::VariableTypes::Strings => {
@@ -59,7 +90,8 @@ impl Compile {
                 if op == "+" {
                   formats.strings.push_str(",");
                 } else {
-                  //error
+                  let err = error::Error::new(node);
+                  err.exit("string binary error");
                 }
                 self.calcuration_write(in_node, &mut formats, &asts::VariableTypes::Strings);
               }
@@ -71,12 +103,14 @@ impl Compile {
               }
 
               _ => {
-                //error
+                let err = error::Error::new(node);
+                err.exit("caliculation error");
               }
             }
           }
           None => {
-            //error
+            let err = error::Error::new(node);
+            err.exit("caliculation error");
           }
         }
       }
@@ -85,13 +119,30 @@ impl Compile {
     }
 
     let formats_len = formats.strings.len();
-    self.write(&format!("char {}[{}] = \"\\0\";\n", var_name, formats_len));
-    self.write(&format!("snprintf({}, {}, ", var_name, formats_len));
-    self.write(&format!("\"{}\",", &formats.formats));
-    self.write(&formats.strings);
-    self.write(")");
+    match formats.types {
+      asts::VariableTypes::Strings => {
+        self.write(&format!("char {}[{}] = \"\\0\";\n", var_name, formats_len));
+        self.write(&format!("snprintf({}, {}, ", var_name, formats_len));
+        self.write(&format!("\"{}\",", &formats.formats));
+        self.write(&formats.strings);
+        self.write(")");
+      }
 
-    let reg = Regex::new(r"[><]").expect("Faild");
+      asts::VariableTypes::Int => {
+        self.write(&format!("int {} = {};", var_name, &formats.strings));
+      }
+
+      asts::VariableTypes::Bool => {
+        self.write(&format!("int {} = {};", var_name, &formats.strings));
+      }
+      _ => {
+        let err = error::Error::new(node);
+        err.exit("caliculation error");
+      }
+    }
+
+
+    let reg = Regex::new(r"[><=!]").expect("Faild");
     match reg.captures(&formats.strings) {
       Some(_) => {
         return asts::VariableTypes::Bool;
@@ -99,7 +150,7 @@ impl Compile {
       _ => {}
     }
 
-    let reg = Regex::new(r"[a-zA-Z]+").expect("Faild");
+    let reg = Regex::new(r#"""#).expect("Faild");
     match reg.captures(&formats.strings) {
       Some(_) => {
         return asts::VariableTypes::Strings;
@@ -122,6 +173,7 @@ impl Compile {
         foramts.formats.push_str("%s");
         foramts.strings.remove(foramts.strings.len() - 1);
         foramts.strings.push_str(&format!(",\"{}\"", &strings.name));
+        foramts.into_string();
 
         if strings.node.is_empty() {
           return;
@@ -157,7 +209,8 @@ impl Compile {
             if bin.op == '+' {
               foramts.strings.push_str(",");
             } else {
-              //error
+              let err = error::Error::new(node);
+              err.exit("caliculation binary error");
             }
           }
           asts::VariableTypes::Int => {
@@ -168,14 +221,13 @@ impl Compile {
                   foramts.strings.push_str(&bin.op.to_string());
                 }
 
-                _ => {
-                  //error
-                }
+                _ => {}
               }
             }
           }
           _ => {
-            //error
+            let err = error::Error::new(node);
+            err.exit("caliculation error");
           }
         }
         if bin.node.is_empty() {
@@ -191,13 +243,15 @@ impl Compile {
       }
 
       asts::Types::Variable(vars) => {
-        match self.variable.sertch_type(&vars.name) {
+        let sertch_type = self.variable.sertch_type(&vars.name).0;
+        match sertch_type {
           Some(t) => {
             match t {
               asts::VariableTypes::Strings => {
                 foramts.formats.push_str("%s");
                 foramts.strings.remove(foramts.strings.len() - 1);
                 foramts.strings.push_str(&format!(",{}", vars.name));
+                foramts.into_string();
                 if vars.node.is_empty() {
                   return;
                 }
@@ -227,12 +281,14 @@ impl Compile {
               }
 
               _ => {
-                //error
+                let err = error::Error::new(node);
+                err.exit("variable calucuration error");
               }
             }
           }
           None => {
-            //error
+            let err = error::Error::new(node);
+            err.exit("calucuration error");
           }
         }
         return;

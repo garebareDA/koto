@@ -1,4 +1,5 @@
 use super::super::ast::asts;
+use super::super::interpreter::error;
 use super::to_c::Compile;
 
 impl Compile {
@@ -8,29 +9,44 @@ impl Compile {
 
     match &judg.judge[0] {
       asts::Types::Binary(bin) => {
-        self.calcuration(&bin, "tmp");
-        self.write(";\nif(atoi(tmp))");
+        let tmp = &format!("tpm{}", self.tmp);
+        match self.calcuration(&bin, tmp){
+          asts::VariableTypes::Strings => {
+            self.write(&format!(";\nif(atoi({}))", tmp));
+          }
+          _ => {
+            self.write(&format!(";\nif({})", tmp));
+          }
+        }
+        self.tmp += 1;
       }
 
       asts::Types::Variable(vars) => {
-        match self.variable.sertch_type(&vars.name) {
+        let (sertch_types, _, change) = self.variable.sertch_type(&vars.name);
+        match sertch_types {
           Some(t) => match t {
             asts::VariableTypes::Strings => {
               self.write(&vars.name);
             }
 
             _ => {
-              self.write(&format!("\nif(itoa({})", vars.name));
+              if change {
+                self.write(&format!("\nif(itoa({})", vars.name));
+              } else {
+                self.write(&format!("\nif({})", vars.name));
+              }
             }
           },
           _ => {
-            //error
+            let err = error::Error::new(&judg.judge[0]);
+            err.exit("if error");
           }
         }
       }
 
       _ => {
-        //error
+        let err = error::Error::new(&judg.judge[0]);
+        err.exit("if error");
       }
     }
 
