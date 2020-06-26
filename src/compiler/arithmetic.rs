@@ -91,27 +91,28 @@ impl Compile {
     }
 
     let formats_len = formats.strings.len();
-    self.write(&format!("char {}[{}] = \"\\0\";\n", var_name, formats_len));
-    self.write(&format!("snprintf({}, {}, ", var_name, formats_len));
-    self.write(&format!("\"{}\",", &formats.formats));
-    self.write(&formats.strings);
-    self.write(")");
-
     let reg = Regex::new(r"[><]").expect("Faild");
     match reg.captures(&formats.strings) {
       Some(_) => {
+        self.write(&format!("int {} = {};", var_name, &formats.strings));
         return asts::VariableTypes::Bool;
       }
       _ => {}
     }
 
-    let reg = Regex::new(r"[a-zA-Z]+").expect("Faild");
+    let reg = Regex::new(r#"""#).expect("Faild");
     match reg.captures(&formats.strings) {
       Some(_) => {
+        self.write(&format!("char {}[{}] = \"\\0\";\n", var_name, formats_len));
+        self.write(&format!("snprintf({}, {}, ", var_name, formats_len));
+        self.write(&format!("\"{}\",", &formats.formats));
+        self.write(&formats.strings);
+        self.write(")");
         return asts::VariableTypes::Strings;
       }
 
       _ => {
+        self.write(&format!("int {} = {};", var_name, &formats.strings));
         return asts::VariableTypes::Int;
       }
     }

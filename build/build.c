@@ -8,7 +8,6 @@ printf("%s\n", string);
 int vector[5] = {1,2,3,4,5,};
 int index = vector[1];
 printf("%d\n", index);
-char cal[14] = "\0";
-snprintf(cal, 14, "%d",number+1-1/2*5);
-printf("%s\n", cal);
-
+int cal = number+1-1/2*5;;
+printf("%d\n", cal);
+cal++;
