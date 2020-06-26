@@ -29,3 +29,4 @@ result = cal;
 printf("%d\n", result);
 for(int i = 0;i>5;i++)
 {
+int reslut = import_hoge_function(

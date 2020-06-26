@@ -82,7 +82,6 @@ impl Compile {
       if index >= len {
         break;
       }
-
       let node = nodes[index].clone();
       match node {
         asts::Types::Import(imports) => match &imports.path[0] {
@@ -104,7 +103,7 @@ impl Compile {
               let mut types = Types::new(&funs.name, &f);
               let addr = self.function.push(&types);
               self.functions(&f, &funs, &mut types, &funs.name);
-              self.function.appo_push(addr + 1, &types);
+              self.function.appo_push(addr, &types);
             } else {
               let funs_name = &format!("import_{}_{}", is_import, funs.name);
               let mut types = Types::new(funs_name, &f);
@@ -112,6 +111,7 @@ impl Compile {
               self.functions(&f, &funs, &mut types, funs_name);
               self.function.appo_push(addr, &types);
             }
+
             self.variable.last_remove();
           }
 

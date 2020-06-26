@@ -70,7 +70,7 @@ impl Vriables {
 
   pub fn push(&mut self, var: &Types) -> usize {
     self.variables[self.inner].push(var.clone());
-    let address = self.variables.len() - 1;
+    let address = self.variables[self.inner].len() - 1;
     return address;
   }
 
@@ -100,6 +100,9 @@ impl Vriables {
     let mut vars_vec = self.variables.clone();
     vars_vec.reverse();
     for vars in vars_vec {
+      if vars.is_empty() {
+        continue;
+      }
       for var in vars {
         if var.name == name {
           return (Some(var.types), var.array, var.change);
@@ -137,8 +140,7 @@ impl Compile {
               if bin.op == '.' {
                 match &bin.node[0] {
                   asts::Types::Call(call) => {
-                    let call_name = &format!("impot_{}_{}", var.name, call.callee);
-                    println!("{}", call_name);
+                    let call_name = &format!("import_{}_{}", var.name, call.callee);
                     self.var_call_write(call, var_name, call_name, var);
                   }
 
