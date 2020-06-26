@@ -116,7 +116,23 @@ impl Compile {
 
     match &var.node[0] {
       asts::Types::Variable(var) => {
-        
+        if var.node.is_empty() {
+          let serch_types = self.variable.sertch_type(&var.name).0;
+          match serch_types {
+            Some(t) => {
+              let var_str = self.type_write(&t, var_name, &asts::Types::Variable(var.clone()));
+              self.write(&var_str);
+              self.write(&var.name);
+              self.write(";");
+            }
+
+            None => {
+              let err = error::Error::new(&var.node[0]);
+              err.exit("variable error");
+            }
+          }
+        }
+
         match &var.index {
           Some(i) => {
             let sertch_type = self.variable.sertch_type(&var.name).0;
@@ -385,6 +401,7 @@ impl Compile {
             Some(_ts) => match t {
               _ts => {
                 self.write(&format!("{} = {}", var_name, vars.name));
+                self.write(";");
               }
             },
 
