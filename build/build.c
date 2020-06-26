@@ -9,5 +9,9 @@ int vector[5] = {1,2,3,4,5,};
 int index = vector[1];
 printf("%d\n", index);
 int cal = number+1-1/2*5;;
-printf("%d\n", cal);
 cal++;
+printf("%d\n", cal);
+
+int result = index;
+result = cal;
+print(result);

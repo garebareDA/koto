@@ -116,6 +116,7 @@ impl Compile {
 
     match &var.node[0] {
       asts::Types::Variable(var) => {
+        
         match &var.index {
           Some(i) => {
             let sertch_type = self.variable.sertch_type(&var.name).0;
@@ -150,22 +151,12 @@ impl Compile {
 
           None => {}
         }
-
-        if var.node.len() > 1 {
-          match &var.node[0] {
-            asts::Types::Binary(bin) => {
-              if bin.op == '+' {
-              } else if bin.op == '-' {
-              }
-            }
-            _ => {
-              let err = error::Error::new(&var.node[0]);
-              err.exit("variable error");
-            }
-          }
-        }
       }
       asts::Types::Binary(bin) => {
+        if bin.op == '=' {
+          self.resubstitution(var_name, &bin, var);
+        }
+
         let types_cal = self.calcuration(&bin, var_name);
         self.write(";");
         let mut types = Types::new(var_name, &types_cal);
@@ -382,5 +373,37 @@ impl Compile {
     }
 
     return types_str;
+  }
+
+  fn resubstitution(&mut self, var_name: &str, bin: &asts::BinaryAST, var: &asts::VariableAST) {
+    match &bin.node[1] {
+      asts::Types::Variable(vars) => {
+        let types = self.variable.sertch_type(&vars.name).0;
+        let types_var = self.variable.sertch_type(&var_name).0;
+        match types {
+          Some(t) => match types_var {
+            Some(_ts) => match t {
+              _ts => {
+                self.write(&format!("{} = {}", var_name, vars.name));
+              }
+            },
+
+            None => {
+              let err = error::Error::new(&var.node[0]);
+              err.exit("variable error");
+            }
+          },
+
+          None => {
+            let err = error::Error::new(&var.node[0]);
+            err.exit("variable error");
+          }
+        }
+      }
+      _ => {
+        let err = error::Error::new(&var.node[0]);
+        err.exit("variable error");
+      }
+    };
   }
 }

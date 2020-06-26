@@ -8,6 +8,7 @@ use super::super::interpreter::error;
 struct Format {
   formats: String,
   strings: String,
+  types:asts::VariableTypes,
 }
 
 impl Format {
@@ -15,7 +16,12 @@ impl Format {
     Format {
       formats: String::new(),
       strings: String::new(),
+      types: asts::VariableTypes::Int,
     }
+  }
+
+  pub fn into_string(&mut self) {
+    self.types = asts::VariableTypes::Strings;
   }
 }
 
@@ -29,6 +35,24 @@ impl Compile {
     let op = &bin.op.to_string();
     let node = &bin.node[0];
     let in_node = &bin.node[1];
+
+    match in_node {
+      asts::Types::Binary(bin) => {
+        if &bin.op.to_string() == op {
+          if op == "+" {
+            self.write(&format!("{}++;", var_name));
+          }else if op == "-"{
+            self.write(&format!("{}--;", var_name));
+          }else{
+            let err = error::Error::new(node);
+            err.exit("type error");
+          }
+
+          return asts::VariableTypes::Int;
+        }
+      }
+      _  => {}
+    }
 
     match node {
       asts::Types::Number(num) => {
@@ -91,10 +115,32 @@ impl Compile {
     }
 
     let formats_len = formats.strings.len();
-    let reg = Regex::new(r"[><]").expect("Faild");
+    match formats.types {
+      asts::VariableTypes::Strings => {
+        self.write(&format!("char {}[{}] = \"\\0\";\n", var_name, formats_len));
+        self.write(&format!("snprintf({}, {}, ", var_name, formats_len));
+        self.write(&format!("\"{}\",", &formats.formats));
+        self.write(&formats.strings);
+        self.write(")");
+      }
+
+      asts::VariableTypes::Int => {
+        self.write(&format!("int {} = {};", var_name, &formats.strings));
+      }
+
+      asts::VariableTypes::Bool => {
+        self.write(&format!("int {} = {};", var_name, &formats.strings));
+      }
+      _ => {
+        let err = error::Error::new(node);
+        err.exit("caliculation error");
+      }
+    }
+
+
+    let reg = Regex::new(r"[><=!]").expect("Faild");
     match reg.captures(&formats.strings) {
       Some(_) => {
-        self.write(&format!("int {} = {};", var_name, &formats.strings));
         return asts::VariableTypes::Bool;
       }
       _ => {}
@@ -103,16 +149,10 @@ impl Compile {
     let reg = Regex::new(r#"""#).expect("Faild");
     match reg.captures(&formats.strings) {
       Some(_) => {
-        self.write(&format!("char {}[{}] = \"\\0\";\n", var_name, formats_len));
-        self.write(&format!("snprintf({}, {}, ", var_name, formats_len));
-        self.write(&format!("\"{}\",", &formats.formats));
-        self.write(&formats.strings);
-        self.write(")");
         return asts::VariableTypes::Strings;
       }
 
       _ => {
-        self.write(&format!("int {} = {};", var_name, &formats.strings));
         return asts::VariableTypes::Int;
       }
     }
@@ -129,6 +169,7 @@ impl Compile {
         foramts.formats.push_str("%s");
         foramts.strings.remove(foramts.strings.len() - 1);
         foramts.strings.push_str(&format!(",\"{}\"", &strings.name));
+        foramts.into_string();
 
         if strings.node.is_empty() {
           return;
@@ -206,6 +247,7 @@ impl Compile {
                 foramts.formats.push_str("%s");
                 foramts.strings.remove(foramts.strings.len() - 1);
                 foramts.strings.push_str(&format!(",{}", vars.name));
+                foramts.into_string();
                 if vars.node.is_empty() {
                   return;
                 }

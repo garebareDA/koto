@@ -1,7 +1,9 @@
 use super::super::ast::asts;
+use super::super::interpreter::error;
 use super::variable;
 use std::fs;
 use std::io::Write;
+
 
 //変数の関数の方を調べるために配列を用意する
 
@@ -74,6 +76,19 @@ impl Compile {
       asts::Types::Variable(var) => {
         self.variable_wirte(var);
         self.write("\n");
+      }
+
+      asts::Types::Binary(bin) => {
+        match &bin.node[0] {
+          asts::Types::Variable(vars) => {
+            self.calcuration(bin, &vars.name);
+            self.write("\n");
+          }
+          _ => {
+            let err = error::Error::new(node);
+            err.exit("type error");
+          }
+        }
       }
 
       asts::Types::Call(fun) => {
