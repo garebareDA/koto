@@ -12,7 +12,7 @@ int cal = number+1-1/2*5;;
 cal++;
 printf("%d\n", cal);
 int result = index;
-result = cal;int result = result=cal;;
+result = cal;
 printf("%d\n", result);
 for(int i = 0;i>5;i++)
 {

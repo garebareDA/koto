@@ -116,7 +116,6 @@ impl Compile {
 
     match &var.node[0] {
       asts::Types::Variable(var) => {
-        println!("{:?}", var);
         if var.node.is_empty() {
           let serch_types = self.variable.sertch_type(&var.name).0;
           match serch_types {
@@ -172,6 +171,7 @@ impl Compile {
       asts::Types::Binary(bin) => {
         if bin.op == '=' {
           self.resubstitution(var_name, &bin, var);
+          return;
         }
 
         let types_cal = self.calcuration(&bin, var_name);
