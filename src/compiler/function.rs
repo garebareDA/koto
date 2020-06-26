@@ -104,7 +104,7 @@ impl Compile {
               let mut types = Types::new(&funs.name, &f);
               let addr = self.function.push(&types);
               self.functions(&f, &funs, &mut types, &funs.name);
-              self.function.appo_push(addr, &types);
+              self.function.appo_push(addr + 1, &types);
             } else {
               let funs_name = &format!("import_{}_{}", is_import, funs.name);
               let mut types = Types::new(funs_name, &f);
