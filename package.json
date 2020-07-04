@@ -1,0 +1,28 @@
+{
+  "name": "koto",
+  "version": "1.0.0",
+  "description": "自作言語の名前はkoto(こと)と言います。 現在基礎的なものが完成してます。 詳しくはexample.kotoへ。   実行は ```cargo run run {file path}```",
+  "main": "koto.js",
+  "directories": {
+    "example": "example",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/garebareDA/koto.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/garebareDA/koto/issues"
+  },
+  "homepage": "https://github.com/garebareDA/koto#readme",
+  "dependencies": {
+    "html-webpack-plugin": "^4.3.0",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12"
+  }
+}
