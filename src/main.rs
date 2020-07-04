@@ -51,9 +51,11 @@ extern "C" {
 
 #[wasm_bindgen]
 pub fn run() {
+    log("start");
     let mut lexer = lexers::Lexer::new("let a = 1");
     let tokens = lexer.start();
     let mut pars = parsing::Parsing::new(&tokens);
+    log("pars");
     let result = pars.parsing();
     interpreter::interpreters::run(result);
     log("finish");
