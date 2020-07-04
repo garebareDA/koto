@@ -48,8 +48,8 @@ function getStringFromWasm0(ptr, len) {
 }
 /**
 */
-export function run() {
-    wasm.run();
+export function runs() {
+    wasm.runs();
 }
 
 function isLikeNone(x) {

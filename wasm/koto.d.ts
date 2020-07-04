@@ -2,4 +2,4 @@
 /* eslint-disable */
 /**
 */
-export function run(): void;
+export function runs(): void;

@@ -1,4 +1,6 @@
 const js = import("../wasm/koto");
-js.then(js => {
-  js.run();
-});
+document.getElementById("run").onclick = function () {
+  js.then(js => {
+    js.runs();
+  });
+}

@@ -204,7 +204,7 @@
 /******/ 				promises.push(installedWasmModuleData);
 /******/ 			else {
 /******/ 				var importObject = wasmImportObjects[wasmModuleId]();
-/******/ 				var req = fetch(__webpack_require__.p + "" + {"../wasm/koto_bg.wasm":"74cdc53ab30c1d20e596"}[wasmModuleId] + ".module.wasm");
+/******/ 				var req = fetch(__webpack_require__.p + "" + {"../wasm/koto_bg.wasm":"259e01abcce47c3d87aa"}[wasmModuleId] + ".module.wasm");
 /******/ 				var promise;
 /******/ 				if(importObject instanceof Promise && typeof WebAssembly.compileStreaming === 'function') {
 /******/ 					promise = Promise.all([WebAssembly.compileStreaming(req), importObject]).then(function(items) {
@@ -305,7 +305,7 @@
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("const js = __webpack_require__.e(/*! import() */ 0).then(__webpack_require__.bind(null, /*! ../wasm/koto */ \"../wasm/koto.js\"));\njs.then(js => {\n  js.run();\n});\n\n//# sourceURL=webpack:///./index.js?");
+eval("const js = __webpack_require__.e(/*! import() */ 0).then(__webpack_require__.bind(null, /*! ../wasm/koto */ \"../wasm/koto.js\"));\ndocument.getElementById(\"run\").onclick = function () {\n  js.then(js => {\n    js.runs();\n  });\n}\n\n\n//# sourceURL=webpack:///./index.js?");
 
 /***/ })
 
