@@ -1,14 +1,8 @@
-extern crate web_sys;
-extern crate wasm_bindgen;
-
 use koto::compiler;
 use koto::interpreter;
-use koto::lexer::lexers;
-use koto::ast::parsing;
-
 use std::env;
 use std::process::Command;
-use wasm_bindgen::prelude::*;
+
 
 //関数の書き込みをなんとかする
 
