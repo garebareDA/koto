@@ -3,12 +3,8 @@ use koto::interpreter;
 use std::env;
 use std::process::Command;
 
-
-//関数の書き込みをなんとかする
-
 fn main() {
     let args: Vec<String> = env::args().collect();
-
     if args.len() == 3 && &args[1] == "run" {
         let path = &args[2];
         let result = interpreter::interpreters::read_file(path);
