@@ -42,22 +42,3 @@ fn main() {
         println!("./koto run [file name]");
     }
 }
-
-#[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(js_namespace=console)]
-    fn log(s: &str);
-}
-
-#[wasm_bindgen]
-pub fn runs() {
-    let document = web_sys::window().unwrap().document().unwrap();
-    document.get_element_by_id("result").unwrap().set_node_value(Some(" "));
-    let val = document.get_element_by_id("code").unwrap().node_value().unwrap();
-    log(&val);
-    let mut lexer = lexers::Lexer::new(&val);
-    let tokens = lexer.start();
-    let mut pars = parsing::Parsing::new(&tokens);
-    let result = pars.parsing();
-    interpreter::interpreters::run(result);
-}

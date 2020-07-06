@@ -8,14 +8,3 @@ edition = "2018"
 
 [dependencies]
 regex = "1.0"
-wasm-bindgen = "0.2.64"
-
-[dependencies.web-sys]
-version = "0.3.41"
-features = [
-  'Document',
-  'Element',
-  'HtmlElement',
-  'Node',
-  'Window',
-]
