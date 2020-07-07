@@ -4,9 +4,9 @@
   "version": "0.1.0",
   "scripts": {
     "build": "webpack",
-    "start": "webpack-dev-server --open -d",
+    "dev": "webpack-dev-server --open -d",
     "test": "cargo test && wasm-pack test --headless",
-    "run": "webpack && node ./js/server.js"
+    "start": "webpack && node ./js/server.js"
   },
   "devDependencies": {
     "@wasm-tool/wasm-pack-plugin": "^1.1.0",
