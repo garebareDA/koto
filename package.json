@@ -6,7 +6,8 @@
     "build": "webpack",
     "dev": "webpack-dev-server --open -d",
     "test": "cargo test && wasm-pack test --headless",
-    "start": "webpack && node ./js/server.js"
+    "devstart": "webpack && node ./js/server.js",
+    "start": "node ./js/server.js"
   },
   "devDependencies": {
     "@wasm-tool/wasm-pack-plugin": "^1.1.0",
