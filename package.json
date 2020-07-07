@@ -3,11 +3,10 @@
   "name": "rust-webpack-template",
   "version": "0.1.0",
   "scripts": {
-    "build": "webpack",
-    "dev": "webpack-dev-server --open -d",
-    "test": "cargo test && wasm-pack test --headless",
-    "devstart": "webpack && node ./js/server.js",
-    "start": "node ./js/server.js"
+    "devbuild": "webpack",
+    "devstart": "webpack-dev-server --open -d",
+    "start": "node ./js/server.js",
+    "test": "cargo test && wasm-pack test --headless"
   },
   "devDependencies": {
     "@wasm-tool/wasm-pack-plugin": "^1.1.0",
@@ -16,8 +15,5 @@
     "webpack-cli": "^3.3.3",
     "webpack-dev-server": "^3.7.1",
     "rimraf": "^3.0.0"
-  },
-  "dependencies": {
-    "express": "^4.17.1"
   }
 }
