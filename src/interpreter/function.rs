@@ -4,6 +4,8 @@ use super::interpreters;
 use super::variable;
 use std;
 
+use wasm_bindgen::prelude::*;
+
 #[derive(Debug)]
 pub struct Function {
     funcstions: Vec<Vec<asts::Types>>,
@@ -216,17 +218,25 @@ impl Function {
         match var_result {
             asts::Types::Strings(value) => {
                 println!("{}", value.name);
+                output_result(&value.name);
             }
             asts::Types::Number(number) => {
                 println!("{}", number.val);
+                output_result(&number.val.to_string());
             }
             asts::Types::Boolean(bools) => {
                 println!("{}", bools.boolean);
+                output_result(&bools.boolean.to_string());
             }
             _ => {
                 let err = error::Error::new(&var_result);
                 err.exit("print error");
             }
+        }
+
+        #[wasm_bindgen(module = "/js/import.js")]
+        extern "C" {
+            pub fn output_result(input: &str);
         }
     }
 

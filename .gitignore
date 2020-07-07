@@ -3,3 +3,7 @@
 /test
 node_modules
 .vscode
+/dist
+/target
+/pkg
+/wasm-pack.log

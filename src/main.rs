@@ -1,7 +1,10 @@
-use koto::compiler;
-use koto::interpreter;
 use std::env;
 use std::process::Command;
+
+pub mod lexer;
+pub mod ast;
+pub mod interpreter;
+pub mod compiler;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
