@@ -5,6 +5,6 @@ var app = express();
 app.use('/', express.static('../dist'));
 
 
-app.listen(8000, function () {
+app.listen(process.env.PORT, function () {
   console.log('Example app listening on port 8000!')
 })
