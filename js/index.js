@@ -1,6 +1,8 @@
+const wasm = import("../pkg/index.js");
+
 document.getElementById("run").onclick = function () {
   document.getElementById("result").textContent = "";
-  import("../pkg/index.js").then(mod => {
+  wasm.then(mod => {
     try {
       let code = document.getElementById("code").value;
       mod.run(code);

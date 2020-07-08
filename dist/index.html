@@ -1,20 +1,27 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>koto</title>
-  </head>
-  <body>
-    <textarea id="code" rows="40" style="width: 99%; margin-top: 2%;">
+
+<head>
+  <meta property="og:url" content="https://koto-e2f64.firebaseapp.com/" />
+  <meta property="og:title" content="koto-e2f64" />
+  <meta property="og:image" content="https://koto-e2f64.firebaseapp.com/img/thum.png" />
+  <meta property="og:description" content="自作言語koto(こと)のインタプリタです"/>
+  <meta charset="UTF-8">
+  <title>koto</title>
+</head>
+
+<body>
+  <textarea id="code" rows="40" style="width: 99%; margin-top: 2%;">
 let hello = "hello koto!";
 print(hello);</textarea>
-    <div style="text-align: center;">
-      <button id="run" style="width: 80px; height: 50px; margin-bottom: 6px;">実行</button>
-    </div>
-    <textarea readonly id="result" style="width: 99%; height: 250px;"></textarea>
-    <script src="index.js"></script>
-    <div>
+  <div style="text-align: center;">
+    <button id="run" style="width: 80px; height: 50px; margin-bottom: 6px;">実行</button>
+  </div>
+  <textarea readonly id="result" style="width: 99%; height: 250px;"></textarea>
+  <script src="index.js"></script>
+  <div>
     <a href="https://github.com/garebareDA/koto">リポジトリに構文の例があります</a>
-    </div>
-  </body>
+  </div>
+</body>
+
 </html>

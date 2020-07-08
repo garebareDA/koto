@@ -4,8 +4,6 @@ pub mod interpreter;
 pub mod lexer;
 
 use wasm_bindgen::prelude::*;
-use wasm_bindgen::JsValue;
-use web_sys::*;
 
 #[wasm_bindgen(module = "/js/import.js")]
 extern "C" {
