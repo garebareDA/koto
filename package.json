@@ -1,6 +1,6 @@
 {
-  "author": "You <you@example.com>",
-  "name": "rust-webpack-template",
+  "author": "garedaiki@outlook.jp",
+  "name": "garebare",
   "version": "0.1.0",
   "scripts": {
     "devbuild": "webpack",
