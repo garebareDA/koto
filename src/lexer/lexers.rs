@@ -27,10 +27,8 @@ impl Lexer {
             }
             let (result, continue_index) = Lexer::get(&content, self.index);
             self.index = continue_index;
-            println!("{:?}", result);
             tokens.push(result);
         }
-
         return tokens;
     }
 

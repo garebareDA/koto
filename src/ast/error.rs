@@ -12,7 +12,6 @@ impl Error {
     }
 
     pub fn exit(self, message: &str) {
-        println!("{} {}",  self.tokens.val,message);
         output_result(&format!("{} {}", self.tokens.val,message));
         exit(0);
 

@@ -8,3 +8,7 @@ export function output_result(val) {
     document.getElementById("result").textContent = afterVal;
   }
 }
+
+export function log(val){
+  console.log(val);
+}

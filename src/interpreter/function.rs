@@ -214,18 +214,15 @@ impl Function {
         return result;
     }
 
-    fn print_var(&self, var_result: &asts::Types) {
+    fn print_var(&self, var_result: &asts::Types,) {
         match var_result {
             asts::Types::Strings(value) => {
-                println!("{}", value.name);
                 output_result(&value.name);
             }
             asts::Types::Number(number) => {
-                println!("{}", number.val);
                 output_result(&number.val.to_string());
             }
             asts::Types::Boolean(bools) => {
-                println!("{}", bools.boolean);
                 output_result(&bools.boolean.to_string());
             }
             _ => {
@@ -236,7 +233,7 @@ impl Function {
 
         #[wasm_bindgen(module = "/js/import.js")]
         extern "C" {
-            pub fn output_result(input: &str);
+            pub fn output_result(val: &str);
         }
     }
 

@@ -1,5 +1,4 @@
 const wasm = import("../pkg/index.js");
-
 document.getElementById("run").onclick = function () {
   document.getElementById("result").textContent = "";
   wasm.then(mod => {

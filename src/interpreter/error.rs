@@ -18,6 +18,11 @@ impl Error {
     }
 
     fn error_message(self, error_message: &str) {
+        #[wasm_bindgen(module = "/js/import.js")]
+        extern "C" {
+            pub fn output_result(val: &str);
+        }
+
         match self.error.clone() {
             asts::Types::Binary(bin) => {
                 output_result(&format!("{} {}", bin.op, error_message));
@@ -52,11 +57,6 @@ impl Error {
             }
 
             _ => {}
-        }
-
-        #[wasm_bindgen(module = "/js/import.js")]
-        extern "C" {
-            pub fn output_result(input: &str);
         }
     }
 }
